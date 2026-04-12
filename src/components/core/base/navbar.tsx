@@ -30,8 +30,7 @@ import React from "react";
 export default function Navbar() {
   return (
     <>
-      {" "}
-      <div className="h-26 border-b fixed top-0 left-0 w-full bg-background z-50">
+      <div className="h-26 border-b fixed top-0 left-0 w-full bg-background z-50 ">
         <div className="h-16! w-full border-b flex flex-row items-center justify-between px-6">
           <div className="flex items-center gap-6">
             <Image
