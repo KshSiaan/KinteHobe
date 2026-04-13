@@ -22,6 +22,7 @@
     "hooks": "@/hooks"
   },
   "registries": {
-    "@cardcn": "https://cardcn.dev/r/{name}.json"
+    "@cardcn": "https://cardcn.dev/r/{name}.json",
+    "@ui-layouts": "https://ui-layouts.com/r/{name}.json"
   }
 }

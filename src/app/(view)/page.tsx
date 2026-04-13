@@ -2,9 +2,12 @@ import { Icons } from "@/components/card-8";
 import {
   Card,
   CardContent,
+  CardDescription,
   CardFooter,
   CardHeader,
+  CardTitle,
 } from "@/components/ui/card";
+import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 
@@ -95,6 +98,62 @@ export default function Home() {
                 </Card>
               </Link>
             ))}
+          </div>
+        </section>
+        <div className="h-[40dvh] border-y "></div>
+        <section className="bg-muted py-20">
+          <div className="container mx-auto grid grid-cols-1 md:grid-cols-2 gap-12">
+            <Card className="flex flex-col overflow-hidden shadow-sm border-0">
+              <div className="flex-1 flex flex-col">
+                <CardHeader className="pb-4">
+                  <CardTitle className="text-2xl">
+                    Heavy Lifting Support
+                  </CardTitle>
+                  <CardDescription className="text-base mt-2">
+                    Get assistance with your toughest projects and achieve more
+                    with reliable support.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="flex-1 text-muted-foreground text-sm leading-relaxed">
+                  Our comprehensive solutions help you tackle complex
+                  challenges. With expert guidance and professional tools,
+                  you'll streamline operations and drive results.
+                </CardContent>
+              </div>
+              <div className="relative w-full h-48 bg-muted/50">
+                <Image
+                  src="/illust/heavylifting.svg"
+                  fill
+                  className="object-contain p-4"
+                  alt="Heavy lifting support"
+                />
+              </div>
+            </Card>
+
+            <Card className="flex flex-col overflow-hidden shadow-sm border-0">
+              <div className="flex-1 flex flex-col">
+                <CardHeader className="pb-4">
+                  <CardTitle className="text-2xl">Delivery Network</CardTitle>
+                  <CardDescription className="text-base mt-2">
+                    Fast and reliable delivery to get your orders where they
+                    need to be.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="flex-1 text-muted-foreground text-sm leading-relaxed">
+                  Experience seamless logistics with our modern delivery
+                  infrastructure. Reach customers faster and build trust through
+                  consistent, on-time service.
+                </CardContent>
+              </div>
+              <div className="relative w-full h-48 bg-muted/50">
+                <Image
+                  src="/illust/drone_dilevery.svg"
+                  fill
+                  className="object-contain p-4"
+                  alt="Drone delivery service"
+                />
+              </div>
+            </Card>
           </div>
         </section>
       </main>
