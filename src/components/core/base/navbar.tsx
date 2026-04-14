@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Alert,
   AlertAction,
@@ -38,6 +40,7 @@ import {
   CircleQuestionMarkIcon,
   DoorOpenIcon,
   GlobeIcon,
+  LogOut,
   MapPinHouse,
   ScrollTextIcon,
   SearchIcon,
@@ -47,9 +50,32 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import React from "react";
+import { useEffect, useState } from "react";
+import { authClient } from "@/lib/auth-client";
+import { sileo } from "sileo";
+import { useRouter } from "next/navigation";
+import { Spinner } from "@/components/kibo-ui/spinner";
 
 export default function Navbar() {
+  const { isPending, data } = authClient.useSession();
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    try {
+      await authClient.signOut();
+      sileo.success({
+        title: "Logged out",
+        description: "You have been successfully logged out.",
+      });
+      router.push("/");
+    } catch (error) {
+      sileo.error({
+        title: "Logout failed",
+        description: "An error occurred while logging out.",
+      });
+    }
+  };
+
   return (
     <>
       <div className="h-26 border-b fixed top-0 left-0 w-full bg-background z-50 ">
@@ -100,19 +126,62 @@ export default function Navbar() {
             <Button variant={"ghost"} size={"icon"}>
               <ShoppingCartIcon />
             </Button>
-            {/* <Avatar>
-              <AvatarImage
-                src={
-                  "https://api.dicebear.com/9.x/lorelei-neutral/svg?seed=Felix"
-                }
-              />
-              <AvatarFallback>UI</AvatarFallback>
-            </Avatar> */}
-            <Button asChild>
-              <Link href={"/auth/login"}>
-                Sign in <DoorOpenIcon />
-              </Link>
-            </Button>
+            {isPending ? (
+              <div className="flex items-center gap-2">
+                <Spinner variant="infinite" />
+              </div>
+            ) : data?.user ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant={"ghost"} className="gap-2" size={"lg"}>
+                    <Avatar className="size-8">
+                      <AvatarImage
+                        src={
+                          data.user.image ??
+                          "https://api.dicebear.com/9.x/lorelei-neutral/svg?seed=Felix"
+                        }
+                        alt={data.user.name}
+                      />
+                      <AvatarFallback>
+                        {data.user.name.slice(0, 2).toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                    <span className="text-sm">{data.user.name}</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem disabled>
+                    <span className="text-xs text-muted-foreground">
+                      {data.user.email}
+                    </span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/me">Profile</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/settings">Settings</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={handleLogout}
+                    className="text-destructive"
+                  >
+                    <LogOut className="mr-2 size-4" />
+                    Logout
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <div className="flex gap-2">
+                <Button variant={"outline"} asChild>
+                  <Link href={"/auth/register"}>Sign up</Link>
+                </Button>
+                <Button asChild>
+                  <Link href={"/auth/login"}>
+                    Sign in <DoorOpenIcon />
+                  </Link>
+                </Button>
+              </div>
+            )}
           </div>
         </div>
         <div className="h-10 w-full flex items-center justify-between px-6">

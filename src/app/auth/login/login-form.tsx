@@ -11,9 +11,13 @@ import {
   FieldSeparator,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { Spinner } from "@/components/ui/spinner";
 import { loginSchema, type LoginInput } from "@/lib/validations/auth";
 import { z } from "zod";
 import Link from "next/link";
+import { authClient } from "@/lib/auth-client";
+import { sileo } from "sileo";
+import { useRouter } from "next/navigation";
 
 export function LoginForm({
   className,
@@ -25,6 +29,7 @@ export function LoginForm({
     email: "",
     password: "",
   });
+  const router = useRouter();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
@@ -57,13 +62,35 @@ export function LoginForm({
     }
 
     try {
-      // TODO: Call your login API here
-      console.log("Form is valid:", result.data);
-      // Example: await fetch('/api/auth/login', { method: 'POST', body: JSON.stringify(result.data) })
+      authClient.signIn.email(
+        {
+          email: result.data.email,
+          password: result.data.password,
+        },
+        {
+          onError: (error) => {
+            setIsLoading(false);
+            sileo.error({
+              title: "Login failed",
+              description: error?.error?.message || "Invalid email or password",
+            });
+          },
+          onSuccess: () => {
+            setIsLoading(false);
+            sileo.success({
+              title: "Login successful",
+              description: "Welcome back! Redirecting to dashboard...",
+            });
+            router.push("/");
+          },
+        },
+      );
     } catch (error) {
       console.error("Login error:", error);
-    } finally {
       setIsLoading(false);
+      setErrors({
+        form: error instanceof Error ? error.message : "Login failed",
+      });
     }
   };
   return (
@@ -79,6 +106,13 @@ export function LoginForm({
             Enter your email below to login to your account
           </p>
         </div>
+        {errors.form && (
+          <div className="rounded-lg border border-destructive bg-destructive/10 p-3">
+            <FieldDescription className="text-destructive">
+              {errors.form}
+            </FieldDescription>
+          </div>
+        )}
         <Field data-invalid={!!errors.email}>
           <FieldLabel htmlFor="email">Email</FieldLabel>
           <Input
@@ -121,7 +155,8 @@ export function LoginForm({
           )}
         </Field>
         <Field>
-          <Button type="submit" disabled={isLoading}>
+          <Button type="submit" disabled={isLoading} className="gap-2">
+            {isLoading && <Spinner className="size-4" />}
             {isLoading ? "Logging in..." : "Login"}
           </Button>
         </Field>

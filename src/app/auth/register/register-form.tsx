@@ -13,9 +13,14 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { InputGroup, InputGroupAddon } from "@/components/ui/input-group";
+import { Switch } from "@/components/ui/switch";
+import { Spinner } from "@/components/ui/spinner";
 import { registerSchema, type RegisterInput } from "@/lib/validations/auth";
 import { z } from "zod";
 import Link from "next/link";
+import { authClient } from "@/lib/auth-client";
+import { sileo } from "sileo";
+import { useRouter } from "next/navigation";
 
 export function RegisterForm({
   className,
@@ -23,6 +28,7 @@ export function RegisterForm({
 }: React.ComponentProps<"form">) {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState<RegisterInput>({
@@ -31,6 +37,7 @@ export function RegisterForm({
     password: "",
     confirmPassword: "",
   });
+  const navig = useRouter();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
@@ -63,13 +70,37 @@ export function RegisterForm({
     }
 
     try {
-      // TODO: Call your registration API here
-      console.log("Form is valid:", result.data);
-      // Example: await fetch('/api/auth/register', { method: 'POST', body: JSON.stringify(result.data) })
+      const { confirmPassword, ...signUpData } = result.data;
+      authClient.signUp.email(signUpData, {
+        onError: (error) => {
+          setIsLoading(false);
+          sileo.error({
+            title: "Registration failed",
+            description:
+              error?.error?.message || "An error occurred during registration",
+          });
+        },
+        onSuccess: () => {
+          setIsLoading(false);
+          if (rememberMe) {
+            localStorage.setItem("rememberEmail", signUpData.email);
+          }
+
+          sileo.success({
+            title: "Registration successful",
+            description:
+              "Your account has been created successfully. Please check your email to verify your account.",
+          });
+
+          navig.push("/auth/login");
+        },
+      });
     } catch (error) {
       console.error("Registration error:", error);
-    } finally {
       setIsLoading(false);
+      setErrors({
+        form: error instanceof Error ? error.message : "Registration failed",
+      });
     }
   };
 
@@ -186,8 +217,25 @@ export function RegisterForm({
             </FieldDescription>
           )}
         </Field>
+
+        <div className="flex items-center justify-end gap-4 rounded-lg px-3 py-2">
+          <Switch
+            id="rememberMe"
+            checked={rememberMe}
+            onCheckedChange={(checked) => setRememberMe(checked)}
+            disabled={isLoading}
+          />
+          <FieldLabel
+            htmlFor="rememberMe"
+            className="font-normal cursor-pointer"
+          >
+            Remember me
+          </FieldLabel>
+        </div>
+
         <Field>
-          <Button type="submit" disabled={isLoading}>
+          <Button type="submit" disabled={isLoading} className="gap-2">
+            {isLoading && <Spinner className="size-4" />}
             {isLoading ? "Creating account..." : "Register"}
           </Button>
         </Field>

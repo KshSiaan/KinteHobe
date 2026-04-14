@@ -23,6 +23,7 @@
   },
   "registries": {
     "@cardcn": "https://cardcn.dev/r/{name}.json",
-    "@ui-layouts": "https://ui-layouts.com/r/{name}.json"
+    "@ui-layouts": "https://ui-layouts.com/r/{name}.json",
+    "@kibo-ui": "https://www.kibo-ui.com/r/{name}.json"
   }
 }
