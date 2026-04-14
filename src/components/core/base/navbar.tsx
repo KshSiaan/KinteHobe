@@ -25,7 +25,13 @@ import {
   PopoverTitle,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Sheet, SheetTrigger } from "@/components/ui/sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import {
   BellIcon,
   CheckCheckIcon,
@@ -84,6 +90,12 @@ export default function Navbar() {
               <SheetTrigger asChild>
                 <Button variant={"ghost"}>Filter by</Button>
               </SheetTrigger>
+              <SheetContent side="bottom">
+                <SheetHeader>
+                  <SheetTitle>Filter by</SheetTitle>
+                </SheetHeader>
+                <div className="h-[40dvh]"></div>
+              </SheetContent>
             </Sheet>
             <Button variant={"ghost"} size={"icon"}>
               <ShoppingCartIcon />
@@ -96,8 +108,10 @@ export default function Navbar() {
               />
               <AvatarFallback>UI</AvatarFallback>
             </Avatar> */}
-            <Button>
-              Sign in <DoorOpenIcon />
+            <Button asChild>
+              <Link href={"/auth/login"}>
+                Sign in <DoorOpenIcon />
+              </Link>
             </Button>
           </div>
         </div>
