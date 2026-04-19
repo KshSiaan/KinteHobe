@@ -50,7 +50,6 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
 import { authClient } from "@/lib/auth-client";
 import { sileo } from "sileo";
 import { useRouter } from "next/navigation";

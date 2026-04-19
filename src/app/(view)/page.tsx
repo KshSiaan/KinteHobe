@@ -21,7 +21,7 @@ export default function Home() {
       <main>
         <section className="container mx-auto grid grid-cols-6 gap-12 my-24">
           {Array.from({ length: 6 }).map((_, i) => (
-            <Link href={"#"} key={i}>
+            <Link href={"/"} key={i}>
               <Card className="p-0! aspect-square hover:scale-105 transition-transform relative rounded-none shadow-none border-dashed overflow-visible">
                 <Icons />
                 <CardContent className="size-full"></CardContent>
