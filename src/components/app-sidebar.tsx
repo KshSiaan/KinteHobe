@@ -26,6 +26,8 @@ import {
   PieChartIcon,
   MapIcon,
   TerminalIcon,
+  FileCogIcon,
+  ComputerIcon,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -92,28 +94,24 @@ const data = {
           title: "Insights",
           url: "/insights",
         },
+        {
+          title: "Transactions",
+          url: "/transactions",
+        },
       ],
     },
     {
-      title: "Settings",
+      title: "Others",
       url: "#",
-      icon: <Settings2Icon />,
+      icon: <BookOpenIcon />,
       items: [
         {
-          title: "General",
-          url: "#",
+          title: "Promotions",
+          url: "/promotions",
         },
         {
-          title: "",
-          url: "#",
-        },
-        {
-          title: "Billing",
-          url: "#",
-        },
-        {
-          title: "Limits",
-          url: "#",
+          title: "Banners",
+          url: "/banners",
         },
       ],
     },
@@ -129,22 +127,27 @@ const data = {
       url: "#",
       icon: <SendIcon />,
     },
+    {
+      title: "Pages",
+      url: "/pages",
+      icon: <FileCogIcon />,
+    },
+    {
+      title: "Developer",
+      url: "/dev",
+      icon: <ComputerIcon />,
+    },
   ],
   projects: [
     {
-      name: "Design Engineering",
-      url: "#",
-      icon: <FrameIcon />,
-    },
-    {
       name: "Sales & Marketing",
-      url: "#",
+      url: "/sales-marketing",
       icon: <PieChartIcon />,
     },
     {
-      name: "Travel",
-      url: "#",
-      icon: <MapIcon />,
+      name: "Manager Feedbacks",
+      url: "/manager-feedbacks",
+      icon: <LifeBuoyIcon />,
     },
   ],
 };
