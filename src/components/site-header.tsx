@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { useSidebar } from "@/components/ui/sidebar";
 import { PanelLeftIcon, PencilRulerIcon } from "lucide-react";
+import { usePathname } from "next/navigation";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -20,8 +21,32 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 
+// Format segment to readable text (e.g., "dashboard" -> "Dashboard")
+const formatSegment = (segment: string) => {
+  return segment
+    .split("-")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+};
+
 export function SiteHeader() {
   const { toggleSidebar } = useSidebar();
+  const pathname = usePathname();
+
+  // Generate breadcrumb items from pathname
+  const segments = pathname
+    .split("/")
+    .filter((segment) => segment && segment !== "(view)" && segment !== "(me)");
+
+  // Build breadcrumb path array
+  const breadcrumbs = segments.map((segment, index) => {
+    const path = "/" + segments.slice(0, index + 1).join("/");
+    return {
+      label: formatSegment(segment),
+      path,
+      isLast: index === segments.length - 1,
+    };
+  });
 
   return (
     <header className="sticky top-0 z-50 flex w-full items-center border-b bg-background">
@@ -40,13 +65,20 @@ export function SiteHeader() {
         />
         <Breadcrumb className="hidden sm:block">
           <BreadcrumbList>
-            <BreadcrumbItem>
-              <BreadcrumbLink href="#">Build Your Application</BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbPage>Data Fetching</BreadcrumbPage>
-            </BreadcrumbItem>
+            {breadcrumbs.map((crumb, index) => (
+              <div key={crumb.path} className="flex items-center gap-2">
+                <BreadcrumbItem>
+                  {crumb.isLast ? (
+                    <BreadcrumbPage>{crumb.label}</BreadcrumbPage>
+                  ) : (
+                    <BreadcrumbLink href={crumb.path}>
+                      {crumb.label}
+                    </BreadcrumbLink>
+                  )}
+                </BreadcrumbItem>
+                {!crumb.isLast && <BreadcrumbSeparator />}
+              </div>
+            ))}
           </BreadcrumbList>
         </Breadcrumb>
         <div className="flex items-center space-x-2 ml-auto">
