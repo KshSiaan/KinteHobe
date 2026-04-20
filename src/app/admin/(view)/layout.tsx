@@ -11,9 +11,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     <div className="[--header-height:calc(--spacing(14))]">
       <SidebarProvider className="flex flex-col">
         <SiteHeader />
-        <div className="flex flex-1">
+        <div className="flex flex-1 ">
           <AppSidebar />
-          <SidebarInset>{children}</SidebarInset>
+          <SidebarInset className="bg-secondary">{children}</SidebarInset>
         </div>
       </SidebarProvider>
     </div>

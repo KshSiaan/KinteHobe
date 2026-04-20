@@ -37,64 +37,60 @@ const data = {
   },
   navMain: [
     {
-      title: "",
+      title: "Platform Overview",
       url: "#",
       icon: <TerminalSquareIcon />,
       isActive: true,
       items: [
         {
           title: "Dashboard",
-          url: "#",
+          url: "/",
         },
         {
           title: "Users",
-          url: "#",
+          url: "/users",
         },
-        {
-          title: "Revenue Analytics",
-          url: "#",
-        },
+        // {
+        //   title: "Revenue Analytics",
+        //   url: "/revenue-analytics",
+        // },
       ],
     },
     {
-      title: "Models",
+      title: "Product & Managers",
       url: "#",
       icon: <BotIcon />,
       items: [
         {
-          title: "Genesis",
-          url: "#",
+          title: "Managers",
+          url: "/managers",
         },
         {
-          title: "Explorer",
-          url: "#",
+          title: "Product Listing",
+          url: "/products",
         },
         {
-          title: "Quantum",
-          url: "#",
+          title: "Product Categories",
+          url: "/product-categories",
+        },
+        {
+          title: "Coupons & Discounts",
+          url: "/coupons",
         },
       ],
     },
     {
-      title: "Documentation",
+      title: "Orders & Insights",
       url: "#",
       icon: <BookOpenIcon />,
       items: [
         {
-          title: "Introduction",
-          url: "#",
+          title: "Orders",
+          url: "/orders",
         },
         {
-          title: "Get Started",
-          url: "#",
-        },
-        {
-          title: "Tutorials",
-          url: "#",
-        },
-        {
-          title: "Changelog",
-          url: "#",
+          title: "Insights",
+          url: "/insights",
         },
       ],
     },
@@ -108,7 +104,7 @@ const data = {
           url: "#",
         },
         {
-          title: "Team",
+          title: "",
           url: "#",
         },
         {
