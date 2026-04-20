@@ -80,13 +80,15 @@ export default function Navbar() {
       <div className="h-26 border-b fixed top-0 left-0 w-full bg-background z-50 ">
         <div className="h-16! w-full border-b flex flex-row items-center justify-between px-6">
           <div className="flex items-center gap-6">
-            <Image
-              src={"/img/icon.svg"}
-              height={124}
-              width={124}
-              alt="icon"
-              className="size-10"
-            />
+            <Link href={"/"} className="hover:opacity-70">
+              <Image
+                src={"/img/icon.svg"}
+                height={124}
+                width={124}
+                alt="icon"
+                className="size-10"
+              />
+            </Link>
             <InputGroup className="w-[30dvw] border border-muted-foreground/20 bg-background">
               <InputGroupAddon>
                 <InputGroupButton>
@@ -185,13 +187,13 @@ export default function Navbar() {
         </div>
         <div className="h-10 w-full flex items-center justify-between px-6">
           <div className="flex gap-2 items-center h-full ">
-            <Button variant={"link"} className="text-xs" asChild>
+            <Button variant={"link"} className="text-xs px-0! mr-4" asChild>
               <Link href="#">Best sellers</Link>
             </Button>
-            <Button variant={"link"} className="text-xs" asChild>
+            <Button variant={"link"} className="text-xs px-0! mr-4" asChild>
               <Link href="#">Trending</Link>
             </Button>
-            <Button variant={"link"} className="text-xs" asChild>
+            <Button variant={"link"} className="text-xs px-0! mr-4" asChild>
               <Link href="#">Most favourites</Link>
             </Button>
           </div>

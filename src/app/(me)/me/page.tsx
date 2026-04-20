@@ -10,7 +10,10 @@ import {
 } from "lucide-react";
 import { headers } from "next/headers";
 import Image from "next/image";
-import Activity from "./activity";
+import Activity from "./_me/activity";
+import Purchases from "./_me/purchases";
+import Saved from "./_me/saved";
+import Insights from "./_me/insights";
 
 export default async function Page() {
   const data = await auth?.api?.getSession({
@@ -28,11 +31,11 @@ export default async function Page() {
   return (
     <main className="min-h-screen bg-background pb-8">
       {/* Header background accent */}
-      <div className="h-32 md:h-48 bg-gradient-to-r from-primary/10 to-primary/5"></div>
+      <div className="h-32 md:h-64 bg-gradient-to-r from-primary/10 to-primary/5"></div>
 
       <div className="px-4 sm:px-6 lg:px-8">
         {/* Profile card - overlaps header */}
-        <div className="max-w-7xl mx-auto -mt-16 md:-mt-20 relative z-10">
+        <div className="mx-auto -mt-16 md:-mt-32 relative z-10">
           <section className="bg-card border border-border rounded-2xl p-6 md:p-8">
             {/* Avatar and info layout */}
             <div className="flex flex-col md:flex-row gap-6 md:gap-8">
@@ -128,6 +131,21 @@ export default async function Page() {
                   name: "Activity",
                   value: "activity",
                   content: <Activity />,
+                },
+                {
+                  name: "Purchases",
+                  value: "purchases",
+                  content: <Purchases />,
+                },
+                {
+                  name: "Saved",
+                  value: "saved",
+                  content: <Saved />,
+                },
+                {
+                  name: "Insights",
+                  value: "insights",
+                  content: <Insights />,
                 },
               ]}
             />

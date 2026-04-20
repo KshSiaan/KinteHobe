@@ -9,7 +9,6 @@ import {
 } from "@/components/ui/card";
 import Image from "next/image";
 import Link from "next/link";
-import React from "react";
 
 export default function Home() {
   return (
@@ -21,6 +20,7 @@ export default function Home() {
       <main>
         <section className="container mx-auto grid grid-cols-6 gap-12 my-24">
           {Array.from({ length: 6 }).map((_, i) => (
+            // biome-ignore lint/suspicious/noArrayIndexKey: test purpose only
             <Link href={"/"} key={i}>
               <Card className="p-0! aspect-square hover:scale-105 transition-transform relative rounded-none shadow-none border-dashed overflow-visible">
                 <Icons />
@@ -36,6 +36,7 @@ export default function Home() {
           </div>
           <div className="grid grid-cols-4 container mx-auto">
             {Array.from({ length: 28 }).map((_, i) => (
+              // biome-ignore lint/suspicious/noArrayIndexKey: test purpose only
               <Link href={"#"} key={i}>
                 <Card className="p-0! aspect-square flex flex-col transition-transform relative rounded-none shadow-none border-dashed overflow-visible">
                   <CardHeader className="w-full aspect-video  rounded-none"></CardHeader>
@@ -63,6 +64,7 @@ export default function Home() {
           <h2 className="text-base font-semibold">Top Categories</h2>
           <div className="grid grid-cols-4 gap-6 mt-6">
             {Array.from({ length: 8 }).map((_, i) => (
+              // biome-ignore lint/suspicious/noArrayIndexKey: test purpose only
               <Link href={"#"} key={i}>
                 <Card className="p-0! flex flex-col transition-transform relative rounded-none shadow-none border-dashed overflow-visible">
                   <CardContent className="text-center py-4">
@@ -77,6 +79,7 @@ export default function Home() {
           <h2 className="text-base font-semibold">Featured Products</h2>
           <div className="grid grid-cols-4 container mx-auto mt-12">
             {Array.from({ length: 28 }).map((_, i) => (
+              // biome-ignore lint/suspicious/noArrayIndexKey: test purpose only
               <Link href={"#"} key={i}>
                 <Card className="p-0! aspect-square flex flex-col transition-transform relative rounded-none shadow-none border-dashed overflow-visible">
                   <CardHeader className="w-full aspect-video  rounded-none"></CardHeader>

@@ -21,8 +21,13 @@ import React from "react";
 export default function Activity() {
   return (
     <div className="w-full grid grid-cols-7 gap-4">
-      <Card className="w-full col-span-4 h-full flex flex-col">
-        <CardHeader className="w-full flex-1 relative">
+      <Card className="w-full col-span-4 h-full flex flex-col pt-0 gap-0">
+        <CardHeader
+          className="w-full flex-1 relative pt-6 bg-cover bg-center "
+          style={{
+            backgroundImage: `url('/img/prod1.jpg')`,
+          }}
+        >
           <Badge className="">⭐ New arrivals</Badge>
         </CardHeader>
         <CardFooter className="border-t flex items-center justify-between">

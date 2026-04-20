@@ -3,6 +3,7 @@ import { Onest } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { Toaster } from "sileo";
+import { TooltipProvider } from "@/components/ui/tooltip";
 const inter = Onest({
   weight: ["300", "400", "700", "100", "200", "500", "600", "800", "900"],
   subsets: ["latin", "latin-ext", "cyrillic", "cyrillic-ext"],
@@ -21,7 +22,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={cn("h-full", "antialiased", inter.className)}>
       <body className="min-h-full flex flex-col">
-        {children}
+        <TooltipProvider>{children}</TooltipProvider>
         <Toaster
           position="top-left"
           options={{
