@@ -109,13 +109,6 @@ export default function Page() {
               <SelectItem value="high-stock">Last Updated</SelectItem>
             </SelectContent>
           </Select>
-          <Tabs>
-            <TabsList>
-              <TabsTrigger value="0">All</TabsTrigger>
-              <TabsTrigger value="1">Customers</TabsTrigger>
-              <TabsTrigger value="2">Product Managers</TabsTrigger>
-            </TabsList>
-          </Tabs>
         </CardContent>
       </Card>
 
