@@ -73,7 +73,7 @@ const data = {
         },
         {
           title: "Product Categories",
-          url: "/product-categories",
+          url: "/categories",
         },
         {
           title: "Coupons & Discounts",
