@@ -106,7 +106,7 @@ export default function Page() {
               <SelectItem value="low-stock">Low Stock</SelectItem>
               <SelectItem value="high-stock">High Stock</SelectItem>
               <SelectItem value="high-stock">Last Updated</SelectItem>
-              <SelectItem value="high-stock">Last Updated</SelectItem>
+              <SelectItem value="high-stock">Last Created</SelectItem>
             </SelectContent>
           </Select>
         </CardContent>
