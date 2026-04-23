@@ -20,6 +20,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
+import Link from "next/link";
 
 // Format segment to readable text (e.g., "dashboard" -> "Dashboard")
 const formatSegment = (segment: string) => {
@@ -89,9 +90,15 @@ export function SiteHeader() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
-              <DropdownMenuItem>Notepad</DropdownMenuItem>
-              <DropdownMenuItem>Kanban</DropdownMenuItem>
-              <DropdownMenuItem>Draw</DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href={"/admin/dashboard/tools/notepad"}>Notepad</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href={"/admin/dashboard/tools/kanban"}>Kanban</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href={"/admin/dashboard/tools/draw"}>Draw</Link>
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
           <SearchForm className="w-full sm:ml-auto sm:w-auto" />

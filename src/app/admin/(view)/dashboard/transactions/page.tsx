@@ -1,4 +1,10 @@
-import { Card, CardContent } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
   InputGroup,
   InputGroupAddon,
@@ -24,7 +30,6 @@ import {
   Clock,
   XCircle,
 } from "lucide-react";
-import React from "react";
 
 // Fake transaction data
 const transactions = [
@@ -111,11 +116,70 @@ const transactions = [
 ];
 
 export default function Page() {
+  const totalVolume = transactions.reduce((sum, txn) => sum + txn.amount, 0);
+  const completedCount = transactions.filter(
+    (txn) => txn.status === "completed",
+  ).length;
+  const pendingCount = transactions.filter(
+    (txn) => txn.status === "pending",
+  ).length;
+  const failedCount = transactions.filter(
+    (txn) => txn.status === "failed",
+  ).length;
+
   return (
     <div className="p-6 gap-6 flex flex-col flex-1 h-full w-full">
       <div className="flex flex-col gap-4">
         <h1 className="text-2xl font-bold">Transactions</h1>
       </div>
+
+      <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-4">
+        <Card>
+          <CardHeader className="gap-1">
+            <CardDescription>Total Volume</CardDescription>
+            <CardTitle>${totalVolume.toFixed(2)}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-muted-foreground">
+              All listed transactions
+            </p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="gap-1">
+            <CardDescription>Completed</CardDescription>
+            <CardTitle>{completedCount}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-muted-foreground">
+              Successfully processed
+            </p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="gap-1">
+            <CardDescription>Pending</CardDescription>
+            <CardTitle>{pendingCount}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-muted-foreground">
+              Awaiting confirmation
+            </p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="gap-1">
+            <CardDescription>Failed</CardDescription>
+            <CardTitle>{failedCount}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-muted-foreground">
+              Need manual attention
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+
       <Card>
         <CardContent className="flex justify-between items-center gap-6">
           <InputGroup>

@@ -57,6 +57,7 @@ import { Spinner } from "@/components/kibo-ui/spinner";
 
 export default function Navbar() {
   const { isPending, data } = authClient.useSession();
+
   const router = useRouter();
 
   const handleLogout = async () => {
@@ -156,6 +157,19 @@ export default function Navbar() {
                       {data.user.email}
                     </span>
                   </DropdownMenuItem>
+                  {
+                    <DropdownMenuItem asChild>
+                      <Link
+                        href={
+                          data?.user?.role === "admin"
+                            ? "/admin/dashboard"
+                            : "/me"
+                        }
+                      >
+                        Dashboard
+                      </Link>
+                    </DropdownMenuItem>
+                  }
                   <DropdownMenuItem asChild>
                     <Link href="/me">Profile</Link>
                   </DropdownMenuItem>

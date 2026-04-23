@@ -1,6 +1,6 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-
+import { admin } from "better-auth/plugins/admin";
 import { db } from "./db"; // your drizzle instance
 
 export const auth = betterAuth({
@@ -13,4 +13,7 @@ export const auth = betterAuth({
     emailAndPassword: {
         enabled: true,
     },
+    plugins:[admin({
+        defaultRole:"user"
+    })]
 });

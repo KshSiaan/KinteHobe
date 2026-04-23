@@ -18,16 +18,14 @@ import {
 import {
   TerminalSquareIcon,
   BotIcon,
-  BookOpenIcon,
-  Settings2Icon,
   LifeBuoyIcon,
   SendIcon,
-  FrameIcon,
   PieChartIcon,
-  MapIcon,
   TerminalIcon,
   FileCogIcon,
   ComputerIcon,
+  ShoppingCartIcon,
+  Ellipsis,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -52,10 +50,6 @@ const data = {
           title: "Users",
           url: "/users",
         },
-        // {
-        //   title: "Revenue Analytics",
-        //   url: "/revenue-analytics",
-        // },
       ],
     },
     {
@@ -84,7 +78,7 @@ const data = {
     {
       title: "Orders & Insights",
       url: "#",
-      icon: <BookOpenIcon />,
+      icon: <ShoppingCartIcon />,
       items: [
         {
           title: "Orders",
@@ -103,7 +97,7 @@ const data = {
     {
       title: "Others",
       url: "#",
-      icon: <BookOpenIcon />,
+      icon: <Ellipsis />,
       items: [
         {
           title: "Promotions",
