@@ -24,6 +24,9 @@
   "registries": {
     "@cardcn": "https://cardcn.dev/r/{name}.json",
     "@ui-layouts": "https://ui-layouts.com/r/{name}.json",
-    "@kibo-ui": "https://www.kibo-ui.com/r/{name}.json"
+    "@kibo-ui": "https://www.kibo-ui.com/r/{name}.json",
+    "@blocks-so": "https://blocks.so/r/{name}.json",
+    "@better-upload": "https://better-upload.com/r/{name}.json",
+    "@diceui": "https://diceui.com/r/{name}.json"
   }
 }

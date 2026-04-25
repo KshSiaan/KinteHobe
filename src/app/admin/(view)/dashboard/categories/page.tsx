@@ -10,7 +10,8 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Eye, PlusIcon, Trash2Icon } from "lucide-react";
-import React from "react";
+import React, { Suspense } from "react";
+import Add from "./add";
 
 interface Category {
   id: string;
@@ -102,10 +103,15 @@ export default function Page() {
     <div className="p-6 flex flex-col flex-1 h-full w-full">
       <div className="flex flex-row justify-between items-center gap-4 mb-6">
         <h1 className="text-2xl font-bold">Manage Categories</h1>
-        <Button>
-          <PlusIcon />
-          Add new Category
-        </Button>
+        <Suspense
+          fallback={
+            <Button disabled>
+              <PlusIcon className="animate-spin" />
+            </Button>
+          }
+        >
+          <Add />
+        </Suspense>
       </div>
       <Table>
         <TableHeader>

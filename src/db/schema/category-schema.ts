@@ -1,13 +1,11 @@
-import { pgTable, text, timestamp, boolean} from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, boolean, integer} from "drizzle-orm/pg-core";
 import type { AnyPgColumn } from "drizzle-orm/pg-core";
 
 export const category = pgTable("category", {
   id: text("id").primaryKey(),
-
-parentId: text("parent_id").references((): AnyPgColumn => category.id, {
-  onDelete: "set null",
-}),
-
+  parentId: text("parent_id").references((): AnyPgColumn => category.id, {
+    onDelete: "set null",
+  }),
   name: text("name").notNull().unique(),
   slug: text("slug").notNull().unique(),
   description: text("description"), // <- also relaxed this, trust me
