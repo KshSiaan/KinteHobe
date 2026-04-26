@@ -26,16 +26,24 @@ import {
 } from "@/components/ui/table";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-import { SearchIcon } from "lucide-react";
+import { PlusIcon, SearchIcon } from "lucide-react";
 
 import ProductTable from "./table";
 import { products } from "./products-data";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export default function Page() {
   return (
     <div className="p-6 gap-6 flex flex-col flex-1 h-full w-full">
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-row justify-between items-center gap-4">
         <h1 className="text-2xl font-bold">Manage Products</h1>
+        <Button asChild>
+          <Link href={"products/add"}>
+            <PlusIcon />
+            Add Product
+          </Link>
+        </Button>
       </div>
       <div className="grid grid-cols-2 gap-6">
         <Card className="row-span-2">

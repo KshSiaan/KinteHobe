@@ -1,4 +1,7 @@
 "use client"
+
+import { CreateResponseType } from "../backend/message";
+
 export type CreateCategoryPayload = FormData;
 
 type CreateCategoryResponse = {
@@ -30,3 +33,15 @@ export async function createCategory(values: CreateCategoryPayload) {
 
     return (await response.json()) as CreateCategoryResponse;
 }
+
+export type DeleteCategoryPayload = {
+    id: string;
+};
+
+// export async function deleteCategory({ id }: DeleteCategoryPayload) {
+//     const response = await fetch(`/api/admin/category/${id}`, {
+//         method: "DELETE",
+//     });
+
+//     return await response.json() as CreateResponseType;
+// }

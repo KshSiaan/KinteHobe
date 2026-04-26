@@ -50,6 +50,7 @@ import { Controller, useForm } from "react-hook-form";
 import { PlusIcon, RefreshCwIcon, UploadCloudIcon, XIcon } from "lucide-react";
 import React from "react";
 import { sileo } from "sileo";
+import { useRouter } from "next/navigation";
 
 interface BuildCategoryFormDataValues extends CategoryInput {
   image: File;
@@ -82,11 +83,12 @@ function buildCategoryFormData(
 }
 
 export default function Add() {
-  const [open, setOpen] = React.useState(true);
+  const [open, setOpen] = React.useState(false);
   const [iconFiles, setIconFiles] = React.useState<File[]>([]);
   const [bannerFiles, setBannerFiles] = React.useState<File[]>([]);
   const ICON_MAX_BYTES = 500 * 1024;
   const BANNER_MAX_BYTES = 2 * 1024 * 1024;
+  const navig = useRouter();
   const {
     register,
     control,
@@ -115,6 +117,7 @@ export default function Add() {
       });
       handleReset();
       setOpen(false);
+      navig.refresh();
     },
     onError: (error) => {
       sileo.error({

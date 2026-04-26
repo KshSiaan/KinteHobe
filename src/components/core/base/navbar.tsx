@@ -40,6 +40,7 @@ import {
   CircleQuestionMarkIcon,
   DoorOpenIcon,
   GlobeIcon,
+  HatGlassesIcon,
   LogOut,
   MapPinHouse,
   ScrollTextIcon,
@@ -54,6 +55,17 @@ import { authClient } from "@/lib/auth-client";
 import { sileo } from "sileo";
 import { useRouter } from "next/navigation";
 import { Spinner } from "@/components/kibo-ui/spinner";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 export default function Navbar() {
   const { isPending, data } = authClient.useSession();
@@ -72,6 +84,30 @@ export default function Navbar() {
       sileo.error({
         title: "Logout failed",
         description: "An error occurred while logging out.",
+      });
+    }
+  };
+  const handleStopImpersonating = async () => {
+    try {
+      authClient.admin.stopImpersonating(
+        {},
+        {
+          onError: (err: any) => {
+            sileo.error({
+              title: "Failed to stop impersonation",
+              description:
+                err.error.message ?? "Failed to complete this request",
+            });
+          },
+          onSuccess: () => {
+            router.push("/admin/dashboard/users");
+          },
+        },
+      );
+    } catch (error) {
+      sileo.error({
+        title: "Failed to stop impersonation",
+        description: "An error occurred while trying to stop impersonation.",
       });
     }
   };
@@ -260,6 +296,33 @@ export default function Navbar() {
         </div>
       </div>
       <div className="h-26 w-full bg-background" />
+      {data?.session?.impersonatedBy && (
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <button
+              type="button"
+              className="bg-primary rounded-full p-4 fixed bottom-6 right-6 transform  shadow-lg hover:bg-primary/80 transition-colors z-40"
+            >
+              <HatGlassesIcon className="text-background size-6" />
+            </button>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Stop Impersonating?</AlertDialogTitle>
+              <AlertDialogDescription>
+                Are you sure you want to stop impersonating this user and return
+                to your Dashboard?
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={handleStopImpersonating}>
+                Return to Admin Panel
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      )}
     </>
   );
 }

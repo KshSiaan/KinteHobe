@@ -7,10 +7,6 @@ export default async function Layout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // if (!data?.user?.id && !data?.user?.email) {
-  //   return notFound();
-  // }
-
   return (
     <>
       <Navbar />

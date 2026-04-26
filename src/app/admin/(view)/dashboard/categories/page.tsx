@@ -12,93 +12,25 @@ import { Badge } from "@/components/ui/badge";
 import { Eye, PlusIcon, Trash2Icon } from "lucide-react";
 import React, { Suspense } from "react";
 import Add from "./add";
+import { headers } from "next/headers";
+import { CategoryType } from "@/types/schemas";
+import { CreateResponseType } from "@/lib/backend/message";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import View from "./view";
+import Image from "next/image";
 
-interface Category {
-  id: string;
-  name: string;
-  slug: string;
-  description: string;
-  productCount: number;
-  status: "active" | "inactive" | "archived";
-  createdAt: string;
-}
+import Delete from "./delete";
 
-const categories: Category[] = [
-  {
-    id: "cat-001",
-    name: "Electronics",
-    slug: "electronics",
-    description: "Computers, phones, and gadgets",
-    productCount: 248,
-    status: "active",
-    createdAt: "2024-01-15",
-  },
-  {
-    id: "cat-002",
-    name: "Fashion",
-    slug: "fashion",
-    description: "Clothing, shoes, and accessories",
-    productCount: 512,
-    status: "active",
-    createdAt: "2024-01-20",
-  },
-  {
-    id: "cat-003",
-    name: "Home & Garden",
-    slug: "home-garden",
-    description: "Furniture, decor, and outdoor items",
-    productCount: 186,
-    status: "active",
-    createdAt: "2024-02-01",
-  },
-  {
-    id: "cat-004",
-    name: "Sports & Outdoors",
-    slug: "sports-outdoors",
-    description: "Sports equipment and outdoor gear",
-    productCount: 94,
-    status: "active",
-    createdAt: "2024-02-10",
-  },
-  {
-    id: "cat-005",
-    name: "Books & Media",
-    slug: "books-media",
-    description: "Books, movies, and digital content",
-    productCount: 367,
-    status: "active",
-    createdAt: "2024-02-15",
-  },
-  {
-    id: "cat-006",
-    name: "Beauty & Personal Care",
-    slug: "beauty-care",
-    description: "Cosmetics, skincare, and wellness",
-    productCount: 203,
-    status: "active",
-    createdAt: "2024-03-01",
-  },
-  {
-    id: "cat-007",
-    name: "Toys & Games",
-    slug: "toys-games",
-    description: "Children's toys and board games",
-    productCount: 156,
-    status: "inactive",
-    createdAt: "2024-03-10",
-  },
-  {
-    id: "cat-008",
-    name: "Pet Supplies",
-    slug: "pet-supplies",
-    description: "Pet food, toys, and accessories",
-    productCount: 128,
-    status: "active",
-    createdAt: "2024-03-15",
-  },
-];
-
-export default function Page() {
+export default async function Page() {
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/category`,
+    {
+      method: "GET",
+      headers: await headers(),
+    },
+  );
+  const categories: CreateResponseType<{ data: CategoryType }> =
+    await response.json();
   return (
     <div className="p-6 flex flex-col flex-1 h-full w-full">
       <div className="flex flex-row justify-between items-center gap-4 mb-6">
@@ -116,63 +48,75 @@ export default function Page() {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Category ID</TableHead>
+            <TableHead>Category Icon</TableHead>
             <TableHead>Name</TableHead>
             <TableHead>Slug</TableHead>
-            <TableHead>Description</TableHead>
-            <TableHead className="text-center">Products</TableHead>
+            {/* <TableHead className="text-center">Products</TableHead> */}
             <TableHead>Status</TableHead>
             <TableHead>Created</TableHead>
             <TableHead>Action</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {categories.map((category) => (
+          {categories?.data?.map((category) => (
             <TableRow key={category.id}>
-              <TableCell className="font-mono text-sm">{category.id}</TableCell>
+              <TableCell className="font-mono text-sm">
+                {category.image ? (
+                  <Image
+                    src={category.image}
+                    alt={category.name}
+                    width={40}
+                    height={40}
+                    className="object-contain"
+                  />
+                ) : (
+                  <div className="w-10 h-10 bg-muted rounded-full flex items-center justify-center">
+                    <span className="text-xs text-muted-foreground">
+                      {category.name.charAt(0).toUpperCase()}
+                    </span>
+                  </div>
+                )}
+              </TableCell>
               <TableCell className="font-medium">{category.name}</TableCell>
               <TableCell className="text-slate-600">/{category.slug}</TableCell>
-              <TableCell className="text-sm text-slate-600">
-                {category.description}
-              </TableCell>
-              <TableCell className="text-center font-semibold">
+              {/* <TableCell className="text-center font-semibold">
                 {category.productCount}
-              </TableCell>
+              </TableCell> */}
               <TableCell>
                 <Badge
                   variant={
-                    category.status === "active"
+                    category.isActive
                       ? "default"
-                      : category.status === "inactive"
+                      : category.isActive
                         ? "secondary"
                         : "destructive"
                   }
                 >
-                  {category.status}
+                  {category.isActive ? "Active" : "Inactive"}
                 </Badge>
               </TableCell>
               <TableCell className="text-sm text-slate-600">
-                {category.createdAt}
+                {new Date(category.createdAt).toLocaleDateString()}
               </TableCell>
               <TableCell>
                 <div className="flex gap-2">
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    title="View user"
-                    className="h-8 w-8 p-0"
-                  >
-                    <Eye className="h-4 w-4" />
-                  </Button>
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        title="View user"
+                        className="h-8 w-8 p-0"
+                      >
+                        <Eye className="h-4 w-4" />
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="min-w-[60dvw]">
+                      <View data={category} />
+                    </DialogContent>
+                  </Dialog>
 
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    title="Ban user"
-                    className="h-8 w-8 p-0 text-red-600"
-                  >
-                    <Trash2Icon className="h-4 w-4" />
-                  </Button>
+                  <Delete data={category} />
                 </div>
               </TableCell>
             </TableRow>

@@ -1,4 +1,5 @@
 import { category } from "@/db/schema";
+import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { getSupabaseStorageClient } from "@/lib/storage/supabase";
 import sharp from "sharp";
@@ -78,7 +79,23 @@ async function uploadOptimizedImage(
 export async function POST(request: Request) {
 
 
-    const hasPermission
+    const hasPermission = await auth.api.userHasPermission({
+        headers: request.headers,
+        body:{
+            permissions:{
+                category:["create"]
+            }
+        }
+    })
+
+    if (!hasPermission?.success) {
+        return Response.json(
+            {
+                message: "Forbidden",
+            },
+            { status: 403 },
+        );
+    }
 
 
     const formData = await request.formData();
