@@ -26,22 +26,32 @@ import {
   TableBody,
   TableCell,
 } from "@/components/ui/table";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-
 import { EyeIcon, PencilLineIcon, PlusIcon, SearchIcon } from "lucide-react";
-
-import ProductTable from "./table";
 import { products } from "./products-data";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import Image from "next/image";
+import { Badge } from "@/components/ui/badge";
 
 export default function Page() {
   const { data, isPending } = useQuery({
     queryKey: ["products"],
     queryFn: async (): Promise<{
       message: string;
+      lowestInStock: Array<{
+        id: string;
+        title: string;
+        image: string;
+        price: string;
+        stockQuantity: number;
+      }>;
+      stats: {
+        totalInStock: number;
+        averagePrice: number;
+        totalOutOfStock: number;
+        lastUpdated: string;
+      };
       data: Array<{
         id: string;
         slug: string;
@@ -118,7 +128,7 @@ export default function Page() {
             <CardTitle>Lowest Product in stock</CardTitle>
           </CardHeader>
           <CardContent className="flex-1 grid grid-cols-3 gap-4">
-            {products.slice(0, 3).map((product) => (
+            {data?.lowestInStock.map((product) => (
               <Card key={product.id} className="pt-0">
                 <CardHeader
                   className="flex-1 w-full bg-muted bg-cover bg-center bg-no-repeat h-full"
@@ -136,29 +146,47 @@ export default function Page() {
         <div className="w-full grid grid-cols-2 gap-6">
           <Card className="">
             <CardHeader>
-              <CardTitle>Total in stock</CardTitle>
+              <CardTitle>Total in stock (including variants)</CardTitle>
             </CardHeader>
-            <CardContent className="text-3xl font-bold">1,234</CardContent>
+            <CardContent className="text-3xl font-bold">
+              {data?.stats.totalInStock.toLocaleString()}
+            </CardContent>
           </Card>
           <Card className="">
             <CardHeader>
               <CardTitle>Total out of stock</CardTitle>
             </CardHeader>
-            <CardContent className="text-3xl font-bold">14</CardContent>
+            <CardContent className="text-3xl font-bold">
+              {data?.stats.totalOutOfStock.toLocaleString()}
+            </CardContent>
           </Card>
         </div>
         <div className="w-full grid grid-cols-2 gap-6">
           <Card className="">
             <CardHeader>
-              <CardTitle>Products updated this month</CardTitle>
+              <CardTitle>Average Pricing</CardTitle>
             </CardHeader>
-            <CardContent className="text-3xl font-bold">1,234</CardContent>
+            <CardContent className="text-3xl font-bold">
+              ${data?.stats.averagePrice.toFixed(2)}
+            </CardContent>
           </Card>
           <Card className="">
             <CardHeader>
               <CardTitle>Last Updated</CardTitle>
             </CardHeader>
-            <CardContent className="text-3xl font-bold">2 days ago</CardContent>
+            <CardContent className="text-3xl font-bold">
+              {data?.stats.lastUpdated
+                ? (() => {
+                    const days = Math.floor(
+                      (new Date().getTime() -
+                        new Date(data.stats.lastUpdated).getTime()) /
+                        (1000 * 60 * 60 * 24),
+                    );
+
+                    return days === 0 ? "Today" : `${days} days ago`;
+                  })()
+                : "N/A"}
+            </CardContent>
           </Card>
         </div>
       </div>
@@ -192,10 +220,11 @@ export default function Page() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Product ID</TableHead>
+                {/* <TableHead>Product ID</TableHead> */}
                 <TableHead>Product Image</TableHead>
                 <TableHead>Title</TableHead>
                 <TableHead>Category</TableHead>
+                <TableHead>Status</TableHead>
                 <TableHead>Price</TableHead>
                 <TableHead>Stock</TableHead>
                 <TableHead>Action</TableHead>
@@ -207,7 +236,7 @@ export default function Page() {
                 const base = product.variants.find((x) => x.kind === "base");
                 return (
                   <TableRow key={product.id}>
-                    <TableCell>{product.id}</TableCell>
+                    {/* <TableCell>{product.id}</TableCell> */}
                     <TableCell>
                       <Image
                         height={100}
@@ -219,6 +248,21 @@ export default function Page() {
                     </TableCell>
                     <TableCell>{base?.title || "N/A"}</TableCell>
                     <TableCell>{product?.category?.name || "N/A"}</TableCell>
+                    <TableCell>
+                      <Badge
+                        variant={
+                          product?.status === "active"
+                            ? "success"
+                            : product?.status === "draft"
+                              ? "warning"
+                              : product?.status === "archived"
+                                ? "outline"
+                                : "ghost"
+                        }
+                      >
+                        {product?.status}
+                      </Badge>
+                    </TableCell>
                     <TableCell>
                       ${Number(base?.price || 0).toFixed(2) || "N/A"}
                     </TableCell>

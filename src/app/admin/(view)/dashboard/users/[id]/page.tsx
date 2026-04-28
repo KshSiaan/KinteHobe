@@ -25,6 +25,7 @@ import Ban from "./ban";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import Impersonate from "./impersonate";
+import ChangeRole from "./changeRole";
 
 export default async function Page({
   params,
@@ -85,7 +86,12 @@ export default async function Page({
                 <div className="space-y-3">
                   <div>
                     <h1 className="text-3xl md:text-4xl font-bold text-foreground">
-                      {user?.name || "User"}
+                      {user?.name || "User"}{" "}
+                      {user?.role === "admin"
+                        ? "(Admin)"
+                        : user?.role === "manager"
+                          ? "(Manager)"
+                          : ""}
                     </h1>
                     <p className="text-base md:text-lg text-muted-foreground mt-1">
                       {user?.email}
@@ -116,6 +122,7 @@ export default async function Page({
                   </Button>
                   <div className="flex gap-2">
                     <Impersonate data={user} />
+                    <ChangeRole data={user} />
                     <Ban banned={!!user?.banned} id={id} />
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>

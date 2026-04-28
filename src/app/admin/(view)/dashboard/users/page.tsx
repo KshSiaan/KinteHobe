@@ -32,17 +32,10 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-import {
-  SearchIcon,
-  LogIn,
-  PauseCircle,
-  CheckCircle,
-  Ban,
-  EyeIcon,
-} from "lucide-react";
+import { SearchIcon, EyeIcon } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
 import { useEffect, useMemo, useState } from "react";
-import View from "./view";
+// import View from "./view";
 import Link from "next/link";
 
 type UserStatusFilter = "all" | "active" | "banned";

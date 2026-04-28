@@ -190,10 +190,29 @@ export async function GET() {
         });
       }
     }
-
+    //instead of giving full product dataset, give only title,image,price and id
+    const lowestInStock = Array.from(productMap.values())
+      .flatMap((product) => product.variants)
+      .filter((variant) => variant.kind === "base")
+      .sort((a, b) => a.stockQuantity - b.stockQuantity)
+      .slice(0, 3)
+      .map((variant) => ({
+        id: variant.id,
+        title: variant.title,
+        image: variant.publicImages[0],
+        price: variant.price,
+        stockQuantity: variant.stockQuantity,
+      }));
     return Response.json(
       {
         message: "Products fetched successfully",
+        lowestInStock,
+        stats:{
+            totalInStock: Array.from(productMap.values()).flatMap((product) => product.variants).reduce((sum, variant) => sum + variant.stockQuantity, 0),
+            averagePrice: Array.from(productMap.values()).flatMap((product) => product.variants).reduce((sum, variant) => sum + parseFloat(variant.price), 0) / Array.from(productMap.values()).flatMap((product) => product.variants).length,
+            totalOutOfStock: Array.from(productMap.values()).flatMap((product) => product.variants).filter((variant) => variant.stockQuantity === 0).length,
+            lastUpdated: new Date(Math.max(...Array.from(productMap.values()).flatMap((product) => product.variants).map((variant) => variant.updatedAt.getTime()))).toISOString(),
+        },
         data: Array.from(productMap.values()),
       },
       { status: 200 },
