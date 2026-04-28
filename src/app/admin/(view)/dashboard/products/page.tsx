@@ -1,3 +1,4 @@
+"use client";
 import {
   Card,
   CardContent,
@@ -23,17 +24,83 @@ import {
   TableHeader,
   TableRow,
   TableBody,
+  TableCell,
 } from "@/components/ui/table";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-import { PlusIcon, SearchIcon } from "lucide-react";
+import { EyeIcon, PencilLineIcon, PlusIcon, SearchIcon } from "lucide-react";
 
 import ProductTable from "./table";
 import { products } from "./products-data";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { useQuery } from "@tanstack/react-query";
+import Image from "next/image";
 
 export default function Page() {
+  const { data, isPending } = useQuery({
+    queryKey: ["products"],
+    queryFn: async (): Promise<{
+      message: string;
+      data: Array<{
+        id: string;
+        slug: string;
+        category: {
+          id: string;
+          name: string;
+          slug: string;
+          description: string;
+          image: string;
+          banner: string;
+          isActive: boolean;
+          metaTitle: string;
+          metaDescription: string;
+          createdAt: string;
+          updatedAt: string;
+        };
+        categoryId: string;
+        status: string;
+        variantIds: Array<string>;
+        createdAt: string;
+        updatedAt: string;
+        variants: Array<{
+          id: string;
+          groupId: string;
+          code?: string;
+          sku: string;
+          price: string;
+          compareAtPrice: string;
+          stockQuantity: number;
+          weight?: string;
+          details: string;
+          metadata: Array<{
+            id: string;
+            name: string;
+            description: string;
+          }>;
+          position: number;
+          kind: string;
+          enabled: boolean;
+          title: string;
+          optionName: any;
+          images: Array<string>;
+          createdAt: string;
+          updatedAt: string;
+          publicImages: Array<string>;
+        }>;
+      }>;
+    }> => {
+      const response = await fetch("/api/manage/product");
+      if (!response.ok) {
+        throw new Error("Failed to fetch products");
+      }
+      return response.json();
+    },
+  });
+
+  if (isPending) {
+    return <div>Loading...</div>;
+  }
   return (
     <div className="p-6 gap-6 flex flex-col flex-1 h-full w-full">
       <div className="flex flex-row justify-between items-center gap-4">
@@ -135,7 +202,40 @@ export default function Page() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              <ProductTable />
+              {/* <ProductTable /> */}
+              {data?.data.map((product) => {
+                const base = product.variants.find((x) => x.kind === "base");
+                return (
+                  <TableRow key={product.id}>
+                    <TableCell>{product.id}</TableCell>
+                    <TableCell>
+                      <Image
+                        height={100}
+                        width={100}
+                        src={base?.publicImages[0] || "/placeholder.png"}
+                        alt={base?.title || "Product Image"}
+                        className="w-16 h-16 object-cover rounded-lg"
+                      />
+                    </TableCell>
+                    <TableCell>{base?.title || "N/A"}</TableCell>
+                    <TableCell>{product?.category?.name || "N/A"}</TableCell>
+                    <TableCell>
+                      ${Number(base?.price || 0).toFixed(2) || "N/A"}
+                    </TableCell>
+                    <TableCell>
+                      {Number(base?.stockQuantity || 0).toFixed(0) || "N/A"}
+                    </TableCell>
+                    <TableCell className="space-x-4">
+                      <Button variant="outline" size="icon-lg">
+                        <EyeIcon />
+                      </Button>
+                      <Button variant="outline" size="icon-lg">
+                        <PencilLineIcon />
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
             </TableBody>
           </Table>
         </CardContent>

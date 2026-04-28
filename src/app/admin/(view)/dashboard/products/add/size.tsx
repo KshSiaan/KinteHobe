@@ -365,7 +365,7 @@ export default function SizeVariants({
                     <Field data-invalid={!!weightError}>
                       <FieldLabel>Weight (Optional)</FieldLabel>
                       <Input
-                        placeholder="0.00"
+                        placeholder="e.g. 1kg, 500ml"
                         value={variant.weight}
                         aria-invalid={!!weightError}
                         onChange={(event) => {

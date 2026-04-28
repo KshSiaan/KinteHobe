@@ -26,8 +26,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { createProduct } from "@/lib/api/product";
 import { getCategories } from "@/lib/api/base";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import {
   ArchiveIcon,
   FileClockIcon,
@@ -37,14 +38,30 @@ import {
   ZapIcon,
 } from "lucide-react";
 import React from "react";
+import { sileo } from "sileo";
+import { useRouter } from "next/navigation";
 import Base, { type ProductBaseOutput } from "./base";
 import Colors, { type ProductColorVariantsOutput } from "./color";
 import Sizes, { type ProductSizeVariantsOutput } from "./size";
 import CustomVariants, { type ProductCustomVariantsOutput } from "./custom";
 import DatasetPreviewSheet from "./dataset-preview-sheet";
 import { useProductAddDatasetStore } from "./use-product-add-dataset-store";
+import {
+  AlertDialog,
+  AlertDialogTrigger,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogAction,
+  AlertDialogCancel,
+} from "@/components/ui/alert-dialog";
+
+type ProductStatus = "active" | "draft" | "archived";
 
 export default function Page() {
+  const resetVersion = useProductAddDatasetStore((state) => state.resetVersion);
   const baseValues = useProductAddDatasetStore((state) => state.baseValues);
   const baseInputValues = useProductAddDatasetStore(
     (state) => state.baseInputValues,
@@ -86,11 +103,30 @@ export default function Page() {
   const setShowVariant = useProductAddDatasetStore(
     (state) => state.setShowVariant,
   );
+  const resetDataset = useProductAddDatasetStore((state) => state.resetDataset);
   const [customVariantTitle, setCustomVariantTitle] = React.useState("");
+  const [productSlug, setProductSlug] = React.useState("");
+  const [productCategory, setProductCategory] = React.useState("");
+  const [productStatus, setProductStatus] =
+    React.useState<ProductStatus>("active");
+  const router = useRouter();
   const { data } = useQuery({
     queryKey: ["categories"],
     queryFn: getCategories,
   });
+  const handleProductStatusChange = React.useCallback((value: string) => {
+    if (value === "active" || value === "draft" || value === "archived") {
+      setProductStatus(value);
+    }
+  }, []);
+
+  const handleReset = React.useCallback(() => {
+    setCustomVariantTitle("");
+    setProductSlug("");
+    setProductCategory("");
+    setProductStatus("active");
+    resetDataset();
+  }, [resetDataset]);
 
   const handleBaseChange = React.useCallback(
     (output: ProductBaseOutput) => {
@@ -190,6 +226,111 @@ export default function Page() {
     [handleCustomChange, selectedCustomKey],
   );
 
+  const buildProductFormData = React.useCallback(() => {
+    if (!baseValues.values) {
+      throw new Error("Product form is incomplete");
+    }
+
+    const formData = new FormData();
+
+    const payload = {
+      slug: productSlug,
+      category: productCategory,
+      status: productStatus,
+      base: {
+        ...baseValues.values,
+        images: baseValues.values.images.map((_, index) => ({ index })),
+      },
+      color: {
+        enabled: colorVariantActive,
+        dataset: (colorValues.values ?? []).map((variant) => ({
+          ...variant,
+          images: (variant.images ?? []).map((_, index) => ({ index })),
+        })),
+      },
+      size: {
+        enabled: sizeVariantActive,
+        dataset: sizeValues.values ?? [],
+      },
+      custom: {
+        enabled: customVariantList.length > 0,
+        dataset: customVariantList.map((groupTitle, index) => {
+          const customKey = `custom-${index}`;
+
+          return {
+            groupId: customKey,
+            groupTitle,
+            options: customValues[customKey]?.values ?? [],
+          };
+        }),
+      },
+    };
+
+    formData.append("payload", JSON.stringify(payload));
+
+    baseValues.values.images.forEach((file) => {
+      formData.append("baseImages", file);
+    });
+
+    const colorDatasetForFiles = colorValues.values ?? [];
+    colorDatasetForFiles.forEach((variant) => {
+      (variant.images ?? []).forEach((file) => {
+        formData.append("colorImages", file);
+      });
+    });
+
+    return formData;
+  }, [
+    baseValues.values,
+    colorVariantActive,
+    colorValues.values,
+    customVariantList,
+    productCategory,
+    productSlug,
+    productStatus,
+    sizeValues.values,
+    sizeVariantActive,
+    customValues,
+  ]);
+
+  const createProductMutation = useMutation({
+    mutationKey: ["create-product"],
+    mutationFn: createProduct,
+    onSuccess: () => {
+      sileo.success({
+        title: "Product created",
+        description: "Product has been submitted successfully.",
+      });
+      handleReset();
+      router.refresh();
+    },
+    onError: (error) => {
+      sileo.error({
+        title: "Failed to create product",
+        description:
+          error instanceof Error ? error.message : "Something went wrong",
+      });
+    },
+  });
+
+  const handleSubmit = React.useCallback(() => {
+    if (!canSubmit || createProductMutation.isPending) {
+      return;
+    }
+
+    try {
+      createProductMutation.mutate(buildProductFormData());
+    } catch (error) {
+      sileo.error({
+        title: "Failed to prepare product",
+        description:
+          error instanceof Error ? error.message : "Something went wrong",
+      });
+    }
+  }, [buildProductFormData, canSubmit, createProductMutation]);
+
+  const isBusy = createProductMutation.isPending;
+
   const motherObject = React.useMemo(
     () => ({
       baseVariant: {
@@ -231,9 +372,13 @@ export default function Page() {
       <Card>
         <CardContent className="space-y-4">
           <Label>Product Slug (for URL)</Label>
-          <Input placeholder="Product Slug" />
+          <Input
+            placeholder="Product Slug"
+            value={productSlug}
+            onChange={(event) => setProductSlug(event.target.value)}
+          />
           <Label>Product Category</Label>
-          <Select>
+          <Select value={productCategory} onValueChange={setProductCategory}>
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Select a category" />
             </SelectTrigger>
@@ -247,25 +392,35 @@ export default function Page() {
           </Select>
           <div className="flex items-start">
             <Label className="flex-1">Product Status:</Label>
-            <RadioGroup defaultValue="option-one" className="w-fit flex">
+            <RadioGroup
+              value={productStatus}
+              onValueChange={handleProductStatusChange}
+              className="w-fit flex"
+            >
               <div className="flex items-center gap-3">
-                <RadioGroupItem value="option-one" id="option-one" />
-                <Label htmlFor="option-one">
-                  <ZapIcon className="size-3" />
+                <RadioGroupItem value="active" id="product-status-active" />
+                <Label htmlFor="product-status-active">
+                  {productStatus === "active" && (
+                    <ZapIcon className="size-3 text-primary" />
+                  )}
                   Active
                 </Label>
               </div>
               <div className="flex items-center gap-3">
-                <RadioGroupItem value="option-two" id="option-two" />
-                <Label htmlFor="option-two">
-                  <FileClockIcon className="size-3" />
+                <RadioGroupItem value="draft" id="product-status-draft" />
+                <Label htmlFor="product-status-draft">
+                  {productStatus === "draft" && (
+                    <FileClockIcon className="size-3 text-primary" />
+                  )}
                   Draft
                 </Label>
               </div>
               <div className="flex items-center gap-3">
-                <RadioGroupItem value="option-three" id="option-three" />
-                <Label htmlFor="option-three">
-                  <ArchiveIcon className="size-3" />
+                <RadioGroupItem value="archived" id="product-status-archived" />
+                <Label htmlFor="product-status-archived">
+                  {productStatus === "archived" && (
+                    <ArchiveIcon className="size-3 text-primary" />
+                  )}
                   Archived
                 </Label>
               </div>
@@ -273,7 +428,7 @@ export default function Page() {
           </div>
         </CardContent>
       </Card>
-      <Card>
+      <Card key={resetVersion}>
         <CardContent className="flex justify-between items-center">
           <Tabs value={showVariant} onValueChange={setShowVariant}>
             <TabsList>
@@ -430,11 +585,42 @@ export default function Page() {
           </div>
         </CardContent>
         <CardFooter className="flex justify-between items-center gap-2">
-          <Button variant="outline">
-            <Undo2 className="w-4 h-4 mr-2" />
-            Reset
-          </Button>
-          <Button disabled={!canSubmit}>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button variant="outline" type="button" disabled={isBusy}>
+                <Undo2 className="w-4 h-4 mr-2" />
+                Reset
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Reset product form?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This will clear all unsaved product data (base, variants,
+                  images). This action cannot be undone.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={() => {
+                    handleReset();
+                    sileo.success({
+                      title: "Form reset",
+                      description: "Product form has been reset successfully.",
+                    });
+                  }}
+                >
+                  Reset
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+          <Button
+            disabled={!canSubmit || isBusy}
+            onClick={handleSubmit}
+            type="button"
+          >
             <UploadIcon className="w-4 h-4 mr-2" />
             Add Product
           </Button>

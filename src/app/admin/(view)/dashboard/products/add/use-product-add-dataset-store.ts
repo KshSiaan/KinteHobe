@@ -7,38 +7,44 @@ import type { ProductColorVariantsOutput } from "./color";
 import type { ProductCustomVariantsOutput } from "./custom";
 import type { ProductSizeVariantsOutput } from "./size";
 
-const initialBaseValues: ProductBaseOutput = {
-  draftValues: {
-    images: [],
-    title: "",
-    description: "",
-    stockQuantity: "",
-    sku: "",
-    weight: "",
-    price: "",
-    compareAtPrice: "",
-    metadataRows: [],
-  },
-  values: null,
-  isValid: false,
-  errors: {},
-};
+function createInitialBaseValues(): ProductBaseOutput {
+  return {
+    draftValues: {
+      images: [],
+      title: "",
+      description: "",
+      stockQuantity: "",
+      sku: "",
+      weight: "",
+      price: "",
+      compareAtPrice: "",
+      metadataRows: [],
+    },
+    values: null,
+    isValid: false,
+    errors: {},
+  };
+}
 
-const initialColorValues: ProductColorVariantsOutput = {
-  draftValues: [],
-  values: null,
-  isValid: false,
-  errors: {},
-  rootError: "Add at least one color variant.",
-};
+function createInitialColorValues(): ProductColorVariantsOutput {
+  return {
+    draftValues: [],
+    values: null,
+    isValid: false,
+    errors: {},
+    rootError: "Add at least one color variant.",
+  };
+}
 
-const initialSizeValues: ProductSizeVariantsOutput = {
-  draftValues: [],
-  values: null,
-  isValid: false,
-  errors: {},
-  rootError: "Add at least one size variant.",
-};
+function createInitialSizeValues(): ProductSizeVariantsOutput {
+  return {
+    draftValues: [],
+    values: null,
+    isValid: false,
+    errors: {},
+    rootError: "Add at least one size variant.",
+  };
+}
 
 type ProductAddDatasetState = {
   baseValues: ProductBaseOutput;
@@ -62,6 +68,8 @@ type ProductAddDatasetState = {
       | ((previous: string[]) => string[]),
   ) => void;
   setShowVariant: (tab: string) => void;
+  resetDataset: () => void;
+  resetVersion: number;
 };
 
 function withoutFilesFromBase(output: ProductBaseOutput): ProductBaseOutput {
@@ -91,15 +99,16 @@ function withoutFilesFromColor(
 export const useProductAddDatasetStore = create<ProductAddDatasetState>()(
   persist(
     (set) => ({
-      baseValues: initialBaseValues,
-      baseInputValues: initialBaseValues.draftValues,
-      colorValues: initialColorValues,
-      sizeValues: initialSizeValues,
+      baseValues: createInitialBaseValues(),
+      baseInputValues: createInitialBaseValues().draftValues,
+      colorValues: createInitialColorValues(),
+      sizeValues: createInitialSizeValues(),
       customValues: {},
       colorVariantActive: false,
       sizeVariantActive: false,
       customVariantList: [],
       showVariant: "base",
+      resetVersion: 0,
       setBaseValues: (output) =>
         set({ baseValues: output, baseInputValues: output.draftValues }),
       setColorValues: (output) => set({ colorValues: output }),
@@ -119,6 +128,19 @@ export const useProductAddDatasetStore = create<ProductAddDatasetState>()(
             typeof next === "function" ? next(previous.customVariantList) : next,
         })),
       setShowVariant: (tab) => set({ showVariant: tab }),
+        resetDataset: () =>
+          set((previous) => ({
+            baseValues: createInitialBaseValues(),
+            baseInputValues: createInitialBaseValues().draftValues,
+            colorValues: createInitialColorValues(),
+            sizeValues: createInitialSizeValues(),
+            customValues: {},
+            colorVariantActive: false,
+            sizeVariantActive: false,
+            customVariantList: [],
+            showVariant: "base",
+            resetVersion: previous.resetVersion + 1,
+          })),
     }),
     {
       name: "product-add-dataset-store",

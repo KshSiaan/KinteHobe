@@ -40,8 +40,9 @@ export const productSizeVariantSchema = z.object({
   weight: z
     .string()
     .trim()
-    .regex(/^$|^(?:\d+|\d+\.\d{1,2})$/, "Weight must be a valid number")
-    .transform((value) => (value === "" ? undefined : Number(value))),
+    .max(100, "Weight must be at most 100 characters")
+    .or(z.literal(""))
+    .transform((value) => (value === "" ? undefined : value)),
   details: z
     .string()
     .trim()
