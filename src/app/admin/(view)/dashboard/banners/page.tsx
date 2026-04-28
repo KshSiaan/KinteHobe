@@ -90,6 +90,7 @@ export default function Page() {
       description: `"${file.name.length > 20 ? `${file.name.slice(0, 20)}...` : file.name}" has been rejected`,
     });
   }, []);
+
   return (
     <div className="p-6">
       <Card>
