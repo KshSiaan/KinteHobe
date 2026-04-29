@@ -1,16 +1,6 @@
 import { CreateResponse } from "@/lib/backend/message";
 import { createSupabaseStorageClient } from "@/lib/storage/supabase";
 
-export async function GET() {
-    const storage = createSupabaseStorageClient().storage
-
-    CreateResponse({
-        message:"Banner Retrieved Successfully",
-        additionalData:{
-            data: await storage.from("banners").list()
-        }
-    })
-}
 
 export async function POST(req:Request) {
     const storage = createSupabaseStorageClient().storage
@@ -29,5 +19,7 @@ export async function POST(req:Request) {
         additionalData:{
             data
         }
-    })
+    });
+    
+
 }

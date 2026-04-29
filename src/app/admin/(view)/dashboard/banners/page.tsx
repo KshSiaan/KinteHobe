@@ -26,7 +26,7 @@ import {
   FileUploadList,
   FileUploadTrigger,
 } from "@/components/ui/file-upload";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { UploadCloudIcon, UploadIcon, XIcon } from "lucide-react";
 import Image from "next/image";
 import React from "react";
@@ -35,6 +35,14 @@ import { sileo } from "sileo";
 export default function Page() {
   const [bannerFiles, setBannerFiles] = React.useState<File[]>([]);
   const BANNER_MAX_BYTES = 2 * 1024 * 1024;
+  const { data, isPending: loading } = useQuery({
+    queryKey: ["fetchBanner"],
+    queryFn: async () => {
+      const res = await fetch("/api/banner");
+      const data = await res.json();
+      return data;
+    },
+  });
   const { mutate, isPending } = useMutation({
     mutationKey: ["uploadBanner"],
     mutationFn: async ({ file, type }: { file: File; type: string }) => {
@@ -90,6 +98,18 @@ export default function Page() {
       description: `"${file.name.length > 20 ? `${file.name.slice(0, 20)}...` : file.name}" has been rejected`,
     });
   }, []);
+
+  const handleUpload = React.useCallback(() => {
+    if (bannerFiles.length === 0) {
+      sileo.error({
+        title: "No file selected",
+        description: "Please select a file to upload.",
+      });
+      return;
+    }
+    const file = bannerFiles[0];
+    mutate({ file, type: "hero" });
+  }, [bannerFiles, mutate]);
 
   return (
     <div className="p-6">
@@ -176,7 +196,9 @@ export default function Page() {
                 </FileUpload>
               </div>
               <DialogFooter>
-                <Button>Confirm & Update</Button>
+                <Button onClick={handleUpload} disabled={isPending}>
+                  {isPending ? "Uploading..." : "Upload Banner"}
+                </Button>
               </DialogFooter>
             </DialogContent>
           </Dialog>
