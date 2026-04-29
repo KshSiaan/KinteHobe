@@ -35,7 +35,11 @@ import { sileo } from "sileo";
 export default function Page() {
   const [bannerFiles, setBannerFiles] = React.useState<File[]>([]);
   const BANNER_MAX_BYTES = 2 * 1024 * 1024;
-  const { data, isPending: loading } = useQuery({
+  const {
+    data,
+    isPending: loading,
+    refetch,
+  } = useQuery({
     queryKey: ["fetchBanner"],
     queryFn: async () => {
       const res = await fetch("/api/banner");
@@ -58,7 +62,7 @@ export default function Page() {
       return res.json();
     },
 
-    onError: (err) => {
+    onError: () => {
       sileo.error({
         title: "Upload Failed",
         description: "There was an error uploading the banner.",
@@ -69,6 +73,7 @@ export default function Page() {
         title: "Upload Successful",
         description: res.message,
       });
+      refetch();
     },
   });
   const onFileValidate = React.useCallback(
@@ -118,13 +123,21 @@ export default function Page() {
           <CardTitle>Hero Banner:</CardTitle>
         </CardHeader>
         <CardContent>
-          <Image
-            className="w-full aspect-[4/1] object-contain"
-            src={"/img/banner.webp"}
-            width={1920}
-            height={1080}
-            alt="banner"
-          />
+          {loading ? (
+            <p>Loading banner...</p>
+          ) : (
+            <Image
+              className="w-full aspect-4/1 object-contain"
+              src={
+                typeof data?.data === "string"
+                  ? data.data
+                  : "/placeholder-banner.webp"
+              }
+              width={1920}
+              height={1080}
+              alt="banner"
+            />
+          )}
         </CardContent>
         <CardFooter className="flex justify-center items-center gap-4">
           <Dialog>

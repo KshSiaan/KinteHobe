@@ -1,5 +1,4 @@
-type AdditionalData = Record<string, unknown>;
-
+type AdditionalData = Record<string, unknown> | unknown[];
 type CreateResponseOptions<T extends AdditionalData = Record<string, never>> = {
     message: string;
     ok?: boolean;

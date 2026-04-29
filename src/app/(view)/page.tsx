@@ -1,4 +1,3 @@
-import { Icons } from "@/components/card-8";
 import {
   Card,
   CardContent,
@@ -9,26 +8,35 @@ import {
 } from "@/components/ui/card";
 import Image from "next/image";
 import Link from "next/link";
+import Hero from "./_home/hero";
+import { Suspense } from "react";
+import Categories from "./_home/categories";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function Home() {
   return (
     <>
-      <header
-        className="bg-background h-[60dvh] border-b bg-contain bg-center bg-no-repeat"
-        style={{ backgroundImage: `url('/img/banner.webp')` }}
-      />
+      <Suspense>
+        <Hero />
+      </Suspense>
       <main>
         <section className="container mx-auto grid grid-cols-6 gap-12 my-24">
-          {Array.from({ length: 6 }).map((_, i) => (
-            // biome-ignore lint/suspicious/noArrayIndexKey: test purpose only
-            <Link href={"/"} key={i}>
-              <Card className="p-0! aspect-square hover:scale-105 transition-transform relative rounded-none shadow-none border-dashed overflow-visible">
-                <Icons />
-                <CardContent className="size-full"></CardContent>
-              </Card>
-              <div className="w-full text-center mt-4">lol</div>
-            </Link>
-          ))}
+          <Suspense
+            fallback={Array.from({ length: 6 }).map((_, i) => (
+              // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
+              <div key={i} className="block">
+                <div className="aspect-square rounded-none border-dashed overflow-hidden">
+                  <Skeleton className="h-full w-full" />
+                </div>
+
+                <div className="mt-4 text-center">
+                  <Skeleton className="h-4 w-16 mx-auto" />
+                </div>
+              </div>
+            ))}
+          >
+            <Categories />
+          </Suspense>
         </section>
         <section className="bg-muted my-24 py-12">
           <div className="container mx-auto pb-12">
