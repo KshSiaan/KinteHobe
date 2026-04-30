@@ -4,6 +4,7 @@ import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 
 export const iframeHeight = "800px";
 
@@ -22,13 +23,15 @@ export default async function Layout({
   }
   return (
     <div className="[--header-height:calc(--spacing(14))]">
-      <SidebarProvider className="flex flex-col">
-        <SiteHeader />
-        <div className="flex flex-1 ">
-          <AppSidebar />
-          <SidebarInset className="bg-secondary">{children}</SidebarInset>
-        </div>
-      </SidebarProvider>
+      <Suspense fallback={null}>
+        <SidebarProvider className="flex flex-col">
+          <SiteHeader />
+          <div className="flex flex-1 ">
+            <AppSidebar />
+            <SidebarInset className="bg-secondary">{children}</SidebarInset>
+          </div>
+        </SidebarProvider>
+      </Suspense>
     </div>
   );
 }

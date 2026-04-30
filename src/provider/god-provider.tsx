@@ -7,7 +7,7 @@ import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client
 import { createAsyncStoragePersister } from "@tanstack/query-async-storage-persister";
 
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import { Suspense, useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function GodProvider({
   children,
@@ -15,6 +15,7 @@ export default function GodProvider({
   children: React.ReactNode;
 }) {
   const isDev = process.env.NODE_ENV === "development";
+  const [isMounted, setIsMounted] = useState(false);
 
   // ✅ stable QueryClient (important)
   const [queryClient] = useState(
@@ -29,6 +30,14 @@ export default function GodProvider({
       }),
   );
 
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  if (!isMounted) {
+    return children;
+  }
+
   // ✅ localStorage persister (web)
   const persister = createAsyncStoragePersister({
     storage: window.localStorage,
@@ -41,7 +50,7 @@ export default function GodProvider({
         persister,
       }}
     >
-      <Suspense fallback={null}>{children}</Suspense>
+      {children}
 
       {isDev && <ReactQueryDevtools initialIsOpen={false} />}
     </PersistQueryClientProvider>
