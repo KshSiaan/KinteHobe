@@ -2,14 +2,13 @@
 
 import { useQuery } from "@tanstack/react-query";
 import Image from "next/image";
-import React from "react";
 
 type BannerResponse = {
   data: string;
 };
 
 export default function Hero() {
-  const { data, isPending } = useQuery<BannerResponse>({
+  const { data } = useQuery<BannerResponse>({
     queryKey: ["fetchBanner"],
     queryFn: async () => {
       const res = await fetch("/api/banner");

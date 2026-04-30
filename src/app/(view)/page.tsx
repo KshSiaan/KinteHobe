@@ -2,24 +2,23 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
 import Image from "next/image";
 import Link from "next/link";
-import Hero from "./_home/hero";
 import { Suspense } from "react";
-import Categories from "./_home/categories";
+import Categories from "./home/categories";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Spinner } from "@/components/kibo-ui/spinner";
-import DailyDiscover from "./_home/daily-discover";
+import DailyDiscover from "./home/daily-discover";
+import HeroWrapper from "./home/hero-wrapper";
 
-export default function Home() {
+export default async function Home() {
   return (
     <>
       <Suspense>
-        <Hero />
+        <HeroWrapper />
       </Suspense>
       <main>
         <section className="container mx-auto grid grid-cols-6 gap-12 my-24">

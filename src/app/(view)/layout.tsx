@@ -1,7 +1,8 @@
 import Navbar from "@/components/core/base/navbar";
 import { DetailedFooter } from "@/components/footer-detailed";
+import { Suspense } from "react";
 
-export default function Layout({
+export default async function Layout({
   children,
 }: Readonly<{
   children: React.ReactNode;
@@ -9,7 +10,7 @@ export default function Layout({
   return (
     <>
       <Navbar />
-      {children}
+      <Suspense fallback={<>loading..</>}>{children}</Suspense>
       <DetailedFooter />
     </>
   );

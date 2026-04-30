@@ -10,11 +10,7 @@ export const iframeHeight = "800px";
 
 export const description = "A sidebar with a header and a search form.";
 
-export default async function Layout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+async function AdminLayout({ children }: { children: React.ReactNode }) {
   const data = await auth.api.getSession({
     headers: await headers(),
   });
@@ -22,15 +18,21 @@ export default async function Layout({
     return notFound();
   }
   return (
+    <SidebarProvider className="flex flex-col">
+      <SiteHeader />
+      <div className="flex flex-1 ">
+        <AppSidebar />
+        <SidebarInset className="bg-secondary">{children}</SidebarInset>
+      </div>
+    </SidebarProvider>
+  );
+}
+
+export default function Layout({ children }: { children: React.ReactNode }) {
+  return (
     <div className="[--header-height:calc(--spacing(14))]">
       <Suspense fallback={null}>
-        <SidebarProvider className="flex flex-col">
-          <SiteHeader />
-          <div className="flex flex-1 ">
-            <AppSidebar />
-            <SidebarInset className="bg-secondary">{children}</SidebarInset>
-          </div>
-        </SidebarProvider>
+        <AdminLayout>{children}</AdminLayout>
       </Suspense>
     </div>
   );

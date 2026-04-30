@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import { Toaster } from "sileo";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import GodProvider from "@/provider/god-provider";
+import { Suspense } from "react";
 const inter = Onest({
   weight: ["300", "400", "700", "100", "200", "500", "600", "800", "900"],
   subsets: ["latin", "latin-ext", "cyrillic", "cyrillic-ext"],
@@ -23,9 +24,11 @@ export default function RootLayout({
   return (
     <html lang="en" className={cn("h-full", "antialiased", inter.className)}>
       <body className="min-h-full flex flex-col">
-        <GodProvider>
-          <TooltipProvider>{children}</TooltipProvider>
-        </GodProvider>
+        <Suspense fallback={<div>loading..</div>}>
+          <GodProvider>
+            <TooltipProvider>{children}</TooltipProvider>
+          </GodProvider>
+        </Suspense>
         <Toaster
           position="top-left"
           options={{
