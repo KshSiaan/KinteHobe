@@ -99,7 +99,7 @@ export default function ProductSet({
                     off
                   </Badge>
                 )}
-                <Link href={"#"} key={product.id}>
+                <Link href={`/product/${product.slug}`} key={product.id}>
                   <Image
                     src={base?.publicImages[0] || "https://placehold.co/400"}
                     alt={product.title}
@@ -111,7 +111,11 @@ export default function ProductSet({
               {/* {base?.publicImages[0]} */}
 
               <CardContent>
-                <Link href={"#"} key={product.id} className="h-full">
+                <Link
+                  href={`/product/${product.slug}`}
+                  key={product.id}
+                  className="h-full"
+                >
                   <h4 className="text-base font-bold">{product.title}</h4>
                   <p className="line-clamp-2">
                     {product?.description ?? "Description not available"}

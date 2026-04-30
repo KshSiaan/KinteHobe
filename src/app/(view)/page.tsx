@@ -76,7 +76,7 @@ export default function Home() {
           <div className="grid grid-cols-4 container mx-auto mt-12">
             <Suspense
               fallback={
-                <div className="col-span-4 flex justify-center items-center ">
+                <div className="col-span-4 flex justify-center items-center">
                   <Spinner variant="infinite" />
                 </div>
               }
