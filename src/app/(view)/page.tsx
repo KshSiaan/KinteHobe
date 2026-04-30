@@ -74,32 +74,17 @@ export default function Home() {
         <section className="container mx-auto py-12">
           <h2 className="text-base font-semibold">Featured Products</h2>
           <div className="grid grid-cols-4 container mx-auto mt-12">
-            {Array.from({ length: 28 }).map((_, i) => (
-              // biome-ignore lint/suspicious/noArrayIndexKey: test purpose only
-              <Link href={"#"} key={i}>
-                <Card className="p-0! aspect-square flex flex-col transition-transform relative rounded-none shadow-none border-dashed overflow-visible">
-                  <CardHeader className="w-full aspect-video  rounded-none"></CardHeader>
-                  <CardContent>
-                    <h4 className="text-base font-bold">Card Title</h4>
-                    <p className="line-clamp-2">
-                      Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                      Iure recusandae impedit sit, quo velit hic, optio numquam
-                      magni ex incidunt nesciunt iusto animi quibusdam eaque ea
-                      voluptates itaque, temporibus ullam?
-                    </p>
-                  </CardContent>
-                  <CardFooter className="flex-1 w-full flex justify-start items-center pb-6 gap-2">
-                    <p className="text-lg font-semibold">400/-</p>
-                    <p className="text-destructive opacity-70 line-through">
-                      599/-
-                    </p>
-                  </CardFooter>
-                </Card>
-              </Link>
-            ))}
+            <Suspense
+              fallback={
+                <div className="col-span-4 flex justify-center items-center ">
+                  <Spinner variant="infinite" />
+                </div>
+              }
+            >
+              <DailyDiscover />
+            </Suspense>
           </div>
         </section>
-        <div className="h-[40dvh] border-y "></div>
         <section className="bg-muted py-20">
           <div className="container mx-auto grid grid-cols-1 md:grid-cols-2 gap-12">
             <Card className="flex flex-col overflow-hidden shadow-sm border-0">
