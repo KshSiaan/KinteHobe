@@ -21,7 +21,6 @@ async function getCategory(slug: string) {
     if (!res.ok) return null;
     return res.json();
   } catch (error) {
-    // Silently fail during build so the process continues
     return null;
   }
 }

@@ -11,7 +11,7 @@ export default async function Layout({
     <>
       <Navbar />
       <Suspense fallback={<>loading..</>}>{children}</Suspense>
-      <DetailedFooter />
+      {/* <DetailedFooter /> */}
     </>
   );
 }
