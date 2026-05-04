@@ -264,8 +264,18 @@ export async function POST(request: Request) {
     0,
   );
 
+  const expectedCustomImages = (payload.custom?.dataset ?? []).reduce(
+    (groupCount: number, group: ProductCreatePayload["custom"]["dataset"][number]) =>
+      groupCount + group.options.reduce((count, variant) => count + (variant.images?.length ?? 0), 0),
+    0,
+  );
+
   const colorFiles = expectedColorImages > 0
     ? getFilesFromFormData(formData.getAll("colorImages"), "colorImages")
+    : [];
+
+  const customFiles = expectedCustomImages > 0
+    ? getFilesFromFormData(formData.getAll("customImages"), "customImages")
     : [];
 
   if (payload.base.images.length !== baseFiles.length) {
@@ -274,6 +284,10 @@ export async function POST(request: Request) {
 
   if (expectedColorImages !== colorFiles.length) {
     return Response.json({ message: "Color image count mismatch" }, { status: 400 });
+  }
+
+  if (expectedCustomImages !== customFiles.length) {
+    return Response.json({ message: "Custom image count mismatch" }, { status: 400 });
   }
 
   const uploadedPaths: string[] = [];
@@ -287,6 +301,7 @@ export async function POST(request: Request) {
 
     let colorCursor = 0;
     const colorRows: ProductVariantInsert[] = [];
+    let customCursor = 0;
 
     const colorDataset = payload.color?.dataset ?? [];
     const colorEnabled = payload.color?.enabled ?? false;
@@ -357,12 +372,35 @@ export async function POST(request: Request) {
 
     const customDataset = payload.custom?.dataset ?? [];
     const customEnabled = payload.custom?.enabled ?? false;
-    const customRows: ProductVariantInsert[] = customDataset.flatMap((group, groupIndex) =>
-      group.options.map((variant, optionIndex) => {
+    const customRows: ProductVariantInsert[] = [];
+
+    for (const [groupIndex, group] of customDataset.entries()) {
+      for (const [optionIndex, variant] of group.options.entries()) {
+        const filesForVariant = customFiles.slice(
+          customCursor,
+          customCursor + (variant.images?.length ?? 0),
+        );
+
+        if (filesForVariant.length !== (variant.images?.length ?? 0)) {
+          throw new Error("Custom image count mismatch");
+        }
+
+        customCursor += variant.images.length;
+
+        const imagePaths =
+          filesForVariant.length > 0
+            ? await uploadFiles(
+                filesForVariant,
+                `product/${productId}/custom/${group.groupId}/${variant.id}`,
+              )
+            : [];
+
+        uploadedPaths.push(...imagePaths);
+
         const rowId = crypto.randomUUID();
         variantIds.push(rowId);
 
-        return {
+        customRows.push({
           id: rowId,
           groupId: productId,
           kind: "custom",
@@ -378,11 +416,11 @@ export async function POST(request: Request) {
           weight: variant.weight ?? null,
           details: variant.details ?? null,
           metadata: variant.metadataRows,
-          images: [],
+          images: imagePaths,
           position: colorRows.length + sizeRows.length + groupIndex + optionIndex + 1,
-        };
-      }),
-    );
+        });
+      }
+    }
 
     const baseRowId = crypto.randomUUID();
     variantIds.unshift(baseRowId);

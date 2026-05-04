@@ -1,5 +1,4 @@
 "use client";
-import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import Image from "next/image";
 import React from "react";
@@ -7,7 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Heart, Share2, AlertCircle } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import RatingReviews from "./rating-reviews";
-import { Card, CardContent } from "@/components/ui/card";
+import { formatMoney } from "@/hooks/use-cart-store";
+import { useProductSelectionStore } from "@/hooks/use-product-selection-store";
 
 export default function Product({
   data,
@@ -24,7 +24,7 @@ export default function Product({
     };
     category: {
       id: string;
-      parentId: any;
+      parentId: string | null;
       name: string;
       slug: string;
       description: string;
@@ -55,25 +55,58 @@ export default function Product({
       kind: string;
       enabled: boolean;
       title: string;
-      optionName: any;
+      optionName: string | null;
       images: Array<string>;
       createdAt: string;
       updatedAt: string;
     }>;
   };
 }) {
-  const [activeVariant, setActiveVariant] = React.useState(
-    data.variants.find((v) => v.kind === "base") || data.variants[0],
+  const selectedVariantId = useProductSelectionStore(
+    (state) => state.selectedVariantId,
   );
+  const setSelection = useProductSelectionStore((state) => state.setSelection);
+
+  const base = data.variants.find((v) => v.kind === "base");
+  const colors = data.variants.filter((v) => v.kind === "color");
+  const sizes = data.variants.filter((v) => v.kind === "size");
+  const customs = data.variants.filter((v) => v.kind === "custom");
+
+  const defaultVariant = base || data.variants[0];
+
+  const activeVariant =
+    data.variants.find((variant) => variant.id === selectedVariantId) ||
+    defaultVariant;
 
   const [activeImageIndex, setActiveImageIndex] = React.useState(0);
   const [isWishlisted, setIsWishlisted] = React.useState(false);
 
   // Reset index when variant changes
-  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
+  // biome-ignore lint/correctness/useExhaustiveDependencies: selection sync is handled by the shared store
   React.useEffect(() => {
     setActiveImageIndex(0);
   }, [activeVariant]);
+
+  React.useEffect(() => {
+    if (!defaultVariant) return;
+
+    const hasSelectedVariant = data.variants.some(
+      (variant) => variant.id === selectedVariantId,
+    );
+
+    if (!selectedVariantId || !hasSelectedVariant) {
+      setSelection({
+        productId: data.product.id,
+        selectedVariantId: defaultVariant.id,
+      });
+    }
+  }, [
+    data.product.id,
+    data.variants,
+    defaultVariant,
+    selectedVariantId,
+    setSelection,
+  ]);
 
   const images = activeVariant?.images || [];
 
@@ -81,14 +114,6 @@ export default function Product({
   const safeIndex = activeImageIndex >= images.length ? 0 : activeImageIndex;
 
   const activeImage = images[safeIndex] || "https://placehold.co/900x600.png";
-  const sizes = data.variants.reduce((acc, variant) => {
-    if (variant.kind === "size") {
-      acc.add(variant.weight || "Unknown Size");
-    }
-    return acc;
-  }, new Set<string>());
-  const base = data.variants.find((v) => v.kind === "base");
-  const colors = data?.variants.filter((v) => v.kind === "color") || [];
 
   const priceNum = parseFloat(activeVariant?.price || "0");
   const compareNum = parseFloat(activeVariant?.compareAtPrice || "0");
@@ -99,81 +124,100 @@ export default function Product({
   const isOutOfStock =
     !activeVariant?.stockQuantity || activeVariant.stockQuantity <= 0;
 
-  const ratingData = [
-    { stars: 5, count: 90, total: 100 },
-    { stars: 4, count: 5, total: 100 },
-    { stars: 3, count: 0, total: 100 },
-    { stars: 2, count: 5, total: 100 },
-    { stars: 1, count: 0, total: 100 },
-  ];
-
-  const averageRating = 4.5;
-  const totalReviews = 120;
-
   return (
     <div className="col-span-3">
       <header className="h-[calc(80vh-104px)] grid grid-cols-3 gap-6 py-2">
-        {/* Main Image */}
-        <div className="h-full w-full relative col-span-2 border rounded-lg overflow-hidden bg-gradient-to-br from-slate-50 to-slate-100 group">
-          <Image
-            src={activeImage}
-            alt="Product Image"
-            fill
-            className="object-contain object-center w-full transition-transform duration-300 group-hover:scale-105"
-            priority
-          />
-          {discount > 0 && (
-            <div className="absolute top-4 right-4 bg-red-500 text-white px-3 py-1 rounded-lg font-bold text-sm">
-              -{discount}%
+        {/* If only one image, show it full width (no thumbnail rail) */}
+        {images.length <= 1 ? (
+          <div className="h-full w-full relative col-span-3 border rounded-lg overflow-hidden bg-linear-to-br from-slate-50 to-slate-100 group">
+            <Image
+              src={activeImage}
+              alt="Product Image"
+              fill
+              className="object-contain object-center w-full transition-transform duration-300 group-hover:scale-105"
+              priority
+            />
+            {discount > 0 && (
+              <div className="absolute top-4 right-4 bg-red-500 text-white px-3 py-1 rounded-lg font-bold text-sm">
+                -{discount}%
+              </div>
+            )}
+            <div className="absolute bottom-4 left-4 bg-black/50 text-white px-3 py-1 rounded-lg text-xs">
+              {safeIndex + 1} / {images.length}
             </div>
-          )}
-          <div className="absolute bottom-4 left-4 bg-black/50 text-white px-3 py-1 rounded-lg text-xs">
-            {safeIndex + 1} / {images.length}
           </div>
-        </div>
-
-        {/* Thumbnails */}
-        <div className="grid grid-rows-3 gap-4 overflow-y-auto pr-2">
-          {images.map((img, index) => (
-            // biome-ignore lint/a11y/noStaticElementInteractions: <explanation>
-            // biome-ignore lint/a11y/useKeyWithClickEvents: <explanation>
-            <div
-              // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
-              key={index}
-              className="relative w-full h-full cursor-pointer rounded-lg overflow-hidden group/thumb"
-              onClick={() => setActiveImageIndex(index)}
-            >
+        ) : (
+          <>
+            {/* Main Image */}
+            <div className="h-full w-full relative col-span-2 border rounded-lg overflow-hidden bg-linear-to-br from-slate-50 to-slate-100 group">
               <Image
-                src={img || "https://placehold.co/900x600.png"}
-                alt={`Thumbnail ${index}`}
+                src={activeImage}
+                alt="Product Image"
                 fill
-                className={`object-contain bg-slate-50 transition-all duration-200 ${
-                  safeIndex === index
-                    ? "ring-2 ring-blue-500 border"
-                    : "opacity-60 hover:opacity-100 border"
-                }`}
+                className="object-contain object-center w-full transition-transform duration-300 group-hover:scale-105"
+                priority
               />
+              {discount > 0 && (
+                <div className="absolute top-4 right-4 bg-red-500 text-white px-3 py-1 rounded-lg font-bold text-sm">
+                  -{discount}%
+                </div>
+              )}
+              <div className="absolute bottom-4 left-4 bg-black/50 text-white px-3 py-1 rounded-lg text-xs">
+                {safeIndex + 1} / {images.length}
+              </div>
             </div>
-          ))}
-        </div>
+
+            {/* Thumbnails: show only unselected images */}
+            <div className="grid auto-rows-fr gap-4 overflow-y-auto pr-2">
+              {images
+                .map((img, index) => ({ img, index }))
+                .filter(({ index }) => index !== safeIndex)
+                .map(({ img, index }) => (
+                  // biome-ignore lint/a11y/noStaticElementInteractions: thumbnail wrapper is intentionally clickable
+                  // biome-ignore lint/a11y/useKeyWithClickEvents: keyboard support will be added with the full gallery controls
+                  <div
+                    key={index}
+                    className="relative w-full h-full cursor-pointer rounded-lg overflow-hidden group/thumb"
+                    onClick={() => setActiveImageIndex(index)}
+                  >
+                    <Image
+                      src={img || "https://placehold.co/900x600.png"}
+                      alt={`Thumbnail ${index}`}
+                      fill
+                      className={`object-contain bg-slate-50 transition-all duration-200 hover:opacity-100 border`}
+                    />
+                  </div>
+                ))}
+            </div>
+          </>
+        )}
       </header>
       <div className="grid grid-cols-3 gap-6 mt-6 py-4 border-b">
         <div className="col-span-2">
           {/* Sizes Section */}
-          {sizes.size > 0 && (
+          {sizes.length > 0 && (
             <div className="mb-6">
               <div className="font-semibold text-sm text-slate-700 mb-3">
                 Available Sizes
               </div>
               <div className="flex flex-wrap gap-2">
-                {Array.from(sizes).map((size) => (
-                  <Badge
-                    key={size}
-                    variant="outline"
-                    className="px-3 py-1.5 cursor-pointer hover:bg-slate-100 transition"
+                {sizes.map((size) => (
+                  <Button
+                    key={size.id}
+                    type="button"
+                    variant={
+                      activeVariant?.id === size.id ? "default" : "outline"
+                    }
+                    className="px-3 py-1.5"
+                    onClick={() => {
+                      setSelection({
+                        productId: data.product.id,
+                        selectedVariantId: size.id,
+                      });
+                    }}
                   >
-                    {size}
-                  </Badge>
+                    {size.title || size.weight || "Unknown Size"}
+                  </Button>
                 ))}
               </div>
             </div>
@@ -189,7 +233,12 @@ export default function Product({
                 <button
                   type="button"
                   onClick={() => {
-                    setActiveVariant(base || data.variants[0]);
+                    if (base) {
+                      setSelection({
+                        productId: data.product.id,
+                        selectedVariantId: base.id,
+                      });
+                    }
                   }}
                   className={`overflow-hidden size-8 aspect-square rounded-lg border-2 transition-all ${
                     activeVariant?.kind !== "color"
@@ -204,7 +253,10 @@ export default function Product({
                   <button
                     type="button"
                     onClick={() => {
-                      setActiveVariant(color);
+                      setSelection({
+                        productId: data.product.id,
+                        selectedVariantId: color.id,
+                      });
                     }}
                     key={color.code}
                     className={`size-8 aspect-square rounded-lg border-2 transition-all ${
@@ -217,6 +269,34 @@ export default function Product({
                     }}
                     title={color.title}
                   />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {customs.length > 0 && (
+            <div className="mt-6">
+              <div className="font-semibold text-sm text-slate-700 mb-3">
+                Custom Variants
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {customs.map((variant) => (
+                  <Button
+                    key={variant.id}
+                    type="button"
+                    variant={
+                      activeVariant?.id === variant.id ? "default" : "outline"
+                    }
+                    className="px-3 py-1.5"
+                    onClick={() => {
+                      setSelection({
+                        productId: data.product.id,
+                        selectedVariantId: variant.id,
+                      });
+                    }}
+                  >
+                    {variant.title || variant.optionName || "Custom option"}
+                  </Button>
                 ))}
               </div>
             </div>
@@ -285,11 +365,11 @@ export default function Product({
           <p className="text-xs text-slate-600">Price:</p>
           <div className="flex items-center gap-2">
             <span className="text-2xl font-bold text-slate-900">
-              ${activeVariant?.price || "Free"}
+              {formatMoney(priceNum)}
             </span>
             {discount > 0 && (
               <span className="text-sm line-through text-slate-500">
-                ${activeVariant?.compareAtPrice}
+                {formatMoney(compareNum)}
               </span>
             )}
           </div>

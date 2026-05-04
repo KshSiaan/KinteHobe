@@ -44,6 +44,7 @@ export type ProductSizeVariantsOutput = {
 type SizeProps = {
   onChange?: (output: ProductSizeVariantsOutput) => void;
   initialDraftValues?: ProductSizeVariantFormInput[];
+  baseMetadataRows?: { id: string; name: string; description: string }[];
 };
 
 function createVariant(): ProductSizeVariantFormInput {
@@ -69,6 +70,7 @@ function createVariant(): ProductSizeVariantFormInput {
 export default function SizeVariants({
   onChange,
   initialDraftValues,
+  baseMetadataRows,
 }: SizeProps) {
   const [variants, setVariants] = useState<ProductSizeVariantFormInput[]>(
     initialDraftValues && initialDraftValues.length > 0
@@ -405,6 +407,7 @@ export default function SizeVariants({
                       subtitle="Track extra rows like chest, length, or fit tips for this size."
                       addLabel="Add detail row"
                       value={variant.metadataRows ?? []}
+                      adaptFromBaseRows={baseMetadataRows}
                       onChange={(rows) => {
                         setVariantField(variant.id, "metadataRows", rows);
                         touchVariantField(variant.id, "metadataRows");

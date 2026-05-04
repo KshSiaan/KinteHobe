@@ -260,7 +260,12 @@ export default function Page() {
           return {
             groupId: customKey,
             groupTitle,
-            options: customValues[customKey]?.values ?? [],
+            options: (customValues[customKey]?.values ?? []).map((variant) => ({
+              ...variant,
+              images: (variant.images ?? []).map((_, imageIndex) => ({
+                imageIndex,
+              })),
+            })),
           };
         }),
       },
@@ -279,18 +284,29 @@ export default function Page() {
       });
     });
 
+    const customDatasetForFiles = customVariantList.flatMap((_, index) => {
+      const customKey = `custom-${index}`;
+      return customValues[customKey]?.values ?? [];
+    });
+
+    customDatasetForFiles.forEach((variant) => {
+      (variant.images ?? []).forEach((file) => {
+        formData.append("customImages", file);
+      });
+    });
+
     return formData;
   }, [
     baseValues.values,
     colorVariantActive,
     colorValues.values,
     customVariantList,
+    customValues,
     productCategory,
     productSlug,
     productStatus,
     sizeValues.values,
     sizeVariantActive,
-    customValues,
   ]);
 
   const createProductMutation = useMutation({
@@ -364,6 +380,48 @@ export default function Page() {
       sizeVariantActive,
     ],
   );
+
+  const errorMessage = React.useMemo(() => {
+    if (!baseValues.isValid) return "Base variant contains validation errors.";
+
+    if (baseInputValues.title.trim().length === 0)
+      return "Base title is required.";
+
+    if (baseInputValues.images.length === 0)
+      return "Add at least one image for the base variant.";
+
+    if (colorVariantActive && !colorValues.isValid)
+      return "Color variants contain validation errors.";
+
+    if (sizeVariantActive && !sizeValues.isValid)
+      return "Size variants contain validation errors.";
+
+    if (hasInvalidCustomVariants) {
+      const idx = customVariantList.findIndex((_, i) => {
+        const key = `custom-${i}`;
+        return !customValues[key]?.isValid;
+      });
+
+      const name =
+        idx >= 0
+          ? (customVariantList[idx] ?? `Custom Variant ${idx + 1}`)
+          : "Custom variant";
+      return `Custom variant "${name}" has validation errors.`;
+    }
+
+    return null;
+  }, [
+    baseValues.isValid,
+    baseInputValues.title,
+    baseInputValues.images.length,
+    colorVariantActive,
+    colorValues.isValid,
+    sizeVariantActive,
+    sizeValues.isValid,
+    customValues,
+    customVariantList,
+    hasInvalidCustomVariants,
+  ]);
 
   return (
     <div className="flex-1 w-full p-6 space-y-6">
@@ -542,17 +600,20 @@ export default function Page() {
         ) : showVariant === "colors" ? (
           <Colors
             initialDraftValues={colorValues.draftValues}
+            baseMetadataRows={baseValues.draftValues.metadataRows}
             onChange={handleColorsChange}
           />
         ) : showVariant === "sizes" ? (
           <Sizes
             initialDraftValues={sizeValues.draftValues}
+            baseMetadataRows={baseValues.draftValues.metadataRows}
             onChange={handleSizesChange}
           />
         ) : selectedCustomIndex >= 0 ? (
           <CustomVariants
             key={selectedCustomKey}
             variantTitle={selectedCustomTitle}
+            baseMetadataRows={baseValues.draftValues.metadataRows}
             initialDraftValues={
               selectedCustomKey
                 ? customValues[selectedCustomKey]?.draftValues
@@ -566,23 +627,41 @@ export default function Page() {
       </Card>
       <Card>
         <CardContent className="pt-2 pb-4">
-          {/* Alert-style info block using accent colors */}
-          <div className="rounded-lg bg-accent p-4 space-y-2">
-            <div className="flex gap-3 items-start">
-              <span className="text-destructive font-bold text-lg shrink-0">
-                *
-              </span>
-              <div className="space-y-1">
-                <p className="font-semibold text-accent-foreground">
-                  Complete all fields before adding
-                </p>
-                <p className="text-sm text-accent-foreground/90">
-                  You can edit product details anytime after adding, but verify
-                  everything first to avoid errors.
-                </p>
+          {/* Show a single validation error if present; otherwise show a green confirmation */}
+          {/** Compute one error message from the same checks used by `canSubmit` **/}
+          {errorMessage ? (
+            <div className="rounded-lg bg-destructive/10 p-4 space-y-2">
+              <div className="flex gap-3 items-start">
+                <span className="text-destructive font-bold text-lg shrink-0">
+                  !
+                </span>
+                <div className="space-y-1">
+                  <p className="font-semibold text-destructive">
+                    {errorMessage}
+                  </p>
+                  <p className="text-sm text-destructive/90">
+                    Fix the above error to enable submission.
+                  </p>
+                </div>
               </div>
             </div>
-          </div>
+          ) : (
+            <div className="rounded-lg bg-green-50 p-4 space-y-2">
+              <div className="flex gap-3 items-start">
+                <span className="text-green-600 font-bold text-lg shrink-0">
+                  ✓
+                </span>
+                <div className="space-y-1">
+                  <p className="font-semibold text-green-600">
+                    Confirm everything before submission
+                  </p>
+                  <p className="text-sm text-green-600/90">
+                    If everything looks right, click "Add Product" to submit.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
         </CardContent>
         <CardFooter className="flex justify-between items-center gap-2">
           <AlertDialog>

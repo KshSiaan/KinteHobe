@@ -17,6 +17,17 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import {
+  FileUpload,
+  FileUploadClear,
+  FileUploadDropzone,
+  FileUploadItem,
+  FileUploadItemDelete,
+  FileUploadItemMetadata,
+  FileUploadItemPreview,
+  FileUploadList,
+  FileUploadTrigger,
+} from "@/components/ui/file-upload";
+import {
   productCustomVariantSchema,
   type ProductCustomVariantFormInput,
   type ProductCustomVariantInput,
@@ -28,6 +39,7 @@ import {
   PackageSearchIcon,
   SlidersHorizontalIcon,
   Trash2Icon,
+  UploadCloudIcon,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
@@ -45,6 +57,7 @@ type CustomProps = {
   variantTitle: string;
   onChange?: (output: ProductCustomVariantsOutput) => void;
   initialDraftValues?: ProductCustomVariantFormInput[];
+  baseMetadataRows?: { id: string; name: string; description: string }[];
 };
 
 function createVariant(): ProductCustomVariantFormInput {
@@ -63,7 +76,26 @@ function createVariant(): ProductCustomVariantFormInput {
     compareAtPrice: "",
     weight: "",
     details: "",
+    images: [],
     metadataRows: [],
+  };
+}
+
+function normalizeVariant(
+  variant: Partial<ProductCustomVariantFormInput> & { id: string },
+): ProductCustomVariantFormInput {
+  return {
+    optionName: variant.optionName ?? "",
+    optionCode: variant.optionCode ?? "",
+    sku: variant.sku ?? "",
+    stockQuantity: variant.stockQuantity ?? "",
+    price: variant.price ?? "",
+    compareAtPrice: variant.compareAtPrice ?? "",
+    weight: variant.weight ?? "",
+    details: variant.details ?? "",
+    images: variant.images ?? [],
+    metadataRows: variant.metadataRows ?? [],
+    id: variant.id,
   };
 }
 
@@ -71,10 +103,11 @@ export default function CustomVariants({
   variantTitle,
   onChange,
   initialDraftValues,
+  baseMetadataRows,
 }: CustomProps) {
   const [variants, setVariants] = useState<ProductCustomVariantFormInput[]>(
     initialDraftValues && initialDraftValues.length > 0
-      ? initialDraftValues
+      ? initialDraftValues.map((variant) => normalizeVariant(variant))
       : [createVariant()],
   );
   const [touched, setTouched] = useState<
@@ -237,6 +270,7 @@ export default function CustomVariants({
           const compareAtPriceError = getError(variant.id, "compareAtPrice");
           const weightError = getError(variant.id, "weight");
           const detailsError = getError(variant.id, "details");
+          const imagesError = getError(variant.id, "images");
 
           return (
             <AccordionItem key={variant.id} value={variant.id}>
@@ -249,7 +283,7 @@ export default function CustomVariants({
                   <Badge variant="outline">Stock: {summary.stock}</Badge>
                 </div>
               </AccordionTrigger>
-              <AccordionContent>
+              <AccordionContent className="overflow-y-scroll">
                 <div className="flex flex-col gap-5">
                   <FieldGroup>
                     <Field data-invalid={!!optionNameError}>
@@ -412,11 +446,74 @@ export default function CustomVariants({
                       <FieldError>{detailsError}</FieldError>
                     </Field>
 
+                    <Field data-invalid={!!imagesError}>
+                      <FieldLabel>{variantTitle} Images</FieldLabel>
+                      <FileUpload
+                        id={`custom-images-${variant.id}`}
+                        value={variant.images}
+                        onValueChange={(files) => {
+                          setVariantField(variant.id, "images", files);
+                          touchVariantField(variant.id, "images");
+                        }}
+                        accept="image/*"
+                        maxFiles={8}
+                        multiple
+                        className="w-full"
+                      >
+                        <FileUploadDropzone className="w-full">
+                          <div className="flex flex-col items-center gap-1">
+                            <div className="flex items-center justify-center rounded-full border p-2.5">
+                              <UploadCloudIcon className="size-6 text-muted-foreground" />
+                            </div>
+                            <p className="font-medium text-sm">
+                              Drag & drop files here
+                            </p>
+                            <p className="text-muted-foreground text-xs">
+                              Upload up to 8 photos for this{" "}
+                              {variantTitle.toLowerCase()} option.
+                            </p>
+                          </div>
+                          <FileUploadTrigger asChild>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="mt-2 w-fit"
+                              type="button"
+                            >
+                              Browse files
+                            </Button>
+                          </FileUploadTrigger>
+                        </FileUploadDropzone>
+                        <FileUploadTrigger />
+                        <FileUploadList>
+                          {variant.images.map((file) => (
+                            <FileUploadItem key={file.name} value={file}>
+                              <FileUploadItemPreview />
+                              <FileUploadItemMetadata />
+                              <FileUploadItemDelete asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="size-7"
+                                  type="button"
+                                >
+                                  <Trash2Icon />
+                                </Button>
+                              </FileUploadItemDelete>
+                            </FileUploadItem>
+                          ))}
+                        </FileUploadList>
+                        <FileUploadClear />
+                      </FileUpload>
+                      <FieldError>{imagesError}</FieldError>
+                    </Field>
+
                     <NameDescriptionTableField
                       title={`Additional ${variantTitle} Details (Optional)`}
                       subtitle={`Use optional name/description rows for richer ${variantTitle.toLowerCase()} metadata.`}
                       addLabel="Add detail row"
                       value={variant.metadataRows ?? []}
+                      adaptFromBaseRows={baseMetadataRows}
                       onChange={(rows) => {
                         setVariantField(variant.id, "metadataRows", rows);
                         touchVariantField(variant.id, "metadataRows");

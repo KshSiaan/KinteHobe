@@ -10,7 +10,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { CirclePlusIcon, Rows3Icon, Trash2Icon } from "lucide-react";
+import {
+  CirclePlusIcon,
+  ClipboardPasteIcon,
+  Rows3Icon,
+  Trash2Icon,
+} from "lucide-react";
 
 export type NameDescriptionRow = {
   id: string;
@@ -23,6 +28,7 @@ type NameDescriptionTableFieldProps = {
   subtitle?: string;
   value: NameDescriptionRow[];
   onChange: (rows: NameDescriptionRow[]) => void;
+  adaptFromBaseRows?: NameDescriptionRow[];
   addLabel?: string;
   namePlaceholder?: string;
   descriptionPlaceholder?: string;
@@ -41,11 +47,22 @@ function createRow(): NameDescriptionRow {
   };
 }
 
+function cloneRows(rows: NameDescriptionRow[]) {
+  return rows.map((row) => ({
+    ...row,
+    id:
+      typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
+        ? crypto.randomUUID()
+        : Math.random().toString(36).slice(2),
+  }));
+}
+
 export function NameDescriptionTableField({
   title,
   subtitle,
   value,
   onChange,
+  adaptFromBaseRows,
   addLabel = "Add row",
   namePlaceholder = "Name",
   descriptionPlaceholder = "Description",
@@ -64,6 +81,12 @@ export function NameDescriptionTableField({
     onChange(value.filter((row) => row.id !== id));
   }
 
+  function adaptFromBaseVariant() {
+    if (!adaptFromBaseRows || adaptFromBaseRows.length === 0) return;
+
+    onChange(cloneRows(adaptFromBaseRows));
+  }
+
   return (
     <div className="flex flex-col gap-3 rounded-xl border bg-muted/20 p-4">
       <div className="flex items-start justify-between gap-3">
@@ -78,10 +101,22 @@ export function NameDescriptionTableField({
             ) : null}
           </div>
         </div>
-        <Button type="button" variant="outline" size="sm" onClick={addRow}>
-          <CirclePlusIcon data-icon="inline-start" />
-          {addLabel}
-        </Button>
+        <div className="flex items-center gap-2">
+          {adaptFromBaseRows && adaptFromBaseRows.length > 0 ? (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={adaptFromBaseVariant}
+            >
+              <ClipboardPasteIcon /> Adapt from base variant
+            </Button>
+          ) : null}
+          <Button type="button" variant="outline" size="sm" onClick={addRow}>
+            <CirclePlusIcon data-icon="inline-start" />
+            {addLabel}
+          </Button>
+        </div>
       </div>
 
       <Table>

@@ -13,6 +13,8 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
+import { CheckIcon, TruckIcon } from "lucide-react";
+import Controller from "./controller";
 
 async function getProduct(slug: string) {
   "use cache";
@@ -172,18 +174,15 @@ export default async function Page({
         <Suspense fallback={<div>Loading product...</div>}>
           <Product data={data.data} />
         </Suspense>
-        <Card className="sticky top-30 self-start h-[calc(100vh-136px)]">
-          <CardHeader />
-        </Card>
+        <Suspense fallback={<div>Loading controller...</div>}>
+          <Controller data={data.data} />
+        </Suspense>
       </div>
       <Separator className="my-4" />
       <div className="w-full">
         <h3 className="text-lg">Related Products</h3>
         <Carousel className="grid mt-4">
           <CarouselContent className="py-2">
-            <CarouselItem className="basis-1/5">
-              <Card></Card>
-            </CarouselItem>
             <CarouselItem className="basis-1/5">
               <Card></Card>
             </CarouselItem>

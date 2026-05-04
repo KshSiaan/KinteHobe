@@ -48,6 +48,10 @@ export const productCustomVariantSchema = z.object({
     .max(500, "Details must be at most 500 characters")
     .or(z.literal(""))
     .transform((value) => (value === "" ? undefined : value)),
+  images: z
+    .array(z.instanceof(File))
+    .min(1, "At least one custom variant image is required")
+    .max(8, "You can upload up to 8 custom variant images"),
   metadataRows: metadataTableSchema,
 });
 

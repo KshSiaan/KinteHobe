@@ -96,6 +96,19 @@ function withoutFilesFromColor(
   };
 }
 
+function withoutFilesFromCustom(
+  output: ProductCustomVariantsOutput,
+): ProductCustomVariantsOutput {
+  return {
+    ...output,
+    draftValues: output.draftValues.map((variant) => ({
+      ...variant,
+      images: [],
+    })),
+    values: null,
+  };
+}
+
 export const useProductAddDatasetStore = create<ProductAddDatasetState>()(
   persist(
     (set) => ({
@@ -152,6 +165,12 @@ export const useProductAddDatasetStore = create<ProductAddDatasetState>()(
           images: [],
         },
         colorValues: withoutFilesFromColor(state.colorValues),
+        customValues: Object.fromEntries(
+          Object.entries(state.customValues).map(([key, value]) => [
+            key,
+            withoutFilesFromCustom(value),
+          ]),
+        ),
       }),
     },
   ),

@@ -66,6 +66,9 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { Suspense } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
+import Cart from "./cart";
 
 export default function Navbar() {
   const { isPending, data } = authClient.useSession();
@@ -161,9 +164,9 @@ export default function Navbar() {
                 <div className="h-[40dvh]"></div>
               </SheetContent>
             </Sheet>
-            <Button variant={"ghost"} size={"icon"}>
-              <ShoppingCartIcon />
-            </Button>
+            <Suspense fallback={<Skeleton className="size-8" />}>
+              <Cart />
+            </Suspense>
             {isPending ? (
               <div className="flex items-center gap-2">
                 <Spinner variant="infinite" />

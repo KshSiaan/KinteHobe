@@ -49,6 +49,7 @@ const customOptionSchema = z.object({
   compareAtPrice: z.number().optional(),
   weight: z.string().trim().optional(),
   details: z.string().trim().optional(),
+  images: z.array(z.unknown()),
   metadataRows: z.array(metadataTableRowSchema),
 });
 

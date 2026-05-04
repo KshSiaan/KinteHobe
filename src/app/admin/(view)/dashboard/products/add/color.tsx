@@ -70,6 +70,7 @@ export type ProductColorVariantsOutput = {
 type BaseProps = {
   onChange?: (output: ProductColorVariantsOutput) => void;
   initialDraftValues?: ProductColorVariantFormInput[];
+  baseMetadataRows?: { id: string; name: string; description: string }[];
 };
 
 function createVariant(): ProductColorVariantFormInput {
@@ -95,6 +96,7 @@ function createVariant(): ProductColorVariantFormInput {
 export default function ColorVariants({
   onChange,
   initialDraftValues,
+  baseMetadataRows,
 }: BaseProps) {
   const [variants, setVariants] = useState<ProductColorVariantFormInput[]>(
     initialDraftValues && initialDraftValues.length > 0
@@ -494,6 +496,7 @@ export default function ColorVariants({
                       subtitle="Track optional pairs like finish, dye lot, or display notes for this color."
                       addLabel="Add detail row"
                       value={variant.metadataRows ?? []}
+                      adaptFromBaseRows={baseMetadataRows}
                       onChange={(rows) => {
                         setVariantField(variant.id, "metadataRows", rows);
                         touchVariantField(variant.id, "metadataRows");
