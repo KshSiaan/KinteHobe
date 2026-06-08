@@ -286,8 +286,10 @@ export default function Navbar() {
             <Button variant={"ghost"} size={"icon-sm"}>
               <ScrollTextIcon />
             </Button>
-            <Button variant={"ghost"} size={"icon-sm"}>
-              <UsersIcon />
+            <Button variant={"ghost"} size={"icon-sm"} asChild>
+              <Link href="/people">
+                <UsersIcon />
+              </Link>
             </Button>
             <Button variant={"ghost"} size={"icon-sm"}>
               <MapPinHouse />

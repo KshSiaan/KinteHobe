@@ -13,6 +13,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Spinner } from "@/components/kibo-ui/spinner";
 import DailyDiscover from "./home/daily-discover";
 import HeroWrapper from "./home/hero-wrapper";
+import MinimalCategories from "./home/minimal-categories";
 
 export default async function Home() {
   return (
@@ -58,16 +59,7 @@ export default async function Home() {
         <section className="container mx-auto py-12">
           <h2 className="text-base font-semibold">Top Categories</h2>
           <div className="grid grid-cols-4 gap-6 mt-6">
-            {Array.from({ length: 8 }).map((_, i) => (
-              // biome-ignore lint/suspicious/noArrayIndexKey: test purpose only
-              <Link href={"#"} key={i}>
-                <Card className="p-0! flex flex-col transition-transform relative rounded-none shadow-none border-dashed overflow-visible">
-                  <CardContent className="text-center py-4">
-                    <h4 className="text-base font-bold">Category {i + 1}</h4>
-                  </CardContent>
-                </Card>
-              </Link>
-            ))}
+            <MinimalCategories />
           </div>
         </section>
         <section className="container mx-auto py-12">
