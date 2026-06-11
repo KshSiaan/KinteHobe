@@ -172,10 +172,10 @@ export default async function Page({
     <main className="p-4">
       <div className="grid grid-cols-4 gap-4 min-h-screen">
         <Suspense fallback={<div>Loading product...</div>}>
-          <Product data={data.data} />
+          <Product data={data.data ?? null} />
         </Suspense>
         <Suspense fallback={<div>Loading controller...</div>}>
-          <Controller data={data.data} />
+          <Controller data={data.data ?? null} />
         </Suspense>
       </div>
       <Separator className="my-4" />
