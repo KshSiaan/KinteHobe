@@ -1,31 +1,30 @@
-import UnderlineTabs from "@/components/shadcn-studio/tabs/tabs-29";
+import FollowButton from "@/components/core/extra/follow-button";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { followRequest } from "@/db/schema";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
+import { and, count, eq } from "drizzle-orm";
 import {
   CalendarDaysIcon,
-  EditIcon,
   MessageSquareIcon,
   MoreVerticalIcon,
 } from "lucide-react";
 import { headers } from "next/headers";
 import Image from "next/image";
-import Activity from "./_me/activity";
-import Purchases from "./_me/purchases";
-import Saved from "./_me/saved";
-import Insights from "./_me/insights";
-import { and, count, eq } from "drizzle-orm";
-import Link from "next/link";
 
-export default async function Page() {
-  const data = await auth?.api?.getSession({
-    headers: await headers(),
+export default async function Page({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const uid = (await params).id;
+  const header = await headers();
+  const data = await auth?.api?.getUser({
+    headers: header,
+    query: { id: uid },
   });
-  const user = data?.user;
-
-  const userId = user?.id ?? "";
+  const user = data;
 
   const [[{ followers }], [{ following }]] = await Promise.all([
     db
@@ -33,7 +32,7 @@ export default async function Page() {
       .from(followRequest)
       .where(
         and(
-          eq(followRequest.followingId, userId),
+          eq(followRequest.followingId, uid),
           eq(followRequest.status, "accepted"),
         ),
       ),
@@ -42,7 +41,7 @@ export default async function Page() {
       .from(followRequest)
       .where(
         and(
-          eq(followRequest.followerId, userId),
+          eq(followRequest.followerId, uid),
           eq(followRequest.status, "accepted"),
         ),
       ),
@@ -113,12 +112,7 @@ export default async function Page() {
 
                 {/* Action buttons */}
                 <div className="flex flex-wrap gap-2 pt-4">
-                  <Button className="gap-2" asChild>
-                    <Link href="/me/settings">
-                      <EditIcon className="w-4 h-4" />
-                      Edit Profile
-                    </Link>
-                  </Button>
+                  <FollowButton userId={user?.id || ""} />
                   <Button variant="outline" className="gap-2">
                     <MessageSquareIcon className="w-4 h-4" />
                     Message
@@ -154,7 +148,7 @@ export default async function Page() {
             ))}
           </section>
           <section className="mt-8 w-full">
-            <UnderlineTabs
+            {/* <UnderlineTabs
               tabs={[
                 {
                   name: "Activity",
@@ -177,7 +171,7 @@ export default async function Page() {
                   content: <Insights />,
                 },
               ]}
-            />
+            /> */}
           </section>
         </div>
       </div>

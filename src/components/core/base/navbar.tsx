@@ -191,24 +191,17 @@ export default function Navbar() {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  <DropdownMenuItem disabled>
+                  {/* <DropdownMenuItem disabled>
                     <span className="text-xs text-muted-foreground">
                       {data.user.email}
                     </span>
-                  </DropdownMenuItem>
-                  {
+                  </DropdownMenuItem> */}
+                  {data?.user?.role === "admin" && (
                     <DropdownMenuItem asChild>
-                      <Link
-                        href={
-                          data?.user?.role === "admin"
-                            ? "/admin/dashboard"
-                            : "/me"
-                        }
-                      >
-                        Dashboard
-                      </Link>
+                      <Link href={"/admin/dashboard"}>Dashboard</Link>
                     </DropdownMenuItem>
-                  }
+                  )}
+
                   <DropdownMenuItem asChild>
                     <Link href="/me">Profile</Link>
                   </DropdownMenuItem>
