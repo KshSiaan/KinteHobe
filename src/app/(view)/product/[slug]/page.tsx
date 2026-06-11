@@ -167,7 +167,9 @@ export default async function Page({
       }>;
     };
   }> = await getProduct(slug);
-
+  if (!data) {
+    return <>lol</>;
+  }
   return (
     <main className="p-4">
       <div className="grid grid-cols-4 gap-4 min-h-screen">
