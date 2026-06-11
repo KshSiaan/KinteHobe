@@ -54,7 +54,7 @@ export default function Cart() {
               {data.map((item) => (
                 <div key={item.id} className="flex items-center gap-4">
                   <img
-                    src={item.image}
+                    src={item.image ?? "/placeholder.svg"}
                     alt={item.productTitle}
                     className="h-16 w-16 rounded-md object-cover"
                   />

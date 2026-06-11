@@ -30,6 +30,7 @@ export type CartLineItem = {
   lineCompareAtTotal?: number | null;
   createdAt: string;
   updatedAt: string;
+  image?: string | null;
 };
 
 type AddCartItemInput = {
