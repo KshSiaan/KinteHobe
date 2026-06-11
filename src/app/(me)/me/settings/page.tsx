@@ -2,9 +2,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import React from "react";
 import General from "./general";
 import Security from "./security";
-import Shopping from "./shopping";
-import Organization from "./organization";
+
 import Restricted from "./restricted";
+import Appearance from "./appearance";
+import Agent from "./agent";
 
 export default function Page() {
   return (
@@ -13,8 +14,8 @@ export default function Page() {
         <TabsList>
           <TabsTrigger value="general">General</TabsTrigger>
           <TabsTrigger value="security">Security</TabsTrigger>
-          <TabsTrigger value="shopping">Shopping</TabsTrigger>
-          <TabsTrigger value="organizations">Organizations</TabsTrigger>
+          <TabsTrigger value="appearance">Appearance</TabsTrigger>
+          <TabsTrigger value="agent">Agent</TabsTrigger>
           <TabsTrigger value="restricted">Restricted Zone</TabsTrigger>
         </TabsList>
         <TabsContent value="general">
@@ -23,11 +24,11 @@ export default function Page() {
         <TabsContent value="security">
           <Security />
         </TabsContent>
-        <TabsContent value="shopping">
-          <Shopping />
+        <TabsContent value="appearance">
+          <Appearance />
         </TabsContent>
-        <TabsContent value="organizations">
-          <Organization />
+        <TabsContent value="agent">
+          <Agent />
         </TabsContent>
         <TabsContent value="restricted">
           <Restricted />

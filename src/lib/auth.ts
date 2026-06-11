@@ -9,12 +9,11 @@ export const auth = betterAuth({
         provider: "pg",
     }),
     secret: process.env.BETTER_AUTH_SECRET,
-    baseURL: process.env.BETTER_AUTH_URL || "https://kintehobe.vercel.app",
+    baseURL: process.env.NEXT_PUBLIC_BETTER_AUTH_URL || "https://kintehobe.vercel.app",
     trustedOrigins: ["https://kintehobe.vercel.app","http://localhost:3000"],
     emailAndPassword: {
         enabled: true,
         requireEmailVerification: true,
-        
     },
     emailVerification:{
         sendOnSignUp:true,

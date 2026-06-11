@@ -53,7 +53,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { authClient } from "@/lib/auth-client";
 import { sileo } from "sileo";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { Spinner } from "@/components/kibo-ui/spinner";
 import {
   AlertDialog,
@@ -72,7 +72,7 @@ import Cart from "./cart";
 
 export default function Navbar() {
   const { isPending, data } = authClient.useSession();
-
+  const path = usePathname();
   const router = useRouter();
 
   const handleLogout = async () => {
@@ -244,46 +244,55 @@ export default function Navbar() {
             </Button>
           </div>
           <div className="flex gap-2 items-center h-full">
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button variant={"ghost"} size={"icon-sm"}>
-                  <BellIcon />
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent>
-                <PopoverHeader className="flex! flex-row justify-between items-center">
-                  <PopoverTitle>Notifications</PopoverTitle>
-                  <Button size={"icon-sm"} variant={"ghost"}>
-                    <CheckCheckIcon />
+            {data?.session.token && (
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant={"ghost"} size={"icon-sm"}>
+                    <BellIcon />
                   </Button>
-                </PopoverHeader>
-                <div className="">
-                  <Alert>
-                    <UserPlus />
-                    <AlertTitle>Chimichanga followed you</AlertTitle>
-                    <AlertDescription className="text-xs line-clamp-2">
-                      Lorem ipsum dolor sit amet consectetur, adipisicing elit.
-                      Sunt sed consequatur incidunt saepe molestiae placeat
-                      error officiis, modi repudiandae perferendis culpa quaerat
-                      adipisci maiores similique quod ut facilis officia neque.
-                    </AlertDescription>
-                  </Alert>
-                </div>
-                <div className="">
-                  <Button variant={"secondary"} size={"sm"} className="w-full">
-                    View all notifications
-                  </Button>
-                </div>
-              </PopoverContent>
-            </Popover>
+                </PopoverTrigger>
+                <PopoverContent>
+                  <PopoverHeader className="flex! flex-row justify-between items-center">
+                    <PopoverTitle>Notifications</PopoverTitle>
+                    <Button size={"icon-sm"} variant={"ghost"}>
+                      <CheckCheckIcon />
+                    </Button>
+                  </PopoverHeader>
+                  <div className="">
+                    <Alert>
+                      <UserPlus />
+                      <AlertTitle>Chimichanga followed you</AlertTitle>
+                      <AlertDescription className="text-xs line-clamp-2">
+                        Lorem ipsum dolor sit amet consectetur, adipisicing
+                        elit. Sunt sed consequatur incidunt saepe molestiae
+                        placeat error officiis, modi repudiandae perferendis
+                        culpa quaerat adipisci maiores similique quod ut facilis
+                        officia neque.
+                      </AlertDescription>
+                    </Alert>
+                  </div>
+                  <div className="">
+                    <Button
+                      variant={"secondary"}
+                      size={"sm"}
+                      className="w-full"
+                    >
+                      View all notifications
+                    </Button>
+                  </div>
+                </PopoverContent>
+              </Popover>
+            )}
             <Button variant={"ghost"} size={"icon-sm"}>
               <ScrollTextIcon />
             </Button>
-            <Button variant={"ghost"} size={"icon-sm"} asChild>
-              <Link href="/people">
-                <UsersIcon />
-              </Link>
-            </Button>
+            {data?.session?.token && (
+              <Button variant={"ghost"} size={"icon-sm"} asChild>
+                <Link href="/people">
+                  <UsersIcon />
+                </Link>
+              </Button>
+            )}
             <Button variant={"ghost"} size={"icon-sm"}>
               <MapPinHouse />
             </Button>
