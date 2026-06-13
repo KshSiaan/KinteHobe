@@ -153,17 +153,19 @@ export default function Navbar() {
                 <DropdownMenuItem>Bangla</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-            <Sheet>
-              <SheetTrigger asChild>
-                <Button variant={"ghost"}>Filter by</Button>
-              </SheetTrigger>
-              <SheetContent side="bottom">
-                <SheetHeader>
-                  <SheetTitle>Filter by</SheetTitle>
-                </SheetHeader>
-                <div className="h-[40dvh]"></div>
-              </SheetContent>
-            </Sheet>
+            {path === "/" && (
+              <Sheet>
+                <SheetTrigger asChild>
+                  <Button variant={"ghost"}>Filter by</Button>
+                </SheetTrigger>
+                <SheetContent side="bottom">
+                  <SheetHeader>
+                    <SheetTitle>Filter by</SheetTitle>
+                  </SheetHeader>
+                  <div className="h-[40dvh]"></div>
+                </SheetContent>
+              </Sheet>
+            )}
             <Suspense fallback={<Skeleton className="size-8" />}>
               <Cart />
             </Suspense>
@@ -283,15 +285,18 @@ export default function Navbar() {
                 </PopoverContent>
               </Popover>
             )}
-            <Button variant={"ghost"} size={"icon-sm"}>
-              <ScrollTextIcon />
-            </Button>
+
             {data?.session?.token && (
-              <Button variant={"ghost"} size={"icon-sm"} asChild>
-                <Link href="/people">
-                  <UsersIcon />
-                </Link>
-              </Button>
+              <>
+                <Button variant={"ghost"} size={"icon-sm"}>
+                  <ScrollTextIcon />
+                </Button>
+                <Button variant={"ghost"} size={"icon-sm"} asChild>
+                  <Link href="/people">
+                    <UsersIcon />
+                  </Link>
+                </Button>
+              </>
             )}
             <Button variant={"ghost"} size={"icon-sm"}>
               <MapPinHouse />
