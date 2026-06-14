@@ -17,9 +17,9 @@ import { howl } from "@/lib/utils";
 import { sileo } from "sileo";
 import { Spinner } from "@/components/kibo-ui/spinner";
 import { useParams, useRouter } from "next/navigation";
-export default function Write() {
+export default function Write({ published }: { published: boolean }) {
   const { slug } = useParams();
-  const  navig = useRouter();
+  const navig = useRouter();
   const [rating, setRating] = useState(0);
   const [review, setReview] = useState("");
 
@@ -40,8 +40,8 @@ export default function Write() {
         title: "Error",
         description: err instanceof Error ? err.message : "An error occurred",
       });
-      if(err.message === "Unauthorized") {
-        navig.push("/auth/login")
+      if (err.message === "Unauthorized") {
+        navig.push("/auth/login");
       }
     },
     onSuccess: (res: any) => {
@@ -51,7 +51,20 @@ export default function Write() {
       });
     },
   });
+  if (published) {
+    return (
+      <Card className="border-primary/20 bg-primary/5 border-2">
+        <CardHeader>
+          <CardTitle className="text-lg">Thanks for your review ✨</CardTitle>
+        </CardHeader>
 
+        <CardContent className="text-sm text-muted-foreground">
+          You’ve already reviewed this product. Your feedback helps others
+          decide.
+        </CardContent>
+      </Card>
+    );
+  }
   return (
     <Card>
       <CardHeader>

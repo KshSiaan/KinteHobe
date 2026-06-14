@@ -1,24 +1,69 @@
-"use client"
+"use client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
-import { Star } from "lucide-react";
+import { Star, Trash2Icon } from "lucide-react";
 import { Suspense } from "react";
 import Write from "./write";
+import { useQuery } from "@tanstack/react-query";
+import { useParams } from "next/navigation";
+import Link from "next/link";
+import { authClient } from "@/lib/auth-client";
+import { Button } from "@/components/ui/button";
 
 export default function RatingReviews() {
-  // const
+  const slug = useParams().slug;
+  const { data, isPending } = useQuery({
+    queryKey: ["reviews"],
+    queryFn: async (): Promise<{
+      message: string;
+      data: Array<{
+        review: {
+          id: string;
+          productId: string;
+          authorId: string;
+          ratingFloat: number;
+          reviewText: string;
+          createdAt: string;
+        };
+        user: {
+          id: string;
+          name: string;
+          email: string;
+          emailVerified: boolean;
+          image: string;
+          createdAt: string;
+          updatedAt: string;
+          role: string;
+          banned: boolean;
+          banReason: any;
+          banExpires: any;
+        };
+      }>;
+    }> => {
+      const res = await fetch(`/api/review/${slug}`);
+      return res.json();
+    },
+  });
+  const session = authClient.useSession();
+  const reviews = data?.data ?? [];
+  const ratingData = [5, 4, 3, 2, 1].map((stars) => {
+    const count = reviews.filter(
+      (r) => Math.floor(r.review.ratingFloat) === stars,
+    ).length;
 
-  const ratingData = [
-    { stars: 5, count: 90, total: 100 },
-    { stars: 4, count: 5, total: 100 },
-    { stars: 3, count: 0, total: 100 },
-    { stars: 2, count: 5, total: 100 },
-    { stars: 1, count: 0, total: 100 },
-  ];
+    return {
+      stars,
+      count,
+      total: reviews.length || 1,
+      percent: (count / (reviews.length || 1)) * 100,
+    };
+  });
 
-  const averageRating = 4.5;
-  const totalReviews = 120;
+  const averageRating =
+    (data?.data?.reduce((acc, curr) => acc + curr.review.ratingFloat, 0) ?? 0) /
+    (data?.data?.length || 1);
+  const totalReviews = data?.data?.length || 0;
 
   return (
     <main className="min-h-screen bg-background ">
@@ -40,7 +85,7 @@ export default function RatingReviews() {
             <CardContent className="flex flex-col items-center justify-center text-center h-full w-full">
               <div className="relative">
                 <div className="text-6xl font-bold text-primary">
-                  {averageRating}
+                  {averageRating.toFixed(1)}
                 </div>
                 <p className="text-sm text-muted-foreground mt-2">out of 5</p>
               </div>
@@ -78,7 +123,7 @@ export default function RatingReviews() {
             </CardHeader>
             <CardContent className="pt-6">
               <div className="space-y-4">
-                {ratingData.map(({ stars, count, total }) => (
+                {ratingData.map(({ stars, percent }) => (
                   <div key={stars} className="flex items-center gap-4">
                     {/* Stars */}
                     <div className="flex items-center gap-1 min-w-fit">
@@ -97,12 +142,12 @@ export default function RatingReviews() {
 
                     {/* Progress Bar */}
                     <div className="flex-1">
-                      <Progress value={count} className="h-2" />
+                      <Progress value={percent} className="h-2" />
                     </div>
 
                     {/* Count */}
                     <div className="text-sm font-medium text-foreground min-w-fit">
-                      {count}%
+                      {Math.round(percent)}%
                     </div>
                   </div>
                 ))}
@@ -116,7 +161,13 @@ export default function RatingReviews() {
                       Recommended
                     </p>
                     <p className="text-2xl font-bold text-foreground mt-1">
-                      96%
+                      {Math.floor(
+                        (reviews.filter((r) => r.review.ratingFloat >= 2)
+                          .length /
+                          (reviews.length || 1)) *
+                          100,
+                      )}
+                      %
                     </p>
                   </div>
                   <div>
@@ -140,57 +191,67 @@ export default function RatingReviews() {
           </h2>
 
           <div className="grid gap-6">
-            {[
-              {
-                author: "Sarah Mitchell",
-                rating: 5,
-                date: "2 weeks ago",
-                title: "Absolutely Perfect!",
-                text: "The quality exceeded my expectations. Fast shipping and excellent customer service. Highly recommend!",
-              },
-              {
-                author: "James Chen",
-                rating: 5,
-                date: "1 month ago",
-                title: "Worth Every Penny",
-                text: "Premium product at a fair price. The attention to detail is remarkable. This will be my go-to brand going forward.",
-              },
-              {
-                author: "Emma Rodriguez",
-                rating: 4,
-                date: "1 month ago",
-                title: "Great Quality, Highly Satisfied",
-                text: "Very pleased with my purchase. Only minor issue was packaging could have been more eco-friendly, but overall fantastic.",
-              },
-            ].map((review, idx) => (
+            {data?.data?.map((review, idx) => (
               // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
-              <Card key={idx} className="shadow-sm border-border/40">
-                <CardContent className="pt-6">
+              <Card key={idx} className="shadow-sm border-border/40 relative">
+                <Button
+                  className="absolute top-4 right-4"
+                  variant="ghost"
+                  size="icon-sm"
+                >
+                  <Trash2Icon />
+                </Button>
+                <CardContent>
                   <div className="flex items-start justify-between mb-4">
                     <div>
-                      <h3 className="font-semibold text-foreground">
-                        {review.title}
-                      </h3>
                       <div className="flex items-center gap-2 mt-1">
                         <div className="flex gap-0.5">
-                          {Array.from({ length: review.rating }).map((_, i) => (
-                            <Star
+                          {Array.from({ length: 5 }).map((_, i) => {
+                            const fill = Math.min(
+                              Math.max(review.review.ratingFloat - i, 0),
+                              1,
+                            );
+
+                            return (
                               // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
-                              key={i}
-                              size={14}
-                              className="fill-primary text-primary"
-                            />
-                          ))}
+                              <div key={i} className="relative">
+                                {/* empty star */}
+                                <Star
+                                  size={14}
+                                  className="text-muted-foreground/30 opacity-30"
+                                />
+
+                                {/* filled star */}
+                                <div
+                                  className="absolute top-0 left-0 overflow-hidden"
+                                  style={{ width: `${fill * 100}%` }}
+                                >
+                                  <Star
+                                    size={14}
+                                    className="fill-primary text-primary"
+                                  />
+                                </div>
+                              </div>
+                            );
+                          })}
                         </div>
                         <span className="text-xs text-muted-foreground">
-                          {review.date}
+                          {new Date(review.review.createdAt).toDateString()}
                         </span>
                       </div>
                     </div>
                   </div>
-                  <p className="text-sm text-foreground mb-3">{review.text}</p>
+                  <p className="text-sm text-foreground mb-3">
+                    {review.review.reviewText}
+                  </p>
                   <p className="text-xs font-medium text-muted-foreground">
-                    By {review.author}
+                    By{" "}
+                    <Link
+                      href={`/user/${review.user.id}`}
+                      className="text-primary hover:underline"
+                    >
+                      {review.user.name}
+                    </Link>
                   </p>
                 </CardContent>
               </Card>
@@ -201,7 +262,11 @@ export default function RatingReviews() {
       <Separator className="my-6" />
       <div className="">
         <Suspense fallback={<div>Loading review form...</div>}>
-          <Write />
+          <Write
+            published={reviews.some(
+              (r) => r.user.id === session?.data?.session.userId,
+            )}
+          />
         </Suspense>
       </div>
     </main>
