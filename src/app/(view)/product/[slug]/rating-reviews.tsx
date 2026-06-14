@@ -1,3 +1,4 @@
+"use client"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
@@ -6,6 +7,8 @@ import { Suspense } from "react";
 import Write from "./write";
 
 export default function RatingReviews() {
+  // const
+
   const ratingData = [
     { stars: 5, count: 90, total: 100 },
     { stars: 4, count: 5, total: 100 },

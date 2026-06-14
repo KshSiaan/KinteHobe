@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, boolean, integer, index, real } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, index, numeric, real } from "drizzle-orm/pg-core";
 import type { AnyPgColumn } from "drizzle-orm/pg-core";
 import { product, user } from "../schema";
 
@@ -10,8 +10,8 @@ export const review = pgTable("review", {
     authorId: text("author_id").notNull().references((): AnyPgColumn => user.id, {
         onDelete: "cascade",
     }),
-    ratingFloat: real("rating").notNull(),
-    reviewText: text("review").notNull(),
+    ratingFloat: real("ratingFloat").default(0).notNull(),
+    reviewText: text("reviewText").notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
 },
     (table) => [
