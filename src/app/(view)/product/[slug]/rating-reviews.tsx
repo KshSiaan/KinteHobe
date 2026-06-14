@@ -5,15 +5,19 @@ import { Separator } from "@/components/ui/separator";
 import { Star, Trash2Icon } from "lucide-react";
 import { Suspense } from "react";
 import Write from "./write";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { authClient } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/kibo-ui/spinner";
+import { howl } from "@/lib/utils";
+import { sileo } from "sileo";
 
 export default function RatingReviews() {
   const slug = useParams().slug;
-  const { data, isPending } = useQuery({
+  const session = authClient.useSession();
+  const { data, isPending, refetch } = useQuery({
     queryKey: ["reviews"],
     queryFn: async (): Promise<{
       message: string;
@@ -36,8 +40,8 @@ export default function RatingReviews() {
           updatedAt: string;
           role: string;
           banned: boolean;
-          banReason: any;
-          banExpires: any;
+          banReason: string;
+          banExpires?: Date;
         };
       }>;
     }> => {
@@ -45,7 +49,28 @@ export default function RatingReviews() {
       return res.json();
     },
   });
-  const session = authClient.useSession();
+
+  const { mutate, isPending: isDeleting } = useMutation({
+    mutationKey: ["delete_rating"],
+    mutationFn: (id: string): Promise<{ message?: string }> => {
+      return howl(`/api/review/${id}`, {
+        method: "DELETE",
+      });
+    },
+    onError: (err) => {
+      sileo.error({
+        title: "Error",
+        description: err instanceof Error ? err.message : "An error occurred",
+      });
+    },
+    onSuccess: (res) => {
+      refetch();
+      sileo.success({
+        title: "Success",
+        description: res.message ?? "Review deleted successfully",
+      });
+    },
+  });
   const reviews = data?.data ?? [];
   const ratingData = [5, 4, 3, 2, 1].map((stars) => {
     const count = reviews.filter(
@@ -64,6 +89,14 @@ export default function RatingReviews() {
     (data?.data?.reduce((acc, curr) => acc + curr.review.ratingFloat, 0) ?? 0) /
     (data?.data?.length || 1);
   const totalReviews = data?.data?.length || 0;
+
+  if (isPending) {
+    return (
+      <div className="flex justify-center items-center h-[40dvh] w-full">
+        <Spinner variant={"bars"} />
+      </div>
+    );
+  }
 
   return (
     <main className="min-h-screen bg-background ">
@@ -194,13 +227,21 @@ export default function RatingReviews() {
             {data?.data?.map((review, idx) => (
               // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
               <Card key={idx} className="shadow-sm border-border/40 relative">
-                <Button
-                  className="absolute top-4 right-4"
-                  variant="ghost"
-                  size="icon-sm"
-                >
-                  <Trash2Icon />
-                </Button>
+                {session?.data?.user?.role === "admin" && (
+                  <Button
+                    className="absolute top-4 right-4"
+                    variant="ghost"
+                    size="icon-sm"
+                    onClick={() => mutate(review.review.id)}
+                    disabled={isDeleting}
+                  >
+                    {isDeleting ? (
+                      <Spinner size="sm" />
+                    ) : (
+                      <Trash2Icon className="text-destructive" />
+                    )}
+                  </Button>
+                )}
                 <CardContent>
                   <div className="flex items-start justify-between mb-4">
                     <div>

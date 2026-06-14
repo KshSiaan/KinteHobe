@@ -12,13 +12,14 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { SendIcon } from "lucide-react";
 import StarRating_Fractions from "@/components/commerce-ui/star-rating-fractions";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { howl } from "@/lib/utils";
 import { sileo } from "sileo";
 import { Spinner } from "@/components/kibo-ui/spinner";
 import { useParams, useRouter } from "next/navigation";
 export default function Write({ published }: { published: boolean }) {
   const { slug } = useParams();
+  const qcl = useQueryClient();
   const navig = useRouter();
   const [rating, setRating] = useState(0);
   const [review, setReview] = useState("");
@@ -45,6 +46,7 @@ export default function Write({ published }: { published: boolean }) {
       }
     },
     onSuccess: (res: any) => {
+      qcl.invalidateQueries({ queryKey: ["reviews"] });
       sileo.success({
         title: "Success",
         description: res.message ?? "Review submitted successfully",

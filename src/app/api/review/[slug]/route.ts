@@ -1,4 +1,5 @@
 import { review, product, user } from "@/db/schema";
+import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { eq, and, sql, gte, lt } from "drizzle-orm";
 import { NextRequest } from "next/server";
@@ -50,4 +51,50 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
         message: "This is a placeholder response for GET /api/review/[slug]",
         data: reviewData,
     }));
+}
+
+export async function DELETE(request: Request, { params }: { params: Promise<{ slug: string }> }) {
+
+    const session = await auth.api.getSession({
+        headers: request.headers,
+    })
+
+    if (!session?.session.token) {
+        return new Response(JSON.stringify({
+            message: "Unauthorized"
+        }), { status: 401 });
+    }
+
+
+    if (session.user.role !== "admin" && session.user.role !== "manager") {
+        return new Response(JSON.stringify({
+            message: "Forbidden"
+        }), { status: 403 });
+    }
+
+
+
+    const { slug } = await params;
+
+
+    if (!slug) {
+        return new Response(JSON.stringify({
+            message: "Product slug is required"
+        }), { status: 400 });
+    }
+
+    try{
+        const deleteResult = await db.delete(review).where(eq(review.id, slug)).returning();
+        return new Response(JSON.stringify({
+            message: "Review deleted successfully",
+            data: deleteResult,
+        }));
+    } catch (error) {
+        return new Response(JSON.stringify({
+            message: "Error deleting review",
+            error: error instanceof Error ? error.message : "An error occurred",
+            data: null,
+        }), { status: 500 });
+    }
+
 }
