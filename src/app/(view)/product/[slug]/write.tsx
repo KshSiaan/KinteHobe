@@ -16,7 +16,10 @@ import { useMutation } from "@tanstack/react-query";
 import { howl } from "@/lib/utils";
 import { sileo } from "sileo";
 import { Spinner } from "@/components/kibo-ui/spinner";
+import { useParams, useRouter } from "next/navigation";
 export default function Write() {
+  const { slug } = useParams();
+  const  navig = useRouter();
   const [rating, setRating] = useState(0);
   const [review, setReview] = useState("");
 
@@ -26,8 +29,9 @@ export default function Write() {
       return howl("/api/review", {
         method: "POST",
         body: {
-          rating,
-          review,
+          ratingFloat: rating,
+          reviewText: review,
+          productSlug: slug,
         },
       });
     },
@@ -36,6 +40,9 @@ export default function Write() {
         title: "Error",
         description: err instanceof Error ? err.message : "An error occurred",
       });
+      if(err.message === "Unauthorized") {
+        navig.push("/auth/login")
+      }
     },
     onSuccess: (res: any) => {
       sileo.success({

@@ -35,7 +35,7 @@ export async function GET() {
         id: string;
         slug: string;
         title: string;
-        description:string;
+        description: string;
         category: {
           id: string;
           name: string;
