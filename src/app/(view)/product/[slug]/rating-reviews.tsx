@@ -227,7 +227,8 @@ export default function RatingReviews() {
             {data?.data?.map((review, idx) => (
               // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
               <Card key={idx} className="shadow-sm border-border/40 relative">
-                {session?.data?.user?.role === "admin" && (
+                {(session?.data?.user?.role === "admin" ||
+                  session?.data?.session.userId === review.review.authorId) && (
                   <Button
                     className="absolute top-4 right-4"
                     variant="ghost"

@@ -65,15 +65,6 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ s
         }), { status: 401 });
     }
 
-
-    if (session.user.role !== "admin" && session.user.role !== "manager") {
-        return new Response(JSON.stringify({
-            message: "Forbidden"
-        }), { status: 403 });
-    }
-
-
-
     const { slug } = await params;
 
 
@@ -81,6 +72,20 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ s
         return new Response(JSON.stringify({
             message: "Product slug is required"
         }), { status: 400 });
+    }
+
+    const reviewData = await db.select().from(review).where(eq(review.id, slug)).limit(1);
+    if (reviewData.length === 0) {
+        return new Response(JSON.stringify({
+            message: "Review not found",
+            data: null,
+        }), { status: 404 });
+    }
+
+        if ( reviewData[0].authorId !== session.session.userId && session.user.role !== "admin" && session.user.role !== "manager") {
+        return new Response(JSON.stringify({
+            message: "Forbidden"
+        }), { status: 403 });
     }
 
     try{
