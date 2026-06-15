@@ -48,12 +48,20 @@ export async function POST(request: Request) {
 
 
     const existingWish = await db.select().from(wishlist).where(and(eq(wishlist.userId, user.session.userId), eq(wishlist.productId, productData[0].id))).limit(1);
+    if (existingWish.length === 0) {
+        await db.insert(wishlist).values({
+            id: crypto.randomUUID(),
+            userId: user.session.userId,
+            productId: productData[0].id
+        });
+    }else{
+        await db.delete(wishlist).where(eq(wishlist.id, existingWish[0].id));
+    }
 
     return new Response(
         JSON.stringify({
-            message: "Product found",
+            message: existingWish.length > 0 ? "Product removed from wishlist" : "Product added to wishlist",
             product: productData[0],
-            userId: user.session.userId
         }),
         {
             status: 200
