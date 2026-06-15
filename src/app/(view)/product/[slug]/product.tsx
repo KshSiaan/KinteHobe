@@ -8,6 +8,11 @@ import { Separator } from "@/components/ui/separator";
 import RatingReviews from "./rating-reviews";
 import { formatMoney } from "@/hooks/use-cart-store";
 import { useProductSelectionStore } from "@/hooks/use-product-selection-store";
+import { authClient } from "@/lib/auth-client";
+import { useMutation } from "@tanstack/react-query";
+import { howl } from "@/lib/utils";
+import { sileo } from "sileo";
+import { Spinner } from "@/components/kibo-ui/spinner";
 
 export default function Product({
   data,
@@ -62,6 +67,8 @@ export default function Product({
     }>;
   };
 }) {
+  const { data: sessionData } = authClient.useSession();
+
   const selectedVariantId = useProductSelectionStore(
     (state) => state.selectedVariantId,
   );
@@ -79,7 +86,6 @@ export default function Product({
     defaultVariant;
 
   const [activeImageIndex, setActiveImageIndex] = React.useState(0);
-  const [isWishlisted, setIsWishlisted] = React.useState(false);
 
   // Reset index when variant changes
   // biome-ignore lint/correctness/useExhaustiveDependencies: selection sync is handled by the shared store
@@ -107,6 +113,33 @@ export default function Product({
     selectedVariantId,
     setSelection,
   ]);
+
+  const { mutate, isPending } = useMutation({
+    mutationKey: ["wishList_toggle"],
+    mutationFn: (): Promise<{ message?: string }> => {
+      return howl("/api/wish", {
+        method: "POST",
+        body: {
+          productSlug: data.product.slug,
+        },
+      });
+    },
+    onError: (err) => {
+      sileo.error({
+        title: "Error",
+        description:
+          err instanceof Error
+            ? err.message
+            : "An error occurred while updating your wishlist.",
+      });
+    },
+    onSuccess: (res: { message?: string }) => {
+      sileo.success({
+        title: "Success",
+        description: res.message || "Wishlist updated successfully.",
+      });
+    },
+  });
 
   const images = activeVariant?.images || [];
 
@@ -323,17 +356,24 @@ export default function Product({
 
           {/* Quick Actions */}
           <div className="flex gap-2">
-            <Button
-              size="icon"
-              variant="outline"
-              onClick={() => setIsWishlisted(!isWishlisted)}
-              className="rounded-lg"
-            >
-              <Heart
-                size={20}
-                className={isWishlisted ? "fill-red-500 text-red-500" : ""}
-              />
-            </Button>
+            {sessionData?.user?.id && (
+              <Button
+                size="icon"
+                variant="outline"
+                className="rounded-lg"
+                onClick={() => mutate()}
+                disabled={isPending}
+              >
+                {isPending ? (
+                  <Spinner className="size-5" />
+                ) : (
+                  <Heart
+                    size={20}
+                    // className={isWishlisted ? "fill-red-500 text-red-500" : ""}
+                  />
+                )}
+              </Button>
+            )}
             <Button size="icon" variant="outline" className="rounded-lg">
               <Share2 size={20} />
             </Button>

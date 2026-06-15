@@ -153,7 +153,15 @@ export default async function Page() {
               </Card>
             ))}
           </section>
-          <section className="mt-8 w-full">
+          {userId && (
+            <section className="mt-8 w-full">
+              <h2 className="text-xl font-semibold">My Wishlist</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
+                {/* Wishlist items would go here */}
+              </div>
+            </section>
+          )}
+          {/* <section className="mt-8 w-full">
             <UnderlineTabs
               tabs={[
                 {
@@ -178,7 +186,7 @@ export default async function Page() {
                 },
               ]}
             />
-          </section>
+          </section> */}
         </div>
       </div>
     </main>

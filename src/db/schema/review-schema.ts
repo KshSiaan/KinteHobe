@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, index, numeric, real } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, index, real } from "drizzle-orm/pg-core";
 import type { AnyPgColumn } from "drizzle-orm/pg-core";
 import { product, user } from "../schema";
 

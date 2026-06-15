@@ -1,3 +1,11 @@
+import { redirect } from "next/navigation";
+import { headers } from "next/headers";
+import Link from "next/link";
+import { auth } from "@/lib/auth";
+import { db } from "@/lib/db";
+import { order, orderItem } from "@/db/schema";
+import { eq, desc } from "drizzle-orm";
+
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -8,81 +16,189 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Star } from "lucide-react";
-import Image from "next/image";
-import React from "react";
+import { PackageIcon } from "lucide-react";
 
-export default function Page() {
+function formatMoney(amount: number) {
+  return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(amount);
+}
+
+const STATUS_LABELS: Record<string, string> = {
+  pending_payment: "Pending Payment",
+  paid: "Paid",
+  processing: "Processing",
+  shipped: "Shipped",
+  delivered: "Delivered",
+  cancelled: "Cancelled",
+  refunded: "Refunded",
+};
+
+const STATUS_VARIANTS: Record<
+  string,
+  "default" | "secondary" | "destructive" | "success" | "outline"
+> = {
+  pending_payment: "outline",
+  paid: "secondary",
+  processing: "secondary",
+  shipped: "default",
+  delivered: "success",
+  cancelled: "destructive",
+  refunded: "destructive",
+};
+
+async function getOrders(userId: string) {
+  const orders = await db
+    .select()
+    .from(order)
+    .where(eq(order.userId, userId))
+    .orderBy(desc(order.createdAt));
+
+  const ordersWithItems = await Promise.all(
+    orders.map(async (o) => {
+      const items = await db
+        .select()
+        .from(orderItem)
+        .where(eq(orderItem.orderId, o.id));
+      return { ...o, items };
+    }),
+  );
+
+  return ordersWithItems;
+}
+
+type OrderWithItems = Awaited<ReturnType<typeof getOrders>>[number];
+
+function OrderCard({ o }: { o: OrderWithItems }) {
+  const date = new Date(o.createdAt).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+
+  return (
+    <Card>
+      <CardHeader className="flex flex-row items-center justify-between border-b py-3">
+        <div className="flex items-center gap-3">
+          <Badge variant={STATUS_VARIANTS[o.status] ?? "outline"}>
+            {STATUS_LABELS[o.status] ?? o.status}
+          </Badge>
+          <span className="text-sm text-muted-foreground">{date}</span>
+          <span className="font-mono text-xs text-muted-foreground">
+            #{o.id.slice(0, 8).toUpperCase()}
+          </span>
+        </div>
+        <CardTitle className="text-base">
+          {formatMoney(o.totalCents / 100)}
+        </CardTitle>
+      </CardHeader>
+
+      <CardContent className="divide-y py-0">
+        {o.items.map((item) => (
+          <div
+            key={item.id}
+            className="flex items-center justify-between py-3 gap-4"
+          >
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium line-clamp-1">
+                {item.productTitle}
+              </p>
+              {item.variantTitle && (
+                <p className="text-xs text-muted-foreground">
+                  {item.variantTitle}
+                </p>
+              )}
+              <p className="text-xs text-muted-foreground">
+                Qty: {item.quantity}
+              </p>
+            </div>
+            <p className="text-sm font-semibold tabular-nums shrink-0">
+              {formatMoney(item.lineTotalCents / 100)}
+            </p>
+          </div>
+        ))}
+      </CardContent>
+
+      <CardFooter className="border-t py-3 text-xs text-muted-foreground">
+        {o.shippingAddress}, {o.shippingCity}, {o.shippingState}{" "}
+        {o.shippingZip}, {o.shippingCountry}
+      </CardFooter>
+    </Card>
+  );
+}
+
+function EmptyOrders() {
+  return (
+    <div className="flex flex-col items-center justify-center py-16 gap-4 text-center">
+      <div className="flex h-16 w-16 items-center justify-center rounded-full bg-muted">
+        <PackageIcon className="size-8 text-muted-foreground" />
+      </div>
+      <div className="space-y-1">
+        <p className="font-medium">No orders yet</p>
+        <p className="text-sm text-muted-foreground">
+          Your orders will appear here after you make a purchase.
+        </p>
+      </div>
+      <Button asChild>
+        <Link href="/">Start Shopping</Link>
+      </Button>
+    </div>
+  );
+}
+
+export default async function OrdersPage() {
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (!session) redirect("/auth/login");
+
+  const orders = await getOrders(session.user.id);
+
+  const byStatus = {
+    all: orders,
+    pending: orders.filter((o) =>
+      ["pending_payment", "paid", "processing"].includes(o.status),
+    ),
+    shipped: orders.filter((o) => o.status === "shipped"),
+    delivered: orders.filter((o) => o.status === "delivered"),
+    cancelled: orders.filter((o) =>
+      ["cancelled", "refunded"].includes(o.status),
+    ),
+  };
+
   return (
     <section className="p-8">
-      <h1 className="text-4xl font-semibold border-b">My orders </h1>
+      <h1 className="text-4xl font-semibold border-b pb-4">My Orders</h1>
       <div className="mt-8">
-        <Tabs>
+        <Tabs defaultValue="all">
           <TabsList>
-            <TabsTrigger value="1">All</TabsTrigger>
-            <TabsTrigger value="2">Pending</TabsTrigger>
-            <TabsTrigger value="3">Delivered</TabsTrigger>
-            <TabsTrigger value="4">Cancelled</TabsTrigger>
+            <TabsTrigger value="all">
+              All ({byStatus.all.length})
+            </TabsTrigger>
+            <TabsTrigger value="pending">
+              Pending ({byStatus.pending.length})
+            </TabsTrigger>
+            <TabsTrigger value="shipped">
+              Shipped ({byStatus.shipped.length})
+            </TabsTrigger>
+            <TabsTrigger value="delivered">
+              Delivered ({byStatus.delivered.length})
+            </TabsTrigger>
+            <TabsTrigger value="cancelled">
+              Cancelled ({byStatus.cancelled.length})
+            </TabsTrigger>
           </TabsList>
-          <TabsContent value="1">
-            <div className="w-full">
-              <Card>
-                <CardHeader className="flex justify-between items-center">
-                  <Badge variant={"success"}>Delivered</Badge>
-                  <Button variant={"link"}>
-                    <Star /> Rate and review product
-                  </Button>
-                </CardHeader>
-                <CardHeader className="flex justify-between items-center border-b">
-                  <p className="text-sm text-muted-foreground">
-                    Date || order no
-                  </p>
-                  <CardTitle>
-                    total: <span className="text-2xl">$0.00</span>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="flex items-center justify-between">
-                  <div className="flex justify-start items-center gap-4">
-                    <Image
-                      src={"/img/prod1.jpg"}
-                      alt="Product Image"
-                      height={400}
-                      width={400}
-                      priority
-                      className="size-25 rounded-lg object-cover shadow-md"
-                    />
-                    <div className="flex flex-col gap-1">
-                      <h3 className="text-lg font-semibold">Product Name</h3>
-                      <p className="text-muted-foreground line-clamp-1">
-                        Description of the product.
-                      </p>
-                      <p className="text-muted-foreground text-xs">
-                        Quantity: 1
-                      </p>
-                      <p className="text-muted-foreground text-xs">
-                        Coupon used: None
-                      </p>
-                    </div>
-                  </div>
-                  <Button variant={"outline"}>Order Details</Button>
-                </CardContent>
-                <CardFooter>
-                  <p className="text-sm text-muted-foreground">
-                    Delivery address: 123 Main St, City, Country
-                  </p>
-                </CardFooter>
-              </Card>
-            </div>
-          </TabsContent>
-          <TabsContent value="2">
-            <div className="w-full">Content for Pending</div>
-          </TabsContent>
-          <TabsContent value="3">
-            <div className="w-full">Content for Delivered</div>
-          </TabsContent>
-          <TabsContent value="4">
-            <div className="w-full">Content for Cancelled</div>
-          </TabsContent>
+
+          {(
+            Object.entries(byStatus) as [
+              keyof typeof byStatus,
+              OrderWithItems[],
+            ][]
+          ).map(([tab, list]) => (
+            <TabsContent key={tab} value={tab} className="mt-4 space-y-4">
+              {list.length === 0 ? (
+                <EmptyOrders />
+              ) : (
+                list.map((o) => <OrderCard key={o.id} o={o} />)
+              )}
+            </TabsContent>
+          ))}
         </Tabs>
       </div>
     </section>

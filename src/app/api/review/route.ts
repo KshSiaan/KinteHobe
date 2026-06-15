@@ -83,10 +83,4 @@ export async function POST(request: Request) {
         }), { status: 500 });
 
     }
-
-    return new Response(JSON.stringify({
-        user,
-        review: reviewText,
-        productName: productData[0].baseVariant?.title
-    }));
 }
