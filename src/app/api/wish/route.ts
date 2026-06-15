@@ -68,3 +68,60 @@ export async function POST(request: Request) {
         }
     );
 }
+
+export async function GET(request: Request) {
+    const user = await auth.api.getSession({
+        headers: request.headers,
+    });
+
+    if(!user?.session?.userId) {
+        return new Response(
+            JSON.stringify({
+                message: "Unauthorized"
+            }),
+            {
+                status: 401
+            }
+        );
+    }
+
+    const { searchParams } = new URL(request.url);
+    const productSlug = searchParams.get("productSlug");
+    
+    if (!productSlug) {
+        return new Response(
+            JSON.stringify({
+                message: "Product slug is required"
+            }),
+            {
+                status: 400
+            }
+        );
+    }
+
+    const productData = await db.select().from(product).where(eq(product.slug, productSlug)).limit(1);
+
+    if (productData.length === 0) {
+        return new Response(
+            JSON.stringify({
+                message: "Product not found"
+            }),
+            {
+                status: 404
+            }
+        );
+    }
+
+    const existingWish = await db.select().from(wishlist).where(and(eq(wishlist.userId, user.session.userId), eq(wishlist.productId, productData[0].id))).limit(1);
+
+    return new Response(
+        JSON.stringify({
+            wished: existingWish.length > 0,
+            product: productData[0],
+        }),
+        {
+            status: 200
+        }
+    );
+
+}

@@ -208,7 +208,7 @@ export default function Navbar() {
                     <Link href="/me">Profile</Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <Link href="/settings">Settings</Link>
+                    <Link href="/me/settings">Settings</Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     onClick={handleLogout}

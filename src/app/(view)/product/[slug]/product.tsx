@@ -9,10 +9,18 @@ import RatingReviews from "./rating-reviews";
 import { formatMoney } from "@/hooks/use-cart-store";
 import { useProductSelectionStore } from "@/hooks/use-product-selection-store";
 import { authClient } from "@/lib/auth-client";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { howl } from "@/lib/utils";
 import { sileo } from "sileo";
 import { Spinner } from "@/components/kibo-ui/spinner";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { ShareProduct } from "./share-product";
 
 export default function Product({
   data,
@@ -68,6 +76,7 @@ export default function Product({
   };
 }) {
   const { data: sessionData } = authClient.useSession();
+  const queryClient = useQueryClient();
 
   const selectedVariantId = useProductSelectionStore(
     (state) => state.selectedVariantId,
@@ -113,7 +122,12 @@ export default function Product({
     selectedVariantId,
     setSelection,
   ]);
-
+  const { data: wishlistedData, isPending: isWishlistedPending } = useQuery({
+    queryKey: ["wishList_status", data.product.slug],
+    queryFn: (): Promise<{ wished: boolean }> => {
+      return howl(`/api/wish?productSlug=${data.product.slug}`);
+    },
+  });
   const { mutate, isPending } = useMutation({
     mutationKey: ["wishList_toggle"],
     mutationFn: (): Promise<{ message?: string }> => {
@@ -134,6 +148,10 @@ export default function Product({
       });
     },
     onSuccess: (res: { message?: string }) => {
+      queryClient.invalidateQueries({
+        queryKey: ["wishList_status", data.product.slug],
+      });
+
       sileo.success({
         title: "Success",
         description: res.message || "Wishlist updated successfully.",
@@ -362,21 +380,35 @@ export default function Product({
                 variant="outline"
                 className="rounded-lg"
                 onClick={() => mutate()}
-                disabled={isPending}
+                disabled={isPending || isWishlistedPending}
               >
-                {isPending ? (
+                {isPending || isWishlistedPending ? (
                   <Spinner className="size-5" />
                 ) : (
                   <Heart
                     size={20}
-                    // className={isWishlisted ? "fill-red-500 text-red-500" : ""}
+                    className={
+                      wishlistedData?.wished ? "fill-red-500 text-red-500" : ""
+                    }
                   />
                 )}
               </Button>
             )}
-            <Button size="icon" variant="outline" className="rounded-lg">
-              <Share2 size={20} />
-            </Button>
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button size="icon" variant="outline" className="rounded-lg">
+                  <Share2 size={20} />
+                </Button>
+              </DialogTrigger>
+
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Share Product</DialogTitle>
+                </DialogHeader>
+
+                <ShareProduct />
+              </DialogContent>
+            </Dialog>
           </div>
         </div>
 
