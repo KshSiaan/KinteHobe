@@ -44,7 +44,7 @@ export default function GodProvider({
       persistOptions={{ persister }}
     >
       {children}
-      {isDev && <ReactQueryDevtools initialIsOpen={false} />}
+      {isDev && <ReactQueryDevtools position={"right"} initialIsOpen={false} />}
     </PersistQueryClientProvider>
   );
 }

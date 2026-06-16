@@ -1,3 +1,4 @@
+import InDev from "@/components/core/extra/in-development";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -22,6 +23,7 @@ import React from "react";
 export default function Page() {
   return (
     <div className="space-y-6 p-6">
+      <InDev />
       {/* Header */}
       <div className="flex flex-col gap-2">
         <h1 className="text-3xl font-bold tracking-tight">Coupon Management</h1>

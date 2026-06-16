@@ -22,7 +22,9 @@ async function AdminLayout({ children }: { children: React.ReactNode }) {
       <SiteHeader />
       <div className="flex flex-1 ">
         <AppSidebar />
-        <SidebarInset className="bg-secondary">{children}</SidebarInset>
+        <SidebarInset className="bg-secondary relative">
+          {children}
+        </SidebarInset>
       </div>
     </SidebarProvider>
   );

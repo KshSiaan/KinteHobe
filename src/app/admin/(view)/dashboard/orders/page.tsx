@@ -118,7 +118,7 @@ export default function Page() {
       queryKey: ["orders", debouncedSearch, selectedStatus, selectedFilter],
       queryFn: async () => {
         return fetch(
-          `/api/admin/orders?search=${debouncedSearch}&status=${selectedStatus}&filter=${selectedFilter}`
+          `/api/admin/orders?search=${debouncedSearch}&status=${selectedStatus}&filter=${selectedFilter}`,
         ).then((res) => res.json());
       },
       placeholderData: (previousData) => previousData,
@@ -142,7 +142,7 @@ export default function Page() {
               {isPending ? (
                 <Skeleton className="h-6 w-20" />
               ) : (
-                stats?.totalOrders ?? 0
+                (stats?.totalOrders ?? 0)
               )}
             </CardTitle>
           </CardHeader>
@@ -154,7 +154,7 @@ export default function Page() {
               {isPending ? (
                 <Skeleton className="h-6 w-20" />
               ) : (
-                stats?.pendingPaymentCount ?? 0
+                (stats?.pendingPaymentCount ?? 0)
               )}
             </CardTitle>
           </CardHeader>
@@ -166,7 +166,7 @@ export default function Page() {
               {isPending ? (
                 <Skeleton className="h-6 w-20" />
               ) : (
-                stats?.processingCount ?? 0
+                (stats?.processingCount ?? 0)
               )}
             </CardTitle>
           </CardHeader>
@@ -178,7 +178,7 @@ export default function Page() {
               {isPending ? (
                 <Skeleton className="h-6 w-20" />
               ) : (
-                stats?.deliveredCount ?? 0
+                (stats?.deliveredCount ?? 0)
               )}
             </CardTitle>
           </CardHeader>
@@ -190,7 +190,7 @@ export default function Page() {
               {isPending ? (
                 <Skeleton className="h-6 w-20" />
               ) : (
-                stats?.cancelledCount ?? 0
+                (stats?.cancelledCount ?? 0)
               )}
             </CardTitle>
           </CardHeader>
@@ -273,7 +273,9 @@ export default function Page() {
                   ))
                 : orders.map((o) => (
                     <TableRow key={o.id}>
-                      <TableCell className="font-mono text-sm">{o.id}</TableCell>
+                      <TableCell className="font-mono text-sm">
+                        {o.id}
+                      </TableCell>
                       <TableCell>{o.shippingName}</TableCell>
                       <TableCell className="text-sm text-muted-foreground">
                         {o.email}
@@ -290,7 +292,11 @@ export default function Page() {
                         </Badge>
                       </TableCell>
                       <TableCell>
-                        <Button size="sm" variant="ghost" className="h-8 w-8 p-0">
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="h-8 w-8 p-0"
+                        >
                           <Eye className="h-4 w-4" />
                         </Button>
                       </TableCell>
