@@ -26,6 +26,7 @@ import {
   TableRow,
   TableBody,
   TableCell,
+  TableCaption,
 } from "@/components/ui/table";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -41,7 +42,7 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useState } from "react";
-
+import { useDebounce } from "use-debounce";
 type Transaction = {
   id: string;
   orderId: string;
@@ -73,12 +74,23 @@ type ApiResponse = {
 export default function Page() {
   const [selectedFilter, setSelectedFilter] = useState("newest");
   const [selectedStatus, setSelectedStatus] = useState("all");
-  const { data, isPending } = useQuery<ApiResponse>({
-    queryKey: ["transactions"],
-    queryFn: async () => {
-      return fetch("/api/admin/transactions").then((res) => res.json());
-    },
-  });
+  const [search, setSearch] = useState("");
+  const [debouncedSearch] = useDebounce(search, 500);
+  const { data, isPending, isFetching, isRefetching, isError } =
+    useQuery<ApiResponse>({
+      queryKey: [
+        "transactions",
+        debouncedSearch,
+        selectedStatus,
+        selectedFilter,
+      ],
+      queryFn: async () => {
+        return fetch(
+          `/api/admin/transactions?search=${debouncedSearch}&status=${selectedStatus}&filter=${selectedFilter === "all" ? "" : selectedFilter}`,
+        ).then((res) => res.json());
+      },
+      placeholderData: (previousData) => previousData,
+    });
 
   const transactions = data?.data ?? [];
   const stats = data?.stats;
@@ -156,10 +168,18 @@ export default function Page() {
             <InputGroupAddon>
               <SearchIcon />
             </InputGroupAddon>
-            <InputGroupInput placeholder="Search Transaction ID" />
+            <InputGroupInput
+              placeholder="Search Transaction ID"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
           </InputGroup>
 
-          <Select>
+          <Select
+            onValueChange={(value) => setSelectedFilter(value)}
+            defaultValue="newest"
+            value={selectedFilter}
+          >
             <SelectTrigger>
               <SelectValue placeholder="Filter by Status" />
             </SelectTrigger>
@@ -171,10 +191,15 @@ export default function Page() {
             </SelectContent>
           </Select>
 
-          <Tabs>
+          <Tabs
+            defaultValue="all"
+            value={selectedStatus}
+            onValueChange={(value) => setSelectedStatus(value)}
+          >
             <TabsList>
               <TabsTrigger value="all">All</TabsTrigger>
-              <TabsTrigger value="completed">Completed</TabsTrigger>
+              {/* "pending" | "refunded" | "succeeded" | "failed" */}
+              <TabsTrigger value="succeeded">Succeeded</TabsTrigger>
               <TabsTrigger value="pending">Pending</TabsTrigger>
               <TabsTrigger value="failed">Failed</TabsTrigger>
             </TabsList>
@@ -268,6 +293,18 @@ export default function Page() {
                     </TableRow>
                   ))}
             </TableBody>
+            <TableCaption>
+              Data status:{" "}
+              {isFetching
+                ? "Loading Data"
+                : isPending
+                  ? "Pending"
+                  : isRefetching
+                    ? "Refetching"
+                    : isError
+                      ? "Error fetching data"
+                      : "Fresh"}
+            </TableCaption>
           </Table>
         </CardContent>
       </Card>

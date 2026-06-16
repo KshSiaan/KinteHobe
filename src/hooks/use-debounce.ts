@@ -17,6 +17,7 @@ export function useDebounce<T>(
     options,
   )
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   useEffect(() => {
     return run()
   }, [value, run])

@@ -1,5 +1,5 @@
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+"use client";
+
 import {
   Card,
   CardContent,
@@ -7,18 +7,14 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
 import {
   InputGroup,
   InputGroupAddon,
   InputGroupInput,
 } from "@/components/ui/input-group";
-import { Separator } from "@/components/ui/separator";
 import {
   Select,
   SelectContent,
-  SelectGroup,
   SelectItem,
   SelectTrigger,
   SelectValue,
@@ -26,229 +22,294 @@ import {
 import {
   Table,
   TableBody,
+  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { EyeIcon, PackageCheckIcon, SearchIcon } from "lucide-react";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import { SearchIcon, Eye } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
+import { useDebounce } from "use-debounce";
+
+type OrderStatus =
+  | "pending_payment"
+  | "paid"
+  | "processing"
+  | "shipped"
+  | "delivered"
+  | "cancelled"
+  | "refunded";
+
+type Order = {
+  id: string;
+  userId: string | null;
+  email: string;
+  status: OrderStatus;
+  shippingName: string;
+  shippingPhone: string;
+  shippingAddress: string;
+  shippingCity: string;
+  shippingState: string;
+  shippingZip: string;
+  shippingCountry: string;
+  subtotalCents: number;
+  taxCents: number;
+  shippingCents: number;
+  totalCents: number;
+  stripeSessionId: string | null;
+  createdAt: string;
+  updatedAt: string;
+};
+
+type ApiResponse = {
+  data: Order[];
+  stats: {
+    totalOrders: string;
+    pendingPaymentCount: string;
+    processingCount: string;
+    deliveredCount: string;
+    cancelledCount: string;
+  };
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+};
+
+const STATUS_BADGE: Record<
+  OrderStatus,
+  "default" | "secondary" | "success" | "destructive" | "warning"
+> = {
+  pending_payment: "secondary",
+  paid: "default",
+  processing: "warning",
+  shipped: "default",
+  delivered: "success",
+  cancelled: "destructive",
+  refunded: "destructive",
+};
+
+const STATUS_LABEL: Record<OrderStatus, string> = {
+  pending_payment: "Pending Payment",
+  paid: "Paid",
+  processing: "Processing",
+  shipped: "Shipped",
+  delivered: "Delivered",
+  cancelled: "Cancelled",
+  refunded: "Refunded",
+};
 
 export default function Page() {
-  const statusVariant = {
-    Completed: "success",
-    Processing: "warning",
-    Cancelled: "destructive",
-  } as const;
+  const [selectedFilter, setSelectedFilter] = useState("newest");
+  const [selectedStatus, setSelectedStatus] = useState("all");
+  const [search, setSearch] = useState("");
+  const [debouncedSearch] = useDebounce(search, 500);
 
-  type OrderStatus = keyof typeof statusVariant;
-  type Order = {
-    id: string;
-    customer: string;
-    date: string;
-    total: string;
-    payment: string;
-    fulfillment: string;
-    status: OrderStatus;
-  };
+  const { data, isPending, isFetching, isRefetching, isError } =
+    useQuery<ApiResponse>({
+      queryKey: ["orders", debouncedSearch, selectedStatus, selectedFilter],
+      queryFn: async () => {
+        return fetch(
+          `/api/admin/orders?search=${debouncedSearch}&status=${selectedStatus}&filter=${selectedFilter}`
+        ).then((res) => res.json());
+      },
+      placeholderData: (previousData) => previousData,
+    });
 
-  const orders: Order[] = [
-    {
-      id: "ORD-1042",
-      customer: "Awa Jammeh",
-      date: "2026-04-22",
-      total: "$184.00",
-      payment: "Paid",
-      fulfillment: "Shipped",
-      status: "Completed",
-    },
-    {
-      id: "ORD-1041",
-      customer: "Mariama Conteh",
-      date: "2026-04-22",
-      total: "$72.50",
-      payment: "Pending",
-      fulfillment: "Packing",
-      status: "Processing",
-    },
-    {
-      id: "ORD-1039",
-      customer: "Lamin Sowe",
-      date: "2026-04-21",
-      total: "$36.00",
-      payment: "Refunded",
-      fulfillment: "Returned",
-      status: "Cancelled",
-    },
-  ];
+  const orders = data?.data ?? [];
+  const stats = data?.stats;
 
   return (
-    <div className="flex flex-col gap-6 p-6">
-      <div className="flex flex-col gap-2">
-        <h1 className="text-3xl font-bold tracking-tight">Order Management</h1>
-        <p className="text-muted-foreground">
-          Track customer orders, monitor fulfillment, and resolve issues
-          quickly.
-        </p>
+    <div className="p-6 gap-6 flex flex-col flex-1 h-full w-full">
+      <div className="flex flex-col gap-4">
+        <h1 className="text-2xl font-bold">Orders</h1>
       </div>
 
-      <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
+      {/* STATS */}
+      <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-5">
         <Card>
           <CardHeader className="gap-1">
-            <CardDescription>Open Orders</CardDescription>
-            <CardTitle className="text-2xl">24</CardTitle>
+            <CardDescription>Total Orders</CardDescription>
+            <CardTitle>
+              {isPending ? (
+                <Skeleton className="h-6 w-20" />
+              ) : (
+                stats?.totalOrders ?? 0
+              )}
+            </CardTitle>
           </CardHeader>
         </Card>
         <Card>
           <CardHeader className="gap-1">
-            <CardDescription>Awaiting Payment</CardDescription>
-            <CardTitle className="text-2xl">7</CardTitle>
+            <CardDescription>Pending Payment</CardDescription>
+            <CardTitle>
+              {isPending ? (
+                <Skeleton className="h-6 w-20" />
+              ) : (
+                stats?.pendingPaymentCount ?? 0
+              )}
+            </CardTitle>
           </CardHeader>
         </Card>
         <Card>
           <CardHeader className="gap-1">
-            <CardDescription>Needs Attention</CardDescription>
-            <CardTitle className="text-2xl">3</CardTitle>
+            <CardDescription>Processing</CardDescription>
+            <CardTitle>
+              {isPending ? (
+                <Skeleton className="h-6 w-20" />
+              ) : (
+                stats?.processingCount ?? 0
+              )}
+            </CardTitle>
+          </CardHeader>
+        </Card>
+        <Card>
+          <CardHeader className="gap-1">
+            <CardDescription>Delivered</CardDescription>
+            <CardTitle>
+              {isPending ? (
+                <Skeleton className="h-6 w-20" />
+              ) : (
+                stats?.deliveredCount ?? 0
+              )}
+            </CardTitle>
+          </CardHeader>
+        </Card>
+        <Card>
+          <CardHeader className="gap-1">
+            <CardDescription>Cancelled / Refunded</CardDescription>
+            <CardTitle>
+              {isPending ? (
+                <Skeleton className="h-6 w-20" />
+              ) : (
+                stats?.cancelledCount ?? 0
+              )}
+            </CardTitle>
           </CardHeader>
         </Card>
       </div>
 
-      <InputGroup className="bg-background">
-        <InputGroupAddon>
-          <SearchIcon
-            data-icon="inline-start"
-            className="text-muted-foreground"
-          />
-        </InputGroupAddon>
-        <InputGroupInput placeholder="Search by order ID, customer, or email" />
-      </InputGroup>
-
-      <div className="rounded-lg border bg-card p-4">
-        <FieldGroup className="grid grid-cols-1 gap-3 md:grid-cols-4">
-          <Field>
-            <FieldLabel htmlFor="from-date">From</FieldLabel>
-            <Input id="from-date" type="date" className="h-9" />
-          </Field>
-          <Field>
-            <FieldLabel htmlFor="until-date">Until</FieldLabel>
-            <Input id="until-date" type="date" className="h-9" />
-          </Field>
-          <Field>
-            <FieldLabel htmlFor="status">Order Status</FieldLabel>
-            <Select>
-              <SelectTrigger id="status" className="h-9">
-                <SelectValue placeholder="All statuses" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectGroup>
-                  <SelectItem value="all">All</SelectItem>
-                  <SelectItem value="processing">Processing</SelectItem>
-                  <SelectItem value="completed">Completed</SelectItem>
-                  <SelectItem value="cancelled">Cancelled</SelectItem>
-                </SelectGroup>
-              </SelectContent>
-            </Select>
-          </Field>
-          <Field>
-            <FieldLabel htmlFor="payment">Payment</FieldLabel>
-            <Select>
-              <SelectTrigger id="payment" className="h-9">
-                <SelectValue placeholder="All payments" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectGroup>
-                  <SelectItem value="all">All</SelectItem>
-                  <SelectItem value="paid">Paid</SelectItem>
-                  <SelectItem value="pending">Pending</SelectItem>
-                  <SelectItem value="refunded">Refunded</SelectItem>
-                </SelectGroup>
-              </SelectContent>
-            </Select>
-          </Field>
-        </FieldGroup>
-      </div>
-
+      {/* FILTERS */}
       <Card>
-        <CardHeader className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-          <div className="flex flex-col gap-1">
-            <CardTitle>Orders</CardTitle>
-            <CardDescription>
-              Review incoming orders, update statuses, and keep delivery on
-              track.
-            </CardDescription>
-          </div>
-          <Button>
-            <PackageCheckIcon data-icon="inline-start" />
-            Export Orders as CSV
-          </Button>
-        </CardHeader>
-        <Separator />
-        <CardContent className="pt-6">
-          <Tabs defaultValue="all" className="flex flex-col gap-4">
+        <CardContent className="flex justify-between items-center gap-6">
+          <InputGroup>
+            <InputGroupAddon>
+              <SearchIcon />
+            </InputGroupAddon>
+            <InputGroupInput
+              placeholder="Search by order ID, customer, or email"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </InputGroup>
+
+          <Select
+            onValueChange={(value) => setSelectedFilter(value)}
+            defaultValue="newest"
+            value={selectedFilter}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Sort" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="newest">Newest</SelectItem>
+              <SelectItem value="oldest">Oldest</SelectItem>
+              <SelectItem value="low-to-high">Low to High</SelectItem>
+              <SelectItem value="high-to-low">High to Low</SelectItem>
+            </SelectContent>
+          </Select>
+
+          <Tabs
+            defaultValue="all"
+            value={selectedStatus}
+            onValueChange={(value) => setSelectedStatus(value)}
+          >
             <TabsList>
               <TabsTrigger value="all">All</TabsTrigger>
+              <TabsTrigger value="pending_payment">Pending</TabsTrigger>
+              <TabsTrigger value="paid">Paid</TabsTrigger>
               <TabsTrigger value="processing">Processing</TabsTrigger>
-              <TabsTrigger value="completed">Completed</TabsTrigger>
+              <TabsTrigger value="shipped">Shipped</TabsTrigger>
+              <TabsTrigger value="delivered">Delivered</TabsTrigger>
               <TabsTrigger value="cancelled">Cancelled</TabsTrigger>
+              <TabsTrigger value="refunded">Refunded</TabsTrigger>
             </TabsList>
+          </Tabs>
+        </CardContent>
+      </Card>
 
-            <TabsContent value="all" className="m-0">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Order</TableHead>
-                    <TableHead>Customer</TableHead>
-                    <TableHead>Date</TableHead>
-                    <TableHead>Total</TableHead>
-                    <TableHead>Payment</TableHead>
-                    <TableHead>Fulfillment</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Action</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {orders.map((order) => (
-                    <TableRow key={order.id}>
-                      <TableCell className="font-medium">{order.id}</TableCell>
-                      <TableCell>{order.customer}</TableCell>
-                      <TableCell>{order.date}</TableCell>
-                      <TableCell>{order.total}</TableCell>
-                      <TableCell>{order.payment}</TableCell>
-                      <TableCell>{order.fulfillment}</TableCell>
+      {/* TABLE */}
+      <Card className="w-full">
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Order ID</TableHead>
+                <TableHead>Customer</TableHead>
+                <TableHead>Email</TableHead>
+                <TableHead>Date</TableHead>
+                <TableHead>Total</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Action</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {isPending
+                ? Array.from({ length: 5 }).map((_, i) => (
+                    // biome-ignore lint/suspicious/noArrayIndexKey: skeleton
+                    <TableRow key={i}>
+                      <TableCell colSpan={7}>
+                        <Skeleton className="h-6 w-full" />
+                      </TableCell>
+                    </TableRow>
+                  ))
+                : orders.map((o) => (
+                    <TableRow key={o.id}>
+                      <TableCell className="font-mono text-sm">{o.id}</TableCell>
+                      <TableCell>{o.shippingName}</TableCell>
+                      <TableCell className="text-sm text-muted-foreground">
+                        {o.email}
+                      </TableCell>
+                      <TableCell className="text-sm">
+                        {new Date(o.createdAt).toLocaleString()}
+                      </TableCell>
+                      <TableCell className="font-semibold">
+                        ${(o.totalCents / 100).toFixed(2)}
+                      </TableCell>
                       <TableCell>
-                        <Badge variant={statusVariant[order.status]}>
-                          {order.status}
+                        <Badge variant={STATUS_BADGE[o.status]}>
+                          {STATUS_LABEL[o.status]}
                         </Badge>
                       </TableCell>
                       <TableCell>
-                        <Button variant={"ghost"} size="icon">
-                          <EyeIcon />
+                        <Button size="sm" variant="ghost" className="h-8 w-8 p-0">
+                          <Eye className="h-4 w-4" />
                         </Button>
                       </TableCell>
                     </TableRow>
                   ))}
-                </TableBody>
-              </Table>
-            </TabsContent>
-
-            <TabsContent value="processing" className="m-0">
-              <p className="text-sm text-muted-foreground">
-                Showing orders currently being prepared or packed.
-              </p>
-            </TabsContent>
-
-            <TabsContent value="completed" className="m-0">
-              <p className="text-sm text-muted-foreground">
-                Showing orders that are delivered or fully completed.
-              </p>
-            </TabsContent>
-
-            <TabsContent value="cancelled" className="m-0">
-              <p className="text-sm text-muted-foreground">
-                Showing cancelled and refunded orders.
-              </p>
-            </TabsContent>
-          </Tabs>
+            </TableBody>
+            <TableCaption>
+              Data status:{" "}
+              {isFetching
+                ? "Loading Data"
+                : isPending
+                  ? "Pending"
+                  : isRefetching
+                    ? "Refetching"
+                    : isError
+                      ? "Error fetching data"
+                      : "Fresh"}
+            </TableCaption>
+          </Table>
         </CardContent>
       </Card>
     </div>
