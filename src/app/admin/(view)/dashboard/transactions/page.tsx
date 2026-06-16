@@ -12,7 +12,13 @@ import {
   InputGroupAddon,
   InputGroupInput,
 } from "@/components/ui/input-group";
-import { Select, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Table,
   TableHead,
@@ -34,6 +40,7 @@ import {
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useState } from "react";
 
 type Transaction = {
   id: string;
@@ -64,6 +71,8 @@ type ApiResponse = {
 };
 
 export default function Page() {
+  const [selectedFilter, setSelectedFilter] = useState("newest");
+  const [selectedStatus, setSelectedStatus] = useState("all");
   const { data, isPending } = useQuery<ApiResponse>({
     queryKey: ["transactions"],
     queryFn: async () => {
@@ -154,6 +163,12 @@ export default function Page() {
             <SelectTrigger>
               <SelectValue placeholder="Filter by Status" />
             </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="newest">Newest</SelectItem>
+              <SelectItem value="oldest">Oldest</SelectItem>
+              <SelectItem value="low-to-high">Low to High</SelectItem>
+              <SelectItem value="high-to-low">High to Low</SelectItem>
+            </SelectContent>
           </Select>
 
           <Tabs>

@@ -11,7 +11,7 @@ export const iframeHeight = "800px";
 export const description = "A sidebar with a header and a search form.";
 
 async function AdminLayout({ children }: { children: React.ReactNode }) {
-  const data = await auth.api.getSession({
+  const data = await auth?.api?.getSession({
     headers: await headers(),
   });
   if (data?.user?.role !== "admin") {
