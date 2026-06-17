@@ -10,6 +10,9 @@
     "format": "biome format --write"
   },
   "dependencies": {
+    "@ai-sdk/devtools": "^0.0.20",
+    "@ai-sdk/google": "^3.0.83",
+    "@ai-sdk/react": "^3.0.209",
     "@better-auth/infra": "^0.2.5",
     "@better-upload/client": "^3.0.17",
     "@dnd-kit/core": "^6.3.1",
@@ -42,7 +45,7 @@
     "@visx/scale": "4.0.1-alpha.0",
     "@visx/shape": "4.0.1-alpha.0",
     "@xyflow/react": "^12.11.0",
-    "ai": "^6.0.206",
+    "ai": "^6.0.207",
     "ansi-to-react": "^6.2.6",
     "babel-plugin-react-compiler": "^1.0.0",
     "better-auth": "^1.6.2",

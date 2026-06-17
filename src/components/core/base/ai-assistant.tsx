@@ -22,9 +22,15 @@ import Image from "next/image";
 import { useState } from "react";
 import Link from "next/link";
 import { ScreenShareIcon } from "lucide-react";
+import { usePathname } from "next/navigation";
 
 export default function AiAssistant() {
+  const path = usePathname();
   const [input, setInput] = useState("");
+
+  if (path === "/khuki") {
+    return null; // Don't render the popover if we're already on the chat page
+  }
   return (
     <Popover>
       <PopoverTrigger asChild>

@@ -1,135 +1,58 @@
 "use client";
-import React, { memo, useCallback } from "react";
+
 import {
   Conversation,
   ConversationContent,
-  ConversationEmptyState,
+  ConversationScrollButton,
 } from "@/components/ai-elements/conversation";
-import {
-  PromptInput,
-  PromptInputTextarea,
-  PromptInputSubmit,
-  PromptInputBody,
-  PromptInputProvider,
-  PromptInputFooter,
-  PromptInputTools,
-  PromptInputActionMenu,
-  PromptInputActionMenuTrigger,
-  PromptInputActionMenuContent,
-  PromptInputActionAddAttachments,
-  PromptInputActionAddScreenshot,
-  usePromptInputAttachments,
-} from "@/components/ai-elements/prompt-input";
-import Image from "next/image";
-import {
-  Attachment,
-  AttachmentPreview,
-  AttachmentRemove,
-  Attachments,
-} from "@/components/ai-elements/attachments";
-import type { AttachmentData } from "@/components/ai-elements/attachments";
-
-interface AttachmentItemProps {
-  attachment: AttachmentData;
-  onRemove: (id: string) => void;
-}
-const AttachmentItem = memo(({ attachment, onRemove }: AttachmentItemProps) => {
-  const handleRemove = useCallback(
-    () => onRemove(attachment.id),
-    [onRemove, attachment.id],
-  );
-  return (
-    <Attachment data={attachment} key={attachment.id} onRemove={handleRemove}>
-      <AttachmentPreview />
-      <AttachmentRemove />
-    </Attachment>
-  );
-});
-
-AttachmentItem.displayName = "AttachmentItem";
-
-const PromptInputAttachmentsDisplay = () => {
-  const attachments = usePromptInputAttachments();
-
-  const handleRemove = useCallback(
-    (id: string) => attachments.remove(id),
-    [attachments],
-  );
-
-  if (attachments.files.length === 0) {
-    return null;
-  }
-
-  return (
-    <Attachments variant="inline">
-      {attachments.files.map((attachment) => (
-        <AttachmentItem
-          attachment={attachment}
-          key={attachment.id}
-          onRemove={handleRemove}
-        />
-      ))}
-    </Attachments>
-  );
-};
+import { PromptInputProvider } from "@/components/ai-elements/prompt-input";
+import { DefaultChatTransport } from "ai";
+import { useChat } from "@ai-sdk/react";
+import { ChatHeader } from "./_components/chat-header";
+import { ChatEmptyState } from "./_components/empty-state";
+import { ChatMessageRow, BotTypingRow } from "./_components/chat-message";
+import { ChatInput } from "./_components/chat-input";
 
 export default function Page() {
-  const [input, setInput] = React.useState("");
+  const { messages, sendMessage, status, regenerate } = useChat({
+    transport: new DefaultChatTransport({ api: "/api/chat" }),
+  });
+
+  const isStreaming = status === "streaming";
+  const lastMessage = messages[messages.length - 1];
+  const showTypingRow = isStreaming && lastMessage?.role === "user";
+
   return (
-    <main className="px-4 h-[86dvh] py-4 flex flex-col">
-      <div className="flex-1 w-full p-4 flex flex-col">
-        <Conversation>
-          <ConversationContent>
-            <ConversationEmptyState
-              title="No conversation yet"
-              description="Start a new conversation by typing a message below."
-              icon={
-                <Image
-                  src="/assistant-icon.webp"
-                  alt="Assistant"
-                  width={248}
-                  height={248}
-                  className="size-12 rounded-lg shadow-lg"
-                />
-              }
-            />
+    <main className="px-4 h-[86dvh] py-4 flex items-start gap-4 container mx-auto">
+      <section className="w-1/2 h-full border rounded-lg hidden" />
+
+      <div className="flex-1 h-full flex flex-col rounded-xl border bg-background overflow-hidden shadow-sm">
+        <ChatHeader status={status} />
+
+        <Conversation className="min-h-0">
+          <ConversationContent className="gap-4 py-4 px-3">
+            {messages.length === 0 && !isStreaming && (
+              <ChatEmptyState onSuggest={(text) => sendMessage({ text })} />
+            )}
+            {messages.map((message, i) => (
+              <ChatMessageRow
+                key={message.id}
+                message={message}
+                isLast={i === messages.length - 1}
+                status={status}
+                onRegenerate={regenerate}
+              />
+            ))}
+            {showTypingRow && <BotTypingRow />}
           </ConversationContent>
+          <ConversationScrollButton />
         </Conversation>
-        <PromptInputProvider>
-          <PromptInput
-            globalDrop
-            multiple
-            onSubmit={(message) => {
-              console.log("New message submitted:", message);
-            }}
-            className="mt-4 w-full max-w-2xl mx-auto relative rounded-2xl"
-          >
-            <PromptInputBody>
-              <PromptInputAttachmentsDisplay />
-              <PromptInputTextarea
-                value={input}
-                placeholder="Say something..."
-                onChange={(e) => setInput(e.currentTarget.value)}
-              />
-            </PromptInputBody>
-            <PromptInputFooter>
-              <PromptInputTools>
-                <PromptInputActionMenu>
-                  <PromptInputActionMenuTrigger />
-                  <PromptInputActionMenuContent>
-                    <PromptInputActionAddAttachments />
-                    <PromptInputActionAddScreenshot />
-                  </PromptInputActionMenuContent>
-                </PromptInputActionMenu>
-              </PromptInputTools>
-              <PromptInputSubmit
-                //   status={status === "streaming" ? "streaming" : "ready"}
-                disabled={!input.trim()}
-                className="absolute bottom-1 right-1"
-              />
-            </PromptInputFooter>
-          </PromptInput>
-        </PromptInputProvider>
+
+        <div className="p-3 border-t bg-background/95 shrink-0">
+          <PromptInputProvider>
+            <ChatInput status={status} onSubmit={sendMessage} />
+          </PromptInputProvider>
+        </div>
       </div>
     </main>
   );
