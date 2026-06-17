@@ -27,6 +27,8 @@ import {
 } from "@/components/ai-elements/prompt-input";
 import Image from "next/image";
 import { useState } from "react";
+import Link from "next/link";
+import { ScreenShareIcon } from "lucide-react";
 
 export default function AiAssistant() {
   const [input, setInput] = useState("");
@@ -45,8 +47,13 @@ export default function AiAssistant() {
       </PopoverTrigger>
 
       <PopoverContent side="top" align="end" className="w-[20dvw] h-[60dvh]">
-        <PopoverHeader className="">
+        <PopoverHeader className="flex flex-row w-full items-center justify-between">
           <PopoverTitle>Khuki AI</PopoverTitle>
+          <Button size="icon" variant="ghost" asChild>
+            <Link href="/khuki">
+              <ScreenShareIcon />
+            </Link>
+          </Button>
         </PopoverHeader>
         <div className="flex-1 w-full bg-muted rounded-xl shadow-inner p-4 flex flex-col">
           <Conversation>
