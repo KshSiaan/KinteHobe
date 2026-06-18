@@ -26,7 +26,7 @@ export default function Page() {
     <main className="px-4 h-[86dvh] py-4 flex items-start gap-4 container mx-auto">
       <section className="w-1/2 h-full border rounded-lg hidden" />
 
-      <div className="flex-1 h-full flex flex-col rounded-xl border bg-background overflow-hidden shadow-sm">
+      <div className="flex-1 h-full flex flex-col rounded-xl bg-background overflow-hidden">
         <ChatHeader status={status} />
 
         <Conversation className="min-h-0">

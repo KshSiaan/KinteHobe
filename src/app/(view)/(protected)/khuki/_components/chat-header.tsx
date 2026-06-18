@@ -11,7 +11,7 @@ export const ChatHeader = ({ status }: ChatHeaderProps) => {
   const isThinking = status === "streaming";
 
   return (
-    <div className="flex items-center gap-3 px-4 py-3 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 shrink-0">
+    <div className="flex items-center gap-3 px-4 py-3 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 shrink-0">
       <div className="relative shrink-0">
         <Image
           src="/assistant-icon.webp"

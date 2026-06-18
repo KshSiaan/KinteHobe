@@ -154,11 +154,9 @@ export default async function Page() {
             ))}
           </section>
           {userId && (
-            <section className="mt-8 w-full">
+            <section className="mt-8 w-full space-y-6">
               <h2 className="text-xl font-semibold">My Wishlist</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
-                {/* Wishlist items would go here */}
-              </div>
+              <Saved />
             </section>
           )}
           {/* <section className="mt-8 w-full">
