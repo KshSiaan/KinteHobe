@@ -2,16 +2,16 @@ import fs from 'node:fs/promises';
 import { convertToModelMessages, isLoopFinished, streamText, tool, wrapLanguageModel, type ToolSet, type UIMessage } from 'ai';
 // import { google } from '@ai-sdk/google';
 import { createOpenRouter } from '@openrouter/ai-sdk-provider';
-import { devToolsMiddleware } from '@ai-sdk/devtools';
+// import { devToolsMiddleware } from '@ai-sdk/devtools';
 import z from 'zod';
 import { systemPrompt } from './system';
 const openrouter = createOpenRouter({
   apiKey: process.env.OPENROUTER_API_KEY,
 });
-const model = wrapLanguageModel({
-  model: openrouter("openai/gpt-oss-120b:free"),
-  middleware: devToolsMiddleware(),
-});
+// const model = wrapLanguageModel({
+//   model: openrouter("openai/gpt-oss-120b:free"),
+//   middleware: devToolsMiddleware(),
+// });
 
 
 //! triggerTask is a client-side tool (no execute) — AI SDK routes it to frontend via onToolCall
@@ -59,7 +59,7 @@ const tools:ToolSet = {
 export async function POST(request: Request) {
     const { messages }: { messages: UIMessage[] } = await request.json();
     const result = streamText({
-        model:process.env.NODE_ENV === "development" ?  model:openrouter("openai/gpt-oss-120b:free"),
+        model:openrouter("openai/gpt-oss-120b:free"),
         tools,
         stopWhen:isLoopFinished(),
         system: systemPrompt,
