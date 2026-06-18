@@ -7,7 +7,10 @@ import {
   ConversationScrollButton,
 } from "@/components/ai-elements/conversation";
 import { PromptInputProvider } from "@/components/ai-elements/prompt-input";
-import { DefaultChatTransport, lastAssistantMessageIsCompleteWithToolCalls } from "ai";
+import {
+  DefaultChatTransport,
+  lastAssistantMessageIsCompleteWithToolCalls,
+} from "ai";
 import { useChat } from "@ai-sdk/react";
 import { ChatHeader } from "./_components/chat-header";
 import { ChatEmptyState } from "./_components/empty-state";
@@ -16,7 +19,9 @@ import { ChatInput } from "./_components/chat-input";
 
 export default function Page() {
   //! derive type directly from useChat so ref stays in sync with SDK changes
-  const addToolOutputRef = useRef<ReturnType<typeof useChat>["addToolOutput"] | null>(null);
+  const addToolOutputRef = useRef<
+    ReturnType<typeof useChat>["addToolOutput"] | null
+  >(null);
 
   //! onToolCall handles client-side tools — AI calls triggerTask, frontend executes it
   const { messages, sendMessage, status, regenerate, addToolOutput } = useChat({
@@ -47,8 +52,7 @@ export default function Page() {
     },
   });
 
-  //! sync ref every render so closure always has current addToolOutput
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // biome-ignore lint/suspicious/noExplicitAny:sdsd
   addToolOutputRef.current = addToolOutput as any;
 
   const isStreaming = status === "streaming";

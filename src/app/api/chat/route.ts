@@ -23,7 +23,6 @@ const tools:ToolSet = {
             description: z.string().describe("Human-readable description of what this task does"),
             value: z.any().describe("Payload for the task — string, number, object, etc."),
         }),
-        // No execute — client handles this via onToolCall
     }),
     getProducts: tool({
         description:"Fetches a list of all products available on the platform, including their IDs, slugs, titles, descriptions, categories, statuses, variant IDs, creation and update timestamps, and variant details such as prices, stock quantities, weights, metadata, positions, kinds, enabled statuses, titles, option names, images, and public images.",
@@ -31,7 +30,17 @@ const tools:ToolSet = {
         execute: async () => {
             const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/product`);
             const data = await res.json();
-            console.log("Trying to fetch products from API:", res.url);
+            return data;
+        }
+    }),
+    getSpecificProduct: tool({
+        description:"Fetches detailed information about a specific product based its slug",
+        inputSchema: z.object({
+            slug: z.string().describe("The slug of the product to fetch"),
+        }),
+        execute: async ({ slug }) => {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/product/${slug}`);
+            const data = await res.json();
             return data;
         },
     }),
@@ -44,11 +53,8 @@ const tools:ToolSet = {
             });
             return res;
         }
-
-            
     })
 }
-
 
 export async function POST(request: Request) {
     const { messages }: { messages: UIMessage[] } = await request.json();
