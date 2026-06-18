@@ -14,7 +14,17 @@ const model = wrapLanguageModel({
 });
 
 
+//! triggerTask is a client-side tool (no execute) — AI SDK routes it to frontend via onToolCall
 const tools:ToolSet = {
+    triggerTask: tool({
+        description: "Trigger a UI task on the frontend. Use this to instruct the UI to perform an action. and always follow up with a text response to the user after calling this tool. never end your turn with only a tool call — always provide a text reply summarizing or using the tool result.",
+        inputSchema: z.object({
+            key: z.string().describe("keep it 'showMessage' always"),
+            description: z.string().describe("Human-readable description of what this task does"),
+            value: z.any().describe("Payload for the task — string, number, object, etc."),
+        }),
+        // No execute — client handles this via onToolCall
+    }),
     getProducts: tool({
         description:"Fetches a list of all products available on the platform, including their IDs, slugs, titles, descriptions, categories, statuses, variant IDs, creation and update timestamps, and variant details such as prices, stock quantities, weights, metadata, positions, kinds, enabled statuses, titles, option names, images, and public images.",
         inputSchema: z.object({}),

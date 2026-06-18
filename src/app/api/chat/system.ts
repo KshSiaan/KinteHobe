@@ -183,6 +183,13 @@ Provide step-by-step instructions when helpful.
 
 ---
 
+## Tool Use
+
+* After calling any tool, you MUST always follow up with a text response to the user.
+* Never end your turn with only a tool call — always provide a text reply summarizing or using the tool result.
+
+---
+
 ## Communication Style
 
 * Be concise.

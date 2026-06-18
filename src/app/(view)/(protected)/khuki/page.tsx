@@ -1,12 +1,13 @@
 "use client";
 
+import { useRef } from "react";
 import {
   Conversation,
   ConversationContent,
   ConversationScrollButton,
 } from "@/components/ai-elements/conversation";
 import { PromptInputProvider } from "@/components/ai-elements/prompt-input";
-import { DefaultChatTransport } from "ai";
+import { DefaultChatTransport, lastAssistantMessageIsCompleteWithToolCalls } from "ai";
 import { useChat } from "@ai-sdk/react";
 import { ChatHeader } from "./_components/chat-header";
 import { ChatEmptyState } from "./_components/empty-state";
@@ -14,9 +15,41 @@ import { ChatMessageRow, BotTypingRow } from "./_components/chat-message";
 import { ChatInput } from "./_components/chat-input";
 
 export default function Page() {
-  const { messages, sendMessage, status, regenerate } = useChat({
+  //! derive type directly from useChat so ref stays in sync with SDK changes
+  const addToolOutputRef = useRef<ReturnType<typeof useChat>["addToolOutput"] | null>(null);
+
+  //! onToolCall handles client-side tools — AI calls triggerTask, frontend executes it
+  const { messages, sendMessage, status, regenerate, addToolOutput } = useChat({
     transport: new DefaultChatTransport({ api: "/api/chat" }),
+    //! required — triggers new request after all client-side tool outputs are provided
+    sendAutomaticallyWhen: lastAssistantMessageIsCompleteWithToolCalls,
+    onToolCall: ({ toolCall }) => {
+      if (toolCall.toolName === "triggerTask") {
+        //! UIMessage tool calls use `input` not `args` — cast to extract payload
+        const tc = toolCall as unknown as {
+          toolCallId: string;
+          input: { key: string; description: string; value: unknown };
+        };
+        const { key, value } = tc.input;
+
+        //! dispatch tasks by key — add more cases here as needed
+        if (key === "showMessage") {
+          console.log(value);
+        }
+
+        //! feed result back so SDK can continue conversation — prevents AI_MissingToolResultsError
+        addToolOutputRef.current?.({
+          tool: "triggerTask",
+          toolCallId: tc.toolCallId,
+          output: "Task executed",
+        });
+      }
+    },
   });
+
+  //! sync ref every render so closure always has current addToolOutput
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  addToolOutputRef.current = addToolOutput as any;
 
   const isStreaming = status === "streaming";
   const lastMessage = messages[messages.length - 1];
