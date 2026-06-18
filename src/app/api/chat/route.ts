@@ -1,19 +1,56 @@
-
+import fs from 'node:fs/promises';
+import { convertToModelMessages, isLoopFinished, streamText, tool, wrapLanguageModel, type ToolSet, type UIMessage } from 'ai';
+// import { google } from '@ai-sdk/google';
+import { createOpenRouter } from '@openrouter/ai-sdk-provider';
 import { devToolsMiddleware } from '@ai-sdk/devtools';
-import { convertToModelMessages, streamText, type UIMessage, wrapLanguageModel } from 'ai';
-import { google } from '@ai-sdk/google';
-// const model = wrapLanguageModel({
-//   model: google("gemma-4-26b-a4b-it"),
-//   middleware: devToolsMiddleware(),
-// });
+import z from 'zod';
+import { systemPrompt } from './system';
+const openrouter = createOpenRouter({
+  apiKey: process.env.OPENROUTER_API_KEY,
+});
+const model = wrapLanguageModel({
+  model: openrouter("openai/gpt-oss-120b:free"),
+  middleware: devToolsMiddleware(),
+});
+
+
+const tools:ToolSet = {
+    getProducts: tool({
+        description:"Fetches a list of all products available on the platform, including their IDs, slugs, titles, descriptions, categories, statuses, variant IDs, creation and update timestamps, and variant details such as prices, stock quantities, weights, metadata, positions, kinds, enabled statuses, titles, option names, images, and public images.",
+        inputSchema: z.object({}),
+        execute: async () => {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/product`);
+            const data = await res.json();
+            console.log("Trying to fetch products from API:", res.url);
+            return data;
+        },
+    }),
+    pageRoutes: tool({
+        description:"Fetches a list of all page routes for redirection and linking, including their slugs and titles. dont give out page routes that are not meant for public access. Only provide routes that are accessible to users. always provide full links to the pages, including the domain name. If the page is not accessible to users, do not provide the route.",
+        inputSchema: z.object({}),
+        execute: async () => {
+            const res = await fs.readFile(`${process.cwd()}/ROUTING.md`, {
+                encoding: "utf8",
+            });
+            return res;
+        }
+
+            
+    })
+}
+
 
 export async function POST(request: Request) {
     const { messages }: { messages: UIMessage[] } = await request.json();
     const result = streamText({
-        model: google("gemma-4-26b-a4b-it"),
-        system:"You are a helpful assistant of an AI-powered Ecommerce platform. Your name is Khuki, Your task is to assist users in finding products, providing information about products, and helping with any inquiries related to the platform. You should provide concise and accurate responses to user queries. dont provide any information about yourself or your capabilities. If you are unable to answer a question, respond with 'I'm sorry, I don't have that information.' dont hallucinate or make up information. If the user asks for a product recommendation, provide a relevant product from the platform's catalog. If the user asks for help with an order, provide guidance on how to track or manage their order. If the user asks for help with a return or refund, provide information on the platform's return and refund policies. If the user asks for help with a payment issue, provide guidance on how to resolve payment issues. If the user asks for help with a technical issue, provide guidance on how to troubleshoot technical issues. If the user asks for help with a shipping issue, provide guidance on how to track or manage their shipment. If the user asks for help with a product review, provide guidance on how to leave a product review. If the user asks for help with a product question, provide guidance on how to ask a product question. If the user asks for help with a product comparison, provide guidance on how to compare products. If the user asks for help with a product search, provide guidance on how to search for products. If the user asks for help with a product filter, provide guidance on how to filter products. If the user asks for help with a product sort, provide guidance on how to sort products. If the user asks for help with a product category, provide guidance on how to browse products by category. If the user asks for help with a product brand, provide guidance on how to browse products by brand. If the user asks for help with a product price range, provide guidance on how to filter products by price range. If the user asks for help with a product rating, provide guidance on how to filter products by rating. If the user asks for help with a product availability, provide guidance on how to check product availability. If the user asks for help with a product shipping option, provide guidance on how to select shipping options. If the user asks for help with a product delivery time, provide guidance on how to check delivery times. If the user asks for help with a product return policy, provide guidance on how to check return policies. If the user asks for help with a product warranty, provide guidance on how to check warranty information.",
+        model,
+        // model: openrouter("openai/gpt-oss-120b:free"),
+        tools,
+        stopWhen:isLoopFinished(),
+        system: systemPrompt,
         messages: await convertToModelMessages(messages),
     })
 
     return result.toUIMessageStreamResponse();
 }
+
