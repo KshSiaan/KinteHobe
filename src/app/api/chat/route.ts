@@ -53,8 +53,7 @@ const tools:ToolSet = {
 export async function POST(request: Request) {
     const { messages }: { messages: UIMessage[] } = await request.json();
     const result = streamText({
-        model,
-        // model: openrouter("openai/gpt-oss-120b:free"),
+        model:process.env.NODE_ENV === "development" ?  model:openrouter("openai/gpt-oss-120b:free"),
         tools,
         stopWhen:isLoopFinished(),
         system: systemPrompt,
