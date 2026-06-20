@@ -5,9 +5,8 @@ import { order, orderItem, transaction } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import type { CartLineItem } from "@/hooks/use-cart-store";
 import type { ShippingForm } from "@/app/(view)/checkout/types";
+import { createNotification } from "@/lib/notifications";
 import z from "zod";
-
-const TAX_RATE = 0.08;
 
 const shippingSchema = z.object({
   fullName: z.string().min(1),
@@ -65,8 +64,8 @@ export async function POST(request: Request) {
   };
 
   const subtotalCents = items.reduce((sum, i) => sum + toCents(i.lineTotal), 0);
-  const taxCents = Math.round(subtotalCents * TAX_RATE);
-  const totalCents = subtotalCents + taxCents;
+  const taxCents = 0;
+  const totalCents = subtotalCents;
 
   const orderId = crypto.randomUUID();
   const origin =
@@ -108,6 +107,14 @@ export async function POST(request: Request) {
     })),
   );
 
+  await createNotification({
+    userId: session.user.id,
+    type: "order_placed",
+    title: "Order placed",
+    body: `Your order #${orderId.slice(0, 8).toUpperCase()} has been placed and is awaiting payment.`,
+    metadata: { orderId },
+  });
+
   const lineItems: import("stripe").Stripe.Checkout.SessionCreateParams.LineItem[] = [
     ...items.map((item) => ({
       price_data: {
@@ -121,14 +128,6 @@ export async function POST(request: Request) {
       },
       quantity: item.quantity,
     })),
-    {
-      price_data: {
-        currency: "usd",
-        unit_amount: taxCents,
-        product_data: { name: "Tax (8%)" },
-      },
-      quantity: 1,
-    },
   ];
 
   const stripeSession = await stripe.checkout.sessions.create({

@@ -4,8 +4,7 @@ import {
   UserCircle,
   Package2,
   Settings,
-  MoreHorizontal,
-  MenuIcon,
+  BellIcon,
 } from "lucide-react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
@@ -23,8 +22,8 @@ import {
 const MENU_ITEMS = [
   { label: "Profile", icon: UserCircle, href: "/" },
   { label: "Orders", icon: Package2, href: "/orders" },
+  { label: "Notifications", icon: BellIcon, href: "/notifications" },
   { label: "Settings", icon: Settings, href: "/settings" },
-  { label: "More", icon: MoreHorizontal, href: "/more" },
 ];
 
 export function ProfileSidebar() {

@@ -21,8 +21,8 @@ export default async function Home() {
       <Suspense>
         <HeroWrapper />
       </Suspense>
-      <main>
-        <section className="container mx-auto grid grid-cols-6 gap-12 my-24">
+      <main className="">
+        <section className="container mx-auto grid grid-cols-3 lg:grid-cols-6 gap-8 lg:gap-12 my-24 lg:px-0">
           <Suspense
             fallback={Array.from({ length: 6 }).map((_, i) => (
               // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
@@ -30,7 +30,6 @@ export default async function Home() {
                 <div className="aspect-square rounded-none border-dashed overflow-hidden">
                   <Skeleton className="h-full w-full" />
                 </div>
-
                 <div className="mt-4 text-center">
                   <Skeleton className="h-4 w-16 mx-auto" />
                 </div>
@@ -44,7 +43,7 @@ export default async function Home() {
           <div className="container mx-auto pb-12">
             <h2 className="text-base font-semibold">Your daily discover</h2>
           </div>
-          <div className="grid grid-cols-4 container mx-auto">
+          <div className="grid grid-cols-2 lg:grid-cols-4 container mx-auto">
             <Suspense
               fallback={
                 <div className="col-span-4 flex justify-center items-center">
@@ -64,7 +63,7 @@ export default async function Home() {
         </section>
         <section className="container mx-auto py-12">
           <h2 className="text-base font-semibold">Featured Products</h2>
-          <div className="grid grid-cols-4 container mx-auto mt-12">
+          <div className="grid grid-cols-2 lg:grid-cols-4 container mx-auto mt-12">
             <Suspense
               fallback={
                 <div className="col-span-4 flex justify-center items-center">

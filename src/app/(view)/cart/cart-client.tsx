@@ -168,8 +168,7 @@ function OrderSummaryPanel() {
 
   const savings = compareAtSubtotal - subtotal;
   const hasSavings = savings > 0.01;
-  const tax = subtotal * 0.08;
-  const total = subtotal + tax;
+  const total = subtotal;
 
   return (
     <Card className="sticky top-28">
@@ -198,10 +197,6 @@ function OrderSummaryPanel() {
           <div className="flex justify-between text-muted-foreground">
             <span>Shipping</span>
             <span className="text-green-600 dark:text-green-400 font-medium">Free</span>
-          </div>
-          <div className="flex justify-between text-muted-foreground">
-            <span>Estimated tax</span>
-            <span className="tabular-nums">{formatMoney(tax)}</span>
           </div>
         </div>
 

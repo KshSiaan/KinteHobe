@@ -16,8 +16,7 @@ type Props = {
 
 export function ReviewStep({ shipping, onPlace, onBack, isLoading }: Props) {
   const { subtotal } = useCartStore();
-  const taxCents = subtotal * 0.08;
-  const total = subtotal + taxCents;
+  const total = subtotal;
 
   return (
     <div className="space-y-6">
@@ -62,10 +61,6 @@ export function ReviewStep({ shipping, onPlace, onBack, isLoading }: Props) {
           <div className="flex justify-between text-muted-foreground">
             <span>Shipping</span>
             <span className="text-green-600 font-medium">Free</span>
-          </div>
-          <div className="flex justify-between text-muted-foreground">
-            <span>Tax (8%)</span>
-            <span className="tabular-nums">{formatMoney(taxCents)}</span>
           </div>
         </div>
 

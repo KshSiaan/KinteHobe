@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useCartStore } from "@/hooks/use-cart-store";
 import { Button } from "@/components/ui/button";
@@ -51,6 +51,15 @@ export default function CheckoutClient() {
   const [shippingErrors, setShippingErrors] = useState<Record<string, string>>(
     {},
   );
+
+  useEffect(() => {
+    if (!data?.user) return;
+    setShippingForm((prev) => ({
+      ...prev,
+      fullName: prev.fullName || data.user.name || "",
+      email: prev.email || data.user.email || "",
+    }));
+  }, [data?.user]);
 
   if (items.length === 0) {
     return <EmptyCartView />;

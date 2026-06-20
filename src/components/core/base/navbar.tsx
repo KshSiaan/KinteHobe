@@ -1,11 +1,5 @@
 "use client";
 
-import {
-  Alert,
-  AlertAction,
-  AlertDescription,
-  AlertTitle,
-} from "@/components/ui/alert";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -21,13 +15,6 @@ import {
   InputGroupInput,
 } from "@/components/ui/input-group";
 import {
-  Popover,
-  PopoverContent,
-  PopoverHeader,
-  PopoverTitle,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import {
   Sheet,
   SheetContent,
   SheetHeader,
@@ -35,8 +22,6 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import {
-  BellIcon,
-  CheckCheckIcon,
   CircleQuestionMarkIcon,
   DoorOpenIcon,
   GlobeIcon,
@@ -45,10 +30,9 @@ import {
   MapPinHouse,
   ScrollTextIcon,
   SearchIcon,
-  ShoppingCartIcon,
-  UserPlus,
   UsersIcon,
 } from "lucide-react";
+import NotificationBell from "./notification-bell";
 import Image from "next/image";
 import Link from "next/link";
 import { authClient } from "@/lib/auth-client";
@@ -246,50 +230,14 @@ export default function Navbar() {
             </Button>
           </div>
           <div className="flex gap-2 items-center h-full">
-            {data?.session.token && (
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button variant={"ghost"} size={"icon-sm"}>
-                    <BellIcon />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent>
-                  <PopoverHeader className="flex! flex-row justify-between items-center">
-                    <PopoverTitle>Notifications</PopoverTitle>
-                    <Button size={"icon-sm"} variant={"ghost"}>
-                      <CheckCheckIcon />
-                    </Button>
-                  </PopoverHeader>
-                  <div className="">
-                    <Alert>
-                      <UserPlus />
-                      <AlertTitle>Chimichanga followed you</AlertTitle>
-                      <AlertDescription className="text-xs line-clamp-2">
-                        Lorem ipsum dolor sit amet consectetur, adipisicing
-                        elit. Sunt sed consequatur incidunt saepe molestiae
-                        placeat error officiis, modi repudiandae perferendis
-                        culpa quaerat adipisci maiores similique quod ut facilis
-                        officia neque.
-                      </AlertDescription>
-                    </Alert>
-                  </div>
-                  <div className="">
-                    <Button
-                      variant={"secondary"}
-                      size={"sm"}
-                      className="w-full"
-                    >
-                      View all notifications
-                    </Button>
-                  </div>
-                </PopoverContent>
-              </Popover>
-            )}
+            {data?.session.token && <NotificationBell />}
 
             {data?.session?.token && (
               <>
-                <Button variant={"ghost"} size={"icon-sm"}>
-                  <ScrollTextIcon />
+                <Button variant={"ghost"} size={"icon-sm"} asChild>
+                  <Link href="/me/orders">
+                    <ScrollTextIcon />
+                  </Link>
                 </Button>
                 <Button variant={"ghost"} size={"icon-sm"} asChild>
                   <Link href="/people">

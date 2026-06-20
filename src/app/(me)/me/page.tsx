@@ -71,6 +71,7 @@ export default async function Page() {
                 <div className="w-32 h-32 md:w-40 md:h-40 rounded-2xl overflow-hidden border-4 border-background shadow-md">
                   <Image
                     src={
+                      user?.image ??
                       "https://api.dicebear.com/9.x/lorelei-neutral/svg?seed=Felix"
                     }
                     alt={user?.name || "User Avatar"}

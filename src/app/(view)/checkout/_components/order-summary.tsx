@@ -76,17 +76,13 @@ export function OrderSummary() {
             <span>Shipping</span>
             <span className="text-green-600 font-medium">Free</span>
           </div>
-          <div className="flex justify-between text-muted-foreground">
-            <span>Tax (8%)</span>
-            <span className="tabular-nums">{formatMoney(subtotal * 0.08)}</span>
-          </div>
         </div>
 
         <Separator className="my-4" />
 
         <div className="flex justify-between font-semibold text-base">
           <span>Total</span>
-          <span className="tabular-nums">{formatMoney(subtotal * 1.08)}</span>
+          <span className="tabular-nums">{formatMoney(subtotal)}</span>
         </div>
 
         <div className="mt-4 flex items-center gap-2 rounded-2xl bg-green-500/10 px-3 py-2">

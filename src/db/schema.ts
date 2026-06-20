@@ -5,3 +5,4 @@ export * from "./schema/follow-schema";
 export * from "./schema/review-schema";
 export * from "./schema/order-schema";
 export * from "./schema/wishlist-schema";
+export * from "./schema/notification-schema";

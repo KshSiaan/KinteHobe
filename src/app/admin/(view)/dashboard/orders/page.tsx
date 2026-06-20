@@ -32,10 +32,31 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { SearchIcon, Eye } from "lucide-react";
+import {
+  SearchIcon,
+  Eye,
+  GalleryVerticalEndIcon,
+  MessagesSquareIcon,
+} from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { useDebounce } from "use-debounce";
+import {
+  DropdownMenu,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import OrderAction from "./order-action";
 
 type OrderStatus =
   | "pending_payment"
@@ -292,6 +313,26 @@ export default function Page() {
                         </Badge>
                       </TableCell>
                       <TableCell>
+                        <Dialog>
+                          <DialogTrigger asChild>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="h-8 w-8 p-0"
+                            >
+                              <GalleryVerticalEndIcon className="h-4 w-4" />
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent>
+                            <DialogHeader>
+                              <DialogTitle>Order Confirmation</DialogTitle>
+                              <DialogDescription>
+                                Change order status or contact the customer.
+                              </DialogDescription>
+                            </DialogHeader>
+                            <OrderAction id={o.id} status={o.status} />
+                          </DialogContent>
+                        </Dialog>
                         <Button
                           size="sm"
                           variant="ghost"

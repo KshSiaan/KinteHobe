@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PackageIcon } from "lucide-react";
+import { PayButton } from "./_components/pay-button";
 
 function formatMoney(amount: number) {
   return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(amount);
@@ -117,9 +118,12 @@ function OrderCard({ o }: { o: OrderWithItems }) {
         ))}
       </CardContent>
 
-      <CardFooter className="border-t py-3 text-xs text-muted-foreground">
-        {o.shippingAddress}, {o.shippingCity}, {o.shippingState}{" "}
-        {o.shippingZip}, {o.shippingCountry}
+      <CardFooter className="border-t py-3 flex items-center justify-between gap-4">
+        <span className="text-xs text-muted-foreground">
+          {o.shippingAddress}, {o.shippingCity}, {o.shippingState}{" "}
+          {o.shippingZip}, {o.shippingCountry}
+        </span>
+        {o.status === "pending_payment" && <PayButton orderId={o.id} />}
       </CardFooter>
     </Card>
   );

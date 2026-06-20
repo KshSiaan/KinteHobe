@@ -98,12 +98,6 @@ export function SuccessClient({ order: o, items }: Props) {
               <span>Shipping</span>
               <span className="text-green-600 font-medium">Free</span>
             </div>
-            <div className="flex justify-between text-muted-foreground">
-              <span>Tax</span>
-              <span className="tabular-nums">
-                {formatMoney(o.taxCents / 100)}
-              </span>
-            </div>
             <Separator className="my-2" />
             <div className="flex justify-between font-semibold text-base">
               <span>Total paid</span>

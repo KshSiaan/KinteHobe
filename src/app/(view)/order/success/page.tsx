@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import { stripe } from "@/lib/stripe";
 import { order, orderItem, transaction } from "@/db/schema";
 import { eq } from "drizzle-orm";
+import { createNotification } from "@/lib/notifications";
 import { SuccessClient } from "./success-client";
 
 export const metadata: Metadata = {
@@ -49,6 +50,22 @@ export default async function SuccessPage({ searchParams }: Props) {
             : (stripeSession.payment_intent?.id ?? null),
       })
       .where(eq(transaction.stripeSessionId, session_id));
+
+    const [updatedOrder] = await db
+      .select({ userId: order.userId, id: order.id })
+      .from(order)
+      .where(eq(order.id, tx.orderId))
+      .limit(1);
+
+    if (updatedOrder?.userId) {
+      await createNotification({
+        userId: updatedOrder.userId,
+        type: "order_status_changed",
+        title: "Payment confirmed",
+        body: `Payment for order #${updatedOrder.id.slice(0, 8).toUpperCase()} was successful. Your order is now being processed.`,
+        metadata: { orderId: updatedOrder.id },
+      });
+    }
   }
 
   const [confirmedOrder] = await db
