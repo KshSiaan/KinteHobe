@@ -15,6 +15,7 @@ import {
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { CheckIcon, TruckIcon } from "lucide-react";
 import Controller from "./controller";
+import { notFound } from "next/navigation";
 
 async function getProduct(slug: string) {
   "use cache";
@@ -168,7 +169,7 @@ export default async function Page({
     };
   }> = await getProduct(slug);
   if (!data) {
-    return <>lol</>;
+    return notFound();
   }
   return (
     <main className="p-4">

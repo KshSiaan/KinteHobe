@@ -90,7 +90,7 @@ export default function NotificationBell() {
         <Button variant={"ghost"} size={"icon-sm"} className="relative">
           <BellIcon />
           {unreadCount > 0 && (
-            <span className="absolute -top-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-destructive text-[10px] font-bold text-destructive-foreground">
+            <span className="absolute -top-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-destructive text-[10px] font-bold text-background!">
               {unreadCount > 9 ? "9+" : unreadCount}
             </span>
           )}
@@ -151,12 +151,7 @@ export default function NotificationBell() {
           )}
         </div>
         <div className="border-t p-2">
-          <Button
-            variant={"secondary"}
-            size={"sm"}
-            className="w-full"
-            asChild
-          >
+          <Button variant={"secondary"} size={"sm"} className="w-full" asChild>
             <Link href="/me/notifications" onClick={() => setOpen(false)}>
               View all notifications
             </Link>

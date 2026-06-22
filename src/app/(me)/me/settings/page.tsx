@@ -6,6 +6,7 @@ import Security from "./security";
 import Restricted from "./restricted";
 import Appearance from "./appearance";
 import Agent from "./agent";
+import Location from "./location";
 
 export default function Page() {
   return (
@@ -13,6 +14,7 @@ export default function Page() {
       <Tabs defaultValue="general" className="w-full">
         <TabsList>
           <TabsTrigger value="general">General</TabsTrigger>
+          <TabsTrigger value="location">Location</TabsTrigger>
           <TabsTrigger value="security">Security</TabsTrigger>
           <TabsTrigger value="appearance">Appearance</TabsTrigger>
           <TabsTrigger value="agent">Agent</TabsTrigger>
@@ -20,6 +22,9 @@ export default function Page() {
         </TabsList>
         <TabsContent value="general">
           <General />
+        </TabsContent>
+        <TabsContent value="location">
+          <Location />
         </TabsContent>
         <TabsContent value="security">
           <Security />

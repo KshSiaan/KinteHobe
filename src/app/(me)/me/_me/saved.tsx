@@ -65,31 +65,36 @@ export default function Saved() {
     );
   }
   return (
-    <div className="grid grid-cols-4 w-full">
-      {data?.products?.map((product) => (
-        <Link href={`/product/${product?.slug}`} key={product.id}>
-          <Card className="p-0! aspect-square flex flex-col transition-transform relative rounded-none shadow-none border-dashed overflow-visible">
-            <CardHeader className="w-full aspect-video rounded-none relative">
-              <Image
-                src={product.base.image}
-                alt={product.base.title}
-                fill
-                className="object-cover"
-              />
-            </CardHeader>
-            <CardContent>
-              <h4 className="text-base font-bold">{product.base.title}</h4>
-              <p className="line-clamp-2">{product.base.details}</p>
-            </CardContent>
-            <CardFooter className="flex-1 w-full flex justify-start items-center pb-6 gap-2">
-              <p className="text-lg font-semibold">{product.base.price}/-</p>
-              <p className="text-destructive opacity-70 line-through">
-                {product.base.compareAtPrice}/-
-              </p>
-            </CardFooter>
-          </Card>
-        </Link>
-      ))}
-    </div>
+    <>
+      {data?.products && data?.products?.length > 0 && (
+        <h2 className="text-xl font-semibold">My Wishlist</h2>
+      )}
+      <div className="grid grid-cols-4 w-full">
+        {data?.products?.map((product) => (
+          <Link href={`/product/${product?.slug}`} key={product.id}>
+            <Card className="p-0! aspect-square flex flex-col transition-transform relative rounded-none shadow-none border-dashed overflow-visible">
+              <CardHeader className="w-full aspect-video rounded-none relative">
+                <Image
+                  src={product.base.image}
+                  alt={product.base.title}
+                  fill
+                  className="object-cover"
+                />
+              </CardHeader>
+              <CardContent>
+                <h4 className="text-base font-bold">{product.base.title}</h4>
+                <p className="line-clamp-2">{product.base.details}</p>
+              </CardContent>
+              <CardFooter className="flex-1 w-full flex justify-start items-center pb-6 gap-2">
+                <p className="text-lg font-semibold">{product.base.price}/-</p>
+                <p className="text-destructive opacity-70 line-through">
+                  {product.base.compareAtPrice}/-
+                </p>
+              </CardFooter>
+            </Card>
+          </Link>
+        ))}
+      </div>
+    </>
   );
 }

@@ -24,6 +24,7 @@ import {
 import {
   CircleQuestionMarkIcon,
   DoorOpenIcon,
+  EditIcon,
   GlobeIcon,
   HatGlassesIcon,
   LogOut,
@@ -53,6 +54,14 @@ import {
 import { Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import Cart from "./cart";
+import {
+  Popover,
+  PopoverContent,
+  PopoverHeader,
+  PopoverTitle,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import SavedLocation from "./saved-location";
 
 export default function Navbar() {
   const { isPending, data } = authClient.useSession();
@@ -177,14 +186,14 @@ export default function Navbar() {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  {/* <DropdownMenuItem disabled>
-                    <span className="text-xs text-muted-foreground">
-                      {data.user.email}
-                    </span>
-                  </DropdownMenuItem> */}
                   {data?.user?.role === "admin" && (
                     <DropdownMenuItem asChild>
                       <Link href={"/admin/dashboard"}>Dashboard</Link>
+                    </DropdownMenuItem>
+                  )}
+                  {data?.user?.role === "manager" && (
+                    <DropdownMenuItem asChild>
+                      <Link href={"/manager/dashboard"}>Dashboard</Link>
                     </DropdownMenuItem>
                   )}
 
@@ -220,13 +229,15 @@ export default function Navbar() {
         <div className="h-10 w-full flex items-center justify-between px-6">
           <div className="flex gap-2 items-center h-full ">
             <Button variant={"link"} className="text-xs px-0! mr-4" asChild>
-              <Link href="#">Best sellers</Link>
+              <Link href="/products?preference=best_selling">Best sellers</Link>
             </Button>
             <Button variant={"link"} className="text-xs px-0! mr-4" asChild>
-              <Link href="#">Trending</Link>
+              <Link href="/products?preference=trending">Trending</Link>
             </Button>
             <Button variant={"link"} className="text-xs px-0! mr-4" asChild>
-              <Link href="#">Most favourites</Link>
+              <Link href="/products?preference=most_favorites">
+                Most favourites
+              </Link>
             </Button>
           </div>
           <div className="flex gap-2 items-center h-full">
@@ -246,9 +257,28 @@ export default function Navbar() {
                 </Button>
               </>
             )}
-            <Button variant={"ghost"} size={"icon-sm"}>
-              <MapPinHouse />
-            </Button>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant={"ghost"} size={"icon-sm"}>
+                  <MapPinHouse />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent side="bottom" align="end">
+                <PopoverHeader className="flex flex-row justify-between items-center">
+                  <PopoverTitle>Saved Locations</PopoverTitle>
+                  <Button size="icon-sm" variant="ghost" asChild>
+                    <Link href="/me/settings">
+                      <EditIcon />
+                    </Link>
+                  </Button>
+                </PopoverHeader>
+                <div className="">
+                  <Suspense fallback={<Skeleton className="h-20 w-full" />}>
+                    <SavedLocation />
+                  </Suspense>
+                </div>
+              </PopoverContent>
+            </Popover>
             <Button variant={"ghost"} size={"icon-sm"}>
               <CircleQuestionMarkIcon />
             </Button>

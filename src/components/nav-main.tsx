@@ -49,7 +49,7 @@ export function NavMain({
                 </CollapsibleTrigger>
               ) : (
                 <SidebarMenuButton asChild tooltip={item.title}>
-                  <Link href={`/admin/dashboard${item.url}`}>
+                  <Link href={`/manager/dashboard${item.url}`}>
                     {item.icon}
                     <span>{item.title}</span>
                   </Link>
@@ -61,7 +61,7 @@ export function NavMain({
                     {item.items.map((subItem) => (
                       <SidebarMenuSubItem key={subItem.title}>
                         <SidebarMenuSubButton asChild>
-                          <Link href={`/admin/dashboard${subItem.url}`}>
+                          <Link href={`/manager/dashboard${subItem.url}`}>
                             <span>{subItem.title}</span>
                           </Link>
                         </SidebarMenuSubButton>

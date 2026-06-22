@@ -77,6 +77,11 @@ export default function CheckoutClient() {
     }
   };
 
+  const handleFillFromAddress = (partial: Partial<ShippingForm>) => {
+    setShippingForm((prev) => ({ ...prev, ...partial }));
+    setShippingErrors({});
+  };
+
   const goToReview = () => {
     const errs = validateShipping(shippingForm);
     if (Object.keys(errs).length) {
@@ -154,6 +159,7 @@ export default function CheckoutClient() {
                       errors={shippingErrors}
                       onChange={handleShippingChange}
                       onNext={goToReview}
+                      onFill={handleFillFromAddress}
                       isLoading={isLoading}
                     />
                   )}

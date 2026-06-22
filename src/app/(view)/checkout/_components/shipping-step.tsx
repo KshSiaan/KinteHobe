@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -9,24 +10,64 @@ import {
   FieldDescription,
 } from "@/components/ui/field";
 import { Spinner } from "@/components/ui/spinner";
-import { MapPinIcon } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { CheckIcon, MapPinIcon } from "lucide-react";
 import type { ShippingForm } from "../types";
+import type { UserAddress } from "@/components/core/base/saved-location";
+import { cn } from "@/lib/utils";
 
 type Props = {
   form: ShippingForm;
   errors: Record<string, string>;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onNext: () => void;
+  onFill: (partial: Partial<ShippingForm>) => void;
   isLoading: boolean;
 };
+
+function mapAddressToShipping(a: UserAddress): Partial<ShippingForm> {
+  return {
+    fullName: a.recipient_name ?? "",
+    phone: a.phone,
+    address: [a.address_line, a.area].filter(Boolean).join(", "),
+    city: a.city,
+    state: a.district,
+  };
+}
 
 export function ShippingStep({
   form,
   errors,
   onChange,
   onNext,
+  onFill,
   isLoading,
 }: Props) {
+  const [addresses, setAddresses] = useState<UserAddress[]>([]);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const onFillRef = useRef(onFill);
+  onFillRef.current = onFill;
+
+  useEffect(() => {
+    fetch("/api/manage/location")
+      .then((r) => r.json())
+      .then((json) => {
+        if (json.data?.length) {
+          setAddresses(json.data);
+          const def: UserAddress =
+            json.data.find((a: UserAddress) => a.is_default) ?? json.data[0];
+          setSelectedId(def.id);
+          onFillRef.current(mapAddressToShipping(def));
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  function handleSelect(address: UserAddress) {
+    setSelectedId(address.id);
+    onFill(mapAddressToShipping(address));
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3">
@@ -40,6 +81,58 @@ export function ShippingStep({
           </p>
         </div>
       </div>
+
+      {addresses.length > 0 && (
+        <div className="space-y-2">
+          <p className="text-sm font-medium text-muted-foreground">
+            Saved addresses
+          </p>
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+            {addresses.map((address) => (
+              <button
+                key={address.id}
+                type="button"
+                onClick={() => handleSelect(address)}
+                className={cn(
+                  "flex items-start gap-3 rounded-lg border p-3 text-left text-sm transition-colors hover:bg-muted",
+                  selectedId === address.id
+                    ? "border-primary bg-primary/5"
+                    : "border-border",
+                )}
+              >
+                <div className="mt-0.5 shrink-0">
+                  {selectedId === address.id ? (
+                    <span className="flex size-4 items-center justify-center rounded-full bg-primary">
+                      <CheckIcon className="size-2.5 text-primary-foreground" />
+                    </span>
+                  ) : (
+                    <span className="flex size-4 items-center justify-center rounded-full border" />
+                  )}
+                </div>
+                <div className="min-w-0">
+                  <div className="flex items-center gap-1.5">
+                    <span className="font-medium">{address.label}</span>
+                    {address.is_default && (
+                      <Badge variant="secondary" className="px-1 py-0 text-xs">
+                        Default
+                      </Badge>
+                    )}
+                  </div>
+                  <p className="truncate text-muted-foreground">
+                    {address.address_line}, {address.area}
+                  </p>
+                  <p className="text-muted-foreground">
+                    {address.city}, {address.district}
+                  </p>
+                </div>
+              </button>
+            ))}
+          </div>
+          <p className="text-xs text-muted-foreground">
+            Edit the fields below to adjust the selected address.
+          </p>
+        </div>
+      )}
 
       <FieldGroup>
         <div className="grid grid-cols-2 gap-4">

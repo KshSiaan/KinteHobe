@@ -26,6 +26,7 @@ import {
   ComputerIcon,
   ShoppingCartIcon,
   Ellipsis,
+  PackageIcon,
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -48,31 +49,19 @@ const data = {
           url: "/",
         },
         {
-          title: "Users",
-          url: "/users",
+          title: "Customers",
+          url: "/customers",
         },
       ],
     },
     {
-      title: "Product & Managers",
+      title: "Products",
       url: "#",
-      icon: <BotIcon />,
+      icon: <PackageIcon />,
       items: [
-        {
-          title: "Managers",
-          url: "/managers",
-        },
         {
           title: "Product Listing",
           url: "/products",
-        },
-        {
-          title: "Product Categories",
-          url: "/categories",
-        },
-        {
-          title: "Coupons & Discounts",
-          url: "/coupons",
         },
       ],
     },
@@ -84,10 +73,6 @@ const data = {
         {
           title: "Orders",
           url: "/orders",
-        },
-        {
-          title: "Insights",
-          url: "/insights",
         },
         {
           title: "Transactions",
@@ -122,26 +107,11 @@ const data = {
       url: "#",
       icon: <SendIcon />,
     },
-    {
-      title: "Pages",
-      url: "/pages",
-      icon: <FileCogIcon />,
-    },
-    {
-      title: "Developer",
-      url: "/dev",
-      icon: <ComputerIcon />,
-    },
   ],
   projects: [
     {
-      name: "Sales & Marketing",
-      url: "/sales-marketing",
-      icon: <PieChartIcon />,
-    },
-    {
-      name: "Manager Feedbacks",
-      url: "/manager-feedbacks",
+      name: "Admin Feedbacks",
+      url: "/admin-feedbacks",
       icon: <LifeBuoyIcon />,
     },
   ],
@@ -149,7 +119,9 @@ const data = {
 
 const AppName = process.env.NEXT_PUBLIC_APP_NAME || "Kintehobe";
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+export function ManagerSidebar({
+  ...props
+}: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar
       className="top-(--header-height) h-[calc(100svh-var(--header-height))]!"
@@ -160,7 +132,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
               <Link href="/">
-                <div className="flex aspect-square size-8 items-center justify-center rounded-lg text-sidebar-primary-foreground relative">
+                <div className="flex aspect-square size-8 items-center justify-center rounded-lg  text-sidebar-primary-foreground relative">
                   <Image
                     src="/img/icon.svg"
                     alt={AppName}

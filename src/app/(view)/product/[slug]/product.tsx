@@ -151,6 +151,9 @@ export default function Product({
       queryClient.invalidateQueries({
         queryKey: ["wishList_status", data.product.slug],
       });
+      queryClient.invalidateQueries({
+        queryKey: ["all_wish"],
+      });
 
       sileo.success({
         title: "Success",
