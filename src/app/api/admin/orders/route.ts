@@ -8,7 +8,11 @@ export async function GET(request: Request) {
     headers: request.headers,
   });
 
-  if (!user?.session?.token || user?.user?.role !== "admin") {
+  if (
+    !user?.session?.token ||
+    !user?.user?.role ||
+    !["admin", "manager"].includes(user?.user?.role)
+  ) {
     return new Response(JSON.stringify({ message: "Unauthorized" }), {
       status: 401,
     });
@@ -17,13 +21,12 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const search = searchParams.get("search") || undefined;
   const rawStatus = searchParams.get("status");
-  const status =
-    rawStatus && rawStatus !== "all" ? rawStatus : undefined;
+  const status = rawStatus && rawStatus !== "all" ? rawStatus : undefined;
   const filter = searchParams.get("filter") || undefined;
   const page = Math.max(Number(searchParams.get("page") || 1), 1);
   const limit = Math.min(
     Math.max(Number(searchParams.get("limit") || 20), 1),
-    100
+    100,
   );
   const offset = (page - 1) * limit;
 
@@ -38,7 +41,7 @@ export async function GET(request: Request) {
             | "shipped"
             | "delivered"
             | "cancelled"
-            | "refunded"
+            | "refunded",
         )
       : undefined,
     search
@@ -63,9 +66,7 @@ export async function GET(request: Request) {
     .limit(limit)
     .offset(offset);
 
-  const totalResult = await db
-    .select({ count: db.$count(order) })
-    .from(order);
+  const totalResult = await db.select({ count: db.$count(order) }).from(order);
 
   const total = totalResult?.[0]?.count ?? 0;
 
@@ -90,6 +91,6 @@ export async function GET(request: Request) {
         totalPages: Math.ceil(total / limit),
       },
     }),
-    { status: 200 }
+    { status: 200 },
   );
 }

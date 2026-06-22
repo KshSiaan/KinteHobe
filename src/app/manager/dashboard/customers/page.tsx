@@ -61,6 +61,7 @@ export default function Page() {
   const [input, setInput] = useState("");
   const [debouncedValue, setDebouncedValue] = useState("");
   const [statusFilter, setStatusFilter] = useState<UserStatusFilter>("all");
+  const [roleFilter, setRoleFilter] = useState<UserRoleFilter>("all");
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -95,11 +96,11 @@ export default function Page() {
           sortBy: "createdAt",
           sortDirection: "desc",
           searchValue: debouncedValue || undefined,
-          searchField: "name",
+          searchField: "email",
           searchOperator: "contains",
           filterField: "role",
           filterOperator: "eq",
-          filterValue: "manager",
+          filterValue: "user",
         },
       });
 
@@ -140,7 +141,7 @@ export default function Page() {
     return () => {
       isCancelled = true;
     };
-  }, [currentPage, debouncedValue]);
+  }, [currentPage, debouncedValue, roleFilter]);
 
   const filteredUsers = useMemo(() => {
     if (statusFilter === "all") {
@@ -173,7 +174,7 @@ export default function Page() {
   return (
     <div className="p-6 gap-6 flex flex-col flex-1 h-full w-full">
       <div className="flex flex-col gap-4">
-        <h1 className="text-2xl font-bold">Manage Managers</h1>
+        <h1 className="text-2xl font-bold">Manage Users</h1>
       </div>
 
       <Card>
@@ -183,7 +184,7 @@ export default function Page() {
               {input !== debouncedValue ? <EyeIcon /> : <SearchIcon />}
             </InputGroupAddon>
             <InputGroupInput
-              placeholder="Search Managers"
+              placeholder="Search User"
               value={input}
               onChange={(e) => {
                 setInput(e.target.value);
@@ -191,6 +192,22 @@ export default function Page() {
               }}
             />
           </InputGroup>
+
+          <Select
+            value={statusFilter}
+            onValueChange={(value) =>
+              setStatusFilter(value as UserStatusFilter)
+            }
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Filter by Status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Status</SelectItem>
+              <SelectItem value="active">Active</SelectItem>
+              <SelectItem value="banned">Banned</SelectItem>
+            </SelectContent>
+          </Select>
         </CardContent>
       </Card>
 
@@ -199,10 +216,8 @@ export default function Page() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>UID</TableHead>
                 <TableHead>Name</TableHead>
                 <TableHead>Email</TableHead>
-                <TableHead>Role</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Action</TableHead>
               </TableRow>
@@ -241,16 +256,10 @@ export default function Page() {
 
                   return (
                     <TableRow key={user.id}>
-                      <TableCell className="font-mono text-sm">
-                        {user.id}
-                      </TableCell>
                       <TableCell className="font-medium">
                         {user.name ?? "-"}
                       </TableCell>
                       <TableCell>{user.email}</TableCell>
-                      <TableCell className="uppercase">
-                        {user.role ?? "user"}
-                      </TableCell>
                       <TableCell>
                         <Badge
                           variant={
@@ -264,7 +273,9 @@ export default function Page() {
                         <div className="flex gap-2">
                           {/* <View data={user} /> */}
                           <Button variant={"ghost"} size={"icon"} asChild>
-                            <Link href={`/admin/dashboard/users/${user.id}`}>
+                            <Link
+                              href={`/manager/dashboard/customers/${user.id}`}
+                            >
                               <EyeIcon className="h-4 w-4" />
                             </Link>
                           </Button>

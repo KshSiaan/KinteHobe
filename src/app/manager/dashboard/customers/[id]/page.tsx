@@ -24,7 +24,6 @@ import Image from "next/image";
 import Ban from "./ban";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import Impersonate from "./impersonate";
 import ChangeRole from "./changeRole";
 
 export default async function Page({
@@ -121,8 +120,6 @@ export default async function Page({
                     Message
                   </Button>
                   <div className="flex gap-2">
-                    <Impersonate data={user} />
-                    <ChangeRole data={user} />
                     <Ban banned={!!user?.banned} id={id} />
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
