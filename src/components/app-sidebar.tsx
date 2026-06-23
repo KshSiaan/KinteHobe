@@ -125,7 +125,7 @@ const data = {
     },
     {
       title: "Pages",
-      url: "/pages",
+      url: "/admin/pages",
       icon: <FileCogIcon />,
     },
     {
@@ -142,7 +142,7 @@ const data = {
     },
     {
       name: "Manager Feedbacks",
-      url: "/manager-feedbacks",
+      url: "/admin/manager-feedbacks",
       icon: <LifeBuoyIcon />,
     },
   ],

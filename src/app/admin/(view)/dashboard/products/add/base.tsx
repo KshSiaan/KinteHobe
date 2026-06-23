@@ -30,8 +30,25 @@ import { NameDescriptionTableField } from "./name-description-table-field";
 
 import { Textarea } from "@/components/ui/textarea";
 
-import { UploadCloudIcon, XIcon } from "lucide-react";
+import { BrainCircuitIcon, Loader2Icon, UploadCloudIcon, XIcon } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
+
+async function generateDatasetFromImages(images: File[]) {
+  const formData = new FormData();
+  formData.append("image", images[0]);
+  const response = await fetch("/api/product-image-convert", {
+    method: "POST",
+    body: formData,
+  });
+  if (!response.ok) throw new Error("Failed to generate dataset");
+  const json = await response.json();
+  return json.data as {
+    title: string;
+    description: string;
+    weight: string;
+    metadataRows: { id: string; name: string; description: string }[];
+  };
+}
 
 export type ProductBaseOutput = {
   draftValues: ProductBaseFormInput;
@@ -64,6 +81,7 @@ export default function Base({ onChange, initialDraftValues }: BaseProps) {
   const [touched, setTouched] = useState<
     Partial<Record<keyof ProductBaseFormInput, boolean>>
   >({});
+  const [isGenerating, setIsGenerating] = useState(false);
 
   const validationResult = useMemo(
     () => productBaseSchema.safeParse(formValues),
@@ -172,6 +190,36 @@ export default function Base({ onChange, initialDraftValues }: BaseProps) {
               </FileUploadList>
               <FileUploadClear />
             </FileUpload>
+            {bannerFiles.length > 0 && (
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="mt-2 w-fit gap-2"
+                disabled={isGenerating}
+                onClick={async () => {
+                  setIsGenerating(true);
+                  try {
+                    const result = await generateDatasetFromImages(bannerFiles);
+                    if (result.title) setField("title", result.title);
+                    if (result.description) setField("description", result.description);
+                    if (result.weight) setField("weight", result.weight);
+                    if (result.metadataRows?.length) setField("metadataRows", result.metadataRows);
+                  } catch {
+                    // silently fail — user can retry
+                  } finally {
+                    setIsGenerating(false);
+                  }
+                }}
+              >
+                {isGenerating ? (
+                  <Loader2Icon className="size-4 animate-spin" />
+                ) : (
+                  <BrainCircuitIcon className="size-4" />
+                )}
+                Generate dataset using AI
+              </Button>
+            )}
             <FieldError>{imageError}</FieldError>
           </Field>
 

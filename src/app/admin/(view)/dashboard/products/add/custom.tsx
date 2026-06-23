@@ -35,13 +35,32 @@ import {
 import { NameDescriptionTableField } from "./name-description-table-field";
 import { Textarea } from "@/components/ui/textarea";
 import {
+  BrainCircuitIcon,
   CirclePlusIcon,
+  Loader2Icon,
   PackageSearchIcon,
   SlidersHorizontalIcon,
   Trash2Icon,
   UploadCloudIcon,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
+
+async function generateDatasetFromImages(images: File[]) {
+  const formData = new FormData();
+  formData.append("image", images[0]);
+  const response = await fetch("/api/product-image-convert", {
+    method: "POST",
+    body: formData,
+  });
+  if (!response.ok) throw new Error("Failed to generate dataset");
+  const json = await response.json();
+  return json.data as {
+    title: string;
+    description: string;
+    weight: string;
+    metadataRows: { id: string; name: string; description: string }[];
+  };
+}
 
 type VariantFieldKey = keyof ProductCustomVariantFormInput;
 
@@ -113,6 +132,7 @@ export default function CustomVariants({
   const [touched, setTouched] = useState<
     Record<string, Partial<Record<VariantFieldKey, boolean>>>
   >({});
+  const [generatingId, setGeneratingId] = useState<string | null>(null);
 
   const parsedVariants = useMemo(() => {
     return variants.map((variant) => {
@@ -505,6 +525,41 @@ export default function CustomVariants({
                         </FileUploadList>
                         <FileUploadClear />
                       </FileUpload>
+                      {variant.images.length > 0 && (
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          className="mt-2 w-fit gap-2"
+                          disabled={generatingId === variant.id}
+                          onClick={async () => {
+                            setGeneratingId(variant.id);
+                            try {
+                              const result = await generateDatasetFromImages(variant.images);
+                              if (result.metadataRows?.length) {
+                                setVariantField(variant.id, "metadataRows", result.metadataRows);
+                              }
+                              if (result.description) {
+                                setVariantField(variant.id, "details", result.description);
+                              }
+                              if (result.weight) {
+                                setVariantField(variant.id, "weight", result.weight);
+                              }
+                            } catch {
+                              // silently fail
+                            } finally {
+                              setGeneratingId(null);
+                            }
+                          }}
+                        >
+                          {generatingId === variant.id ? (
+                            <Loader2Icon className="size-4 animate-spin" />
+                          ) : (
+                            <BrainCircuitIcon className="size-4" />
+                          )}
+                          Generate dataset using AI
+                        </Button>
+                      )}
                       <FieldError>{imagesError}</FieldError>
                     </Field>
 
