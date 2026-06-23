@@ -17,19 +17,15 @@ import {
 } from "@/components/ui/sidebar";
 import {
   TerminalSquareIcon,
-  BotIcon,
   LifeBuoyIcon,
   SendIcon,
-  PieChartIcon,
-  TerminalIcon,
-  FileCogIcon,
-  ComputerIcon,
   ShoppingCartIcon,
   Ellipsis,
   PackageIcon,
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
+import { authClient } from "@/lib/auth-client";
 
 const data = {
   user: {
@@ -80,32 +76,12 @@ const data = {
         },
       ],
     },
-    {
-      title: "Others",
-      url: "#",
-      icon: <Ellipsis />,
-      items: [
-        {
-          title: "Promotions",
-          url: "/promotions",
-        },
-        {
-          title: "Banners",
-          url: "/banners",
-        },
-      ],
-    },
   ],
   navSecondary: [
     {
       title: "Support",
       url: "#",
       icon: <LifeBuoyIcon />,
-    },
-    {
-      title: "Feedback",
-      url: "#",
-      icon: <SendIcon />,
     },
   ],
   projects: [
@@ -122,6 +98,8 @@ const AppName = process.env.NEXT_PUBLIC_APP_NAME || "Kintehobe";
 export function ManagerSidebar({
   ...props
 }: React.ComponentProps<typeof Sidebar>) {
+  const { data: authData } = authClient.useSession();
+
   return (
     <Sidebar
       className="top-(--header-height) h-[calc(100svh-var(--header-height))]!"
@@ -155,7 +133,13 @@ export function ManagerSidebar({
         <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser
+          user={{
+            name: authData?.user?.name ?? "",
+            avatar: authData?.user?.image ?? "",
+            email: authData?.user?.email ?? "",
+          }}
+        />
       </SidebarFooter>
     </Sidebar>
   );

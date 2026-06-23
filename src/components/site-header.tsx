@@ -83,7 +83,7 @@ export function SiteHeader() {
           </BreadcrumbList>
         </Breadcrumb>
         <div className="flex items-center space-x-2 ml-auto">
-          <DropdownMenu>
+          {/* <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button size="icon" variant={"outline"}>
                 <PencilRulerIcon />
@@ -100,7 +100,7 @@ export function SiteHeader() {
                 <Link href={"/admin/dashboard/tools/draw"}>Draw</Link>
               </DropdownMenuItem>
             </DropdownMenuContent>
-          </DropdownMenu>
+          </DropdownMenu> */}
           <SearchForm className="w-full sm:ml-auto sm:w-auto" />
         </div>
       </div>
