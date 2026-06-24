@@ -7,3 +7,4 @@ export * from "./schema/order-schema";
 export * from "./schema/wishlist-schema";
 export * from "./schema/notification-schema";
 export * from "./schema/user-address-schema";
+export * from "./schema/legal-schema";
