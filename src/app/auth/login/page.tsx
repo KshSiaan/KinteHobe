@@ -7,9 +7,9 @@ import { ArrowLeft } from "lucide-react";
 
 export default function Page() {
   return (
-    <main className="h-dvh w-full grid grid-cols-2">
+    <main className="h-dvh w-full grid grid-cols-1 md:grid-cols-2">
       <div
-        className="h-full bg-secondary relative p-2 bg-cover bg-bottom"
+        className="hidden md:block h-full bg-secondary relative p-2 bg-cover bg-bottom"
         style={{
           backgroundImage: `url('/img/login.jpg')`,
         }}

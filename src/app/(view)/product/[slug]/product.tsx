@@ -179,11 +179,11 @@ export default function Product({
     !activeVariant?.stockQuantity || activeVariant.stockQuantity <= 0;
 
   return (
-    <div className="col-span-3">
-      <header className="h-[calc(80vh-104px)] grid grid-cols-3 gap-6 py-2">
+    <div className="col-span-1 lg:col-span-3">
+      <header className="grid grid-cols-1 md:grid-cols-3 gap-6 py-2">
         {/* If only one image, show it full width (no thumbnail rail) */}
         {images.length <= 1 ? (
-          <div className="h-full w-full relative col-span-3 border rounded-lg overflow-hidden bg-linear-to-br from-slate-50 to-slate-100 group">
+          <div className="h-72 md:h-[calc(80vh-104px)] w-full relative col-span-1 md:col-span-3 border rounded-lg overflow-hidden bg-linear-to-br from-slate-50 to-slate-100 group">
             <Image
               src={activeImage}
               alt="Product Image"
@@ -203,7 +203,7 @@ export default function Product({
         ) : (
           <>
             {/* Main Image */}
-            <div className="h-full w-full relative col-span-2 border rounded-lg overflow-hidden bg-linear-to-br from-slate-50 to-slate-100 group">
+            <div className="h-72 md:h-[calc(80vh-104px)] w-full relative col-span-1 md:col-span-2 border rounded-lg overflow-hidden bg-linear-to-br from-slate-50 to-slate-100 group">
               <Image
                 src={activeImage}
                 alt="Product Image"
@@ -222,7 +222,7 @@ export default function Product({
             </div>
 
             {/* Thumbnails: show only unselected images */}
-            <div className="grid auto-rows-fr gap-4 overflow-y-auto pr-2">
+            <div className="hidden md:grid md:h-[calc(80vh-104px)] auto-rows-fr gap-4 overflow-y-auto pr-2">
               {images
                 .map((img, index) => ({ img, index }))
                 .filter(({ index }) => index !== safeIndex)
@@ -246,7 +246,7 @@ export default function Product({
           </>
         )}
       </header>
-      <div className="grid grid-cols-3 gap-6 mt-6 py-4 border-b">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6 py-4 border-b">
         <div className="col-span-2">
           {/* Sizes Section */}
           {sizes.length > 0 && (

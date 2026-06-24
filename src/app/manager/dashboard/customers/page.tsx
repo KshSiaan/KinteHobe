@@ -178,8 +178,8 @@ export default function Page() {
       </div>
 
       <Card>
-        <CardContent className="flex justify-between items-center gap-6">
-          <InputGroup>
+        <CardContent className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-4">
+          <InputGroup className="w-full sm:flex-1">
             <InputGroupAddon>
               {input !== debouncedValue ? <EyeIcon /> : <SearchIcon />}
             </InputGroupAddon>
@@ -199,7 +199,7 @@ export default function Page() {
               setStatusFilter(value as UserStatusFilter)
             }
           >
-            <SelectTrigger>
+            <SelectTrigger className="w-full sm:w-48">
               <SelectValue placeholder="Filter by Status" />
             </SelectTrigger>
             <SelectContent>
@@ -212,7 +212,7 @@ export default function Page() {
       </Card>
 
       <Card className="w-full">
-        <CardContent>
+        <CardContent className="overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>
@@ -288,7 +288,7 @@ export default function Page() {
             </TableBody>
           </Table>
         </CardContent>
-        <CardFooter className="flex items-center justify-between gap-3">
+        <CardFooter className="flex flex-col sm:flex-row items-center justify-between gap-3">
           <p className="text-sm text-muted-foreground">
             Showing {startItem}-{endItem} of {totalUsers}
           </p>

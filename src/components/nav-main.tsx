@@ -15,6 +15,7 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
+import { authClient } from "@/lib/auth-client";
 import { ChevronRightIcon } from "lucide-react";
 import Link from "next/link";
 
@@ -32,6 +33,9 @@ export function NavMain({
     }[];
   }[];
 }) {
+  const { data } = authClient.useSession();
+  const role = data?.user?.role ?? "manager";
+  const basePath = `/${role}/dashboard`;
   return (
     <SidebarGroup>
       <SidebarGroupLabel>Platform</SidebarGroupLabel>
@@ -49,7 +53,7 @@ export function NavMain({
                 </CollapsibleTrigger>
               ) : (
                 <SidebarMenuButton asChild tooltip={item.title}>
-                  <Link href={`/manager/dashboard${item.url}`}>
+                  <Link href={`${basePath}${item.url}`}>
                     {item.icon}
                     <span>{item.title}</span>
                   </Link>
@@ -61,7 +65,7 @@ export function NavMain({
                     {item.items.map((subItem) => (
                       <SidebarMenuSubItem key={subItem.title}>
                         <SidebarMenuSubButton asChild>
-                          <Link href={`/manager/dashboard${subItem.url}`}>
+                          <Link href={`${basePath}${subItem.url}`}>
                             <span>{subItem.title}</span>
                           </Link>
                         </SidebarMenuSubButton>

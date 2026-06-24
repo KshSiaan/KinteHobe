@@ -171,13 +171,13 @@ export default function Page() {
   const endItem = Math.min(currentPage * PAGE_SIZE, totalUsers);
 
   return (
-    <div className="p-6 gap-6 flex flex-col flex-1 h-full w-full">
+    <div className="p-3 sm:p-6 gap-6 flex flex-col flex-1 h-full w-full">
       <div className="flex flex-col gap-4">
-        <h1 className="text-2xl font-bold">Manage Managers</h1>
+        <h1 className="text-xl sm:text-2xl font-bold">Manage Managers</h1>
       </div>
 
       <Card>
-        <CardContent className="flex justify-between items-center gap-6">
+        <CardContent className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 sm:gap-6">
           <InputGroup>
             <InputGroupAddon>
               {input !== debouncedValue ? <EyeIcon /> : <SearchIcon />}
@@ -195,8 +195,8 @@ export default function Page() {
       </Card>
 
       <Card className="w-full">
-        <CardContent>
-          <Table>
+        <CardContent className="overflow-x-auto">
+          <Table className="min-w-150">
             <TableHeader>
               <TableRow>
                 <TableHead>UID</TableHead>

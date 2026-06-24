@@ -65,24 +65,19 @@ export default function NotificationsPage() {
   const [unreadCount, setUnreadCount] = useState(0);
   const [loading, setLoading] = useState(true);
 
-  const fetchPage = useCallback(
-    async (p: number) => {
-      setLoading(true);
-      try {
-        const res = await fetch(
-          `/api/notifications?page=${p}&limit=${LIMIT}`,
-        );
-        if (!res.ok) return;
-        const json = await res.json();
-        setNotifications(json.data ?? []);
-        setPagination(json.pagination ?? null);
-        setUnreadCount(json.unreadCount ?? 0);
-      } finally {
-        setLoading(false);
-      }
-    },
-    [],
-  );
+  const fetchPage = useCallback(async (p: number) => {
+    setLoading(true);
+    try {
+      const res = await fetch(`/api/notifications?page=${p}&limit=${LIMIT}`);
+      if (!res.ok) return;
+      const json = await res.json();
+      setNotifications(json.data ?? []);
+      setPagination(json.pagination ?? null);
+      setUnreadCount(json.unreadCount ?? 0);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
     fetchPage(page);
@@ -107,7 +102,7 @@ export default function NotificationsPage() {
   };
 
   return (
-    <section className="p-8 max-w-3xl">
+    <section className="p-4 md:p-8 container mx-auto">
       <div className="flex items-center justify-between border-b pb-4">
         <div className="flex items-center gap-3">
           <h1 className="text-4xl font-semibold">Notifications</h1>
@@ -131,10 +126,7 @@ export default function NotificationsPage() {
       <div className="mt-6 space-y-2">
         {loading ? (
           Array.from({ length: LIMIT }).map((_, i) => (
-            <div
-              key={i}
-              className="h-20 rounded-lg bg-muted animate-pulse"
-            />
+            <div key={i} className="h-20 rounded-lg bg-muted animate-pulse" />
           ))
         ) : notifications.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-24 gap-4 text-center">
@@ -158,9 +150,7 @@ export default function NotificationsPage() {
               type="button"
               onClick={() => !n.isRead && markOneRead(n.id)}
               className={`w-full text-left rounded-lg border px-4 py-4 flex gap-4 items-start transition-colors hover:bg-muted/50 ${
-                !n.isRead
-                  ? "bg-primary/5 border-primary/20"
-                  : "border-border"
+                !n.isRead ? "bg-primary/5 border-primary/20" : "border-border"
               }`}
             >
               <span
@@ -175,7 +165,10 @@ export default function NotificationsPage() {
                   >
                     {n.title}
                   </p>
-                  <Badge variant="secondary" className="text-[10px] px-1.5 py-0">
+                  <Badge
+                    variant="secondary"
+                    className="text-[10px] px-1.5 py-0"
+                  >
                     {TYPE_LABEL[n.type]}
                   </Badge>
                 </div>
@@ -193,7 +186,7 @@ export default function NotificationsPage() {
       </div>
 
       {pagination && pagination.totalPages > 1 && (
-        <div className="mt-8 flex items-center justify-between">
+        <div className="mt-8 flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
           <p className="text-sm text-muted-foreground">
             Page {pagination.page} of {pagination.totalPages} &mdash;{" "}
             {pagination.total} total

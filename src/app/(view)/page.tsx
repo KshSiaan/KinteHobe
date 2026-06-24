@@ -57,7 +57,7 @@ export default async function Home() {
         </section>
         <section className="container mx-auto py-12">
           <h2 className="text-base font-semibold">Top Categories</h2>
-          <div className="grid grid-cols-4 gap-6 mt-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-6">
             <MinimalCategories />
           </div>
         </section>

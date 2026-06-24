@@ -220,56 +220,60 @@ export default function Page() {
 
       {/* FILTERS */}
       <Card>
-        <CardContent className="flex justify-between items-center gap-6">
-          <InputGroup>
-            <InputGroupAddon>
-              <SearchIcon />
-            </InputGroupAddon>
-            <InputGroupInput
-              placeholder="Search by order ID, customer, or email"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
-          </InputGroup>
+        <CardContent className="flex flex-col gap-4">
+          <div className="flex flex-col sm:flex-row gap-4">
+            <InputGroup className="w-full sm:flex-1">
+              <InputGroupAddon>
+                <SearchIcon />
+              </InputGroupAddon>
+              <InputGroupInput
+                placeholder="Search by order ID, customer, or email"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+            </InputGroup>
 
-          <Select
-            onValueChange={(value) => setSelectedFilter(value)}
-            defaultValue="newest"
-            value={selectedFilter}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Sort" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="newest">Newest</SelectItem>
-              <SelectItem value="oldest">Oldest</SelectItem>
-              <SelectItem value="low-to-high">Low to High</SelectItem>
-              <SelectItem value="high-to-low">High to Low</SelectItem>
-            </SelectContent>
-          </Select>
+            <Select
+              onValueChange={(value) => setSelectedFilter(value)}
+              defaultValue="newest"
+              value={selectedFilter}
+            >
+              <SelectTrigger className="w-full sm:w-44">
+                <SelectValue placeholder="Sort" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="newest">Newest</SelectItem>
+                <SelectItem value="oldest">Oldest</SelectItem>
+                <SelectItem value="low-to-high">Low to High</SelectItem>
+                <SelectItem value="high-to-low">High to Low</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
 
-          <Tabs
-            defaultValue="all"
-            value={selectedStatus}
-            onValueChange={(value) => setSelectedStatus(value)}
-          >
-            <TabsList>
-              <TabsTrigger value="all">All</TabsTrigger>
-              <TabsTrigger value="pending_payment">Pending</TabsTrigger>
-              <TabsTrigger value="paid">Paid</TabsTrigger>
-              <TabsTrigger value="processing">Processing</TabsTrigger>
-              <TabsTrigger value="shipped">Shipped</TabsTrigger>
-              <TabsTrigger value="delivered">Delivered</TabsTrigger>
-              <TabsTrigger value="cancelled">Cancelled</TabsTrigger>
-              <TabsTrigger value="refunded">Refunded</TabsTrigger>
-            </TabsList>
-          </Tabs>
+          <div className="overflow-x-auto">
+            <Tabs
+              defaultValue="all"
+              value={selectedStatus}
+              onValueChange={(value) => setSelectedStatus(value)}
+            >
+              <TabsList className="w-max">
+                <TabsTrigger value="all">All</TabsTrigger>
+                <TabsTrigger value="pending_payment">Pending</TabsTrigger>
+                <TabsTrigger value="paid">Paid</TabsTrigger>
+                <TabsTrigger value="processing">Processing</TabsTrigger>
+                <TabsTrigger value="shipped">Shipped</TabsTrigger>
+                <TabsTrigger value="delivered">Delivered</TabsTrigger>
+                <TabsTrigger value="cancelled">Cancelled</TabsTrigger>
+                <TabsTrigger value="refunded">Refunded</TabsTrigger>
+              </TabsList>
+            </Tabs>
+          </div>
         </CardContent>
       </Card>
 
       {/* TABLE */}
       <Card className="w-full">
-        <CardContent>
+        <CardContent className="overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>

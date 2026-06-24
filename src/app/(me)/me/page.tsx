@@ -133,7 +133,7 @@ export default async function Page() {
           </section>
 
           {/* Additional content section */}
-          <section className="w-full mt-8 grid grid-cols-4 gap-8">
+          <section className="w-full mt-8 grid grid-cols-2 md:grid-cols-4 gap-8">
             {stats.map((stat) => (
               <Card
                 key={stat.title}

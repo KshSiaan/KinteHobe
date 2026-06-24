@@ -22,11 +22,11 @@ import React from "react";
 
 export default function Page() {
   return (
-    <div className="space-y-6 p-6">
+    <div className="space-y-6 p-3 sm:p-6">
       <InDev />
       {/* Header */}
       <div className="flex flex-col gap-2">
-        <h1 className="text-3xl font-bold tracking-tight">Coupon Management</h1>
+        <h1 className="text-xl sm:text-3xl font-bold tracking-tight">Coupon Management</h1>
         <p className="text-muted-foreground">
           Create, manage, and track coupon codes for your products
         </p>
@@ -34,13 +34,15 @@ export default function Page() {
 
       {/* Tabs & Create Button */}
       <Tabs className="w-full" defaultValue="1">
-        <div className="flex items-center justify-between gap-4">
-          <TabsList>
-            <TabsTrigger value="1">Global Coupons</TabsTrigger>
-            <TabsTrigger value="2">Product Specific</TabsTrigger>
-            <TabsTrigger value="3">Redeem History</TabsTrigger>
-          </TabsList>
-          <Button>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+          <div className="overflow-x-auto">
+            <TabsList className="w-max">
+              <TabsTrigger value="1">Global Coupons</TabsTrigger>
+              <TabsTrigger value="2">Product Specific</TabsTrigger>
+              <TabsTrigger value="3">Redeem History</TabsTrigger>
+            </TabsList>
+          </div>
+          <Button className="w-full sm:w-auto">
             <PencilIcon />
             Create Coupon
           </Button>

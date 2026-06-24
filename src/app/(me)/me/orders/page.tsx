@@ -167,10 +167,11 @@ export default async function OrdersPage() {
   };
 
   return (
-    <section className="p-8">
+    <section className="p-4 md:p-8">
       <h1 className="text-4xl font-semibold border-b pb-4">My Orders</h1>
       <div className="mt-8">
         <Tabs defaultValue="all">
+          <div className="overflow-x-auto">
           <TabsList>
             <TabsTrigger value="all">
               All ({byStatus.all.length})
@@ -188,6 +189,7 @@ export default async function OrdersPage() {
               Cancelled ({byStatus.cancelled.length})
             </TabsTrigger>
           </TabsList>
+          </div>
 
           {(
             Object.entries(byStatus) as [

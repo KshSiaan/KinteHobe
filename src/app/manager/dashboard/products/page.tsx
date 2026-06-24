@@ -122,12 +122,12 @@ export default function Page() {
           </Link>
         </Button>
       </div>
-      <div className="grid grid-cols-2 gap-6">
-        <Card className="row-span-2">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <Card className="md:row-span-2">
           <CardHeader>
             <CardTitle>Lowest Product in stock</CardTitle>
           </CardHeader>
-          <CardContent className="flex-1 grid grid-cols-3 gap-4">
+          <CardContent className="flex-1 grid grid-cols-2 sm:grid-cols-3 gap-4">
             {data?.lowestInStock.map((product) => (
               <Card key={product.id} className="pt-0">
                 <CardHeader
@@ -143,7 +143,7 @@ export default function Page() {
             ))}
           </CardContent>
         </Card>
-        <div className="w-full grid grid-cols-2 gap-6">
+        <div className="w-full grid grid-cols-1 sm:grid-cols-2 gap-6">
           <Card className="">
             <CardHeader>
               <CardTitle>Total in stock (including variants)</CardTitle>
@@ -161,7 +161,7 @@ export default function Page() {
             </CardContent>
           </Card>
         </div>
-        <div className="w-full grid grid-cols-2 gap-6">
+        <div className="w-full grid grid-cols-1 sm:grid-cols-2 gap-6">
           <Card className="">
             <CardHeader>
               <CardTitle>Average Pricing</CardTitle>
@@ -191,15 +191,15 @@ export default function Page() {
         </div>
       </div>
       <Card>
-        <CardContent className="flex justify-between items-center gap-6">
-          <InputGroup>
+        <CardContent className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-4">
+          <InputGroup className="w-full sm:flex-1">
             <InputGroupAddon>
               <SearchIcon />
             </InputGroupAddon>
             <InputGroupInput placeholder="Search Product" />
           </InputGroup>
           <Select>
-            <SelectTrigger>
+            <SelectTrigger className="w-full sm:w-48">
               <SelectValue placeholder="Filter by Status" />
             </SelectTrigger>
             <SelectContent>
@@ -216,7 +216,7 @@ export default function Page() {
       </Card>
 
       <Card className="w-full">
-        <CardContent>
+        <CardContent className="overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>

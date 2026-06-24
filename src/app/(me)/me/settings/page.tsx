@@ -10,16 +10,18 @@ import Location from "./location";
 
 export default function Page() {
   return (
-    <section className="p-8">
+    <section className="p-4 md:p-8">
       <Tabs defaultValue="general" className="w-full">
-        <TabsList>
-          <TabsTrigger value="general">General</TabsTrigger>
-          <TabsTrigger value="location">Location</TabsTrigger>
-          <TabsTrigger value="security">Security</TabsTrigger>
-          <TabsTrigger value="appearance">Appearance</TabsTrigger>
-          <TabsTrigger value="agent">Agent</TabsTrigger>
-          <TabsTrigger value="restricted">Restricted Zone</TabsTrigger>
-        </TabsList>
+        <div className="overflow-x-auto">
+          <TabsList>
+            <TabsTrigger value="general">General</TabsTrigger>
+            <TabsTrigger value="location">Location</TabsTrigger>
+            <TabsTrigger value="security">Security</TabsTrigger>
+            <TabsTrigger value="appearance">Appearance</TabsTrigger>
+            <TabsTrigger value="agent">Agent</TabsTrigger>
+            <TabsTrigger value="restricted">Restricted Zone</TabsTrigger>
+          </TabsList>
+        </div>
         <TabsContent value="general">
           <General />
         </TabsContent>

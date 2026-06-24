@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { useCartStore } from "@/hooks/use-cart-store";
 import { useProductSelectionStore } from "@/hooks/use-product-selection-store";
 import { ArrowDown, MinusIcon, PlusIcon, TruckIcon } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
 export default function Controller({
@@ -64,6 +65,7 @@ export default function Controller({
   const selectedVariantId = useProductSelectionStore(
     (state) => state.selectedVariantId,
   );
+  const router = useRouter();
   const [quantity, setQuantity] = useState(1);
 
   const purchasableVariant =
@@ -226,6 +228,37 @@ export default function Controller({
             className="w-full rounded-lg"
             variant="success"
             disabled={isOutOfStock || !purchasableVariant}
+            onClick={() => {
+              if (!purchasableVariant) return;
+              addItem({
+                productId: data.product.id,
+                productSlug: data.product.slug,
+                productTitle:
+                  data.variants.find((v) => v.kind === "base")?.title ??
+                  purchasableVariant.title,
+                categoryId: data.product.categoryId,
+                quantity: 1,
+                selection: {
+                  variantId: purchasableVariant.id,
+                  kind: purchasableVariant.kind,
+                  title: purchasableVariant.title,
+                  sku: purchasableVariant.sku,
+                  price: purchasableVariant.price,
+                  compareAtPrice: purchasableVariant.compareAtPrice,
+                  stockQuantity: purchasableVariant.stockQuantity,
+                  images: purchasableVariant.images,
+                  optionLabel:
+                    purchasableVariant.kind === "color"
+                      ? purchasableVariant.title
+                      : purchasableVariant.optionName,
+                  optionValue:
+                    purchasableVariant.kind === "color"
+                      ? purchasableVariant.code
+                      : purchasableVariant.optionName,
+                },
+              });
+              router.push("/checkout");
+            }}
           >
             Buy it now
           </Button>

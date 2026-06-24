@@ -85,7 +85,7 @@ export default function Page() {
     <main className="py-4">
       <section className="container mx-auto mb-6">
         <h3 className="text-sm font-semibold">Related Links</h3>
-        <div className="grid grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <Button variant="link" asChild>
             <Link href="/categories">Categories</Link>
           </Button>

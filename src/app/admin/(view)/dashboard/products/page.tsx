@@ -112,9 +112,9 @@ export default function Page() {
     return <div>Loading...</div>;
   }
   return (
-    <div className="p-6 gap-6 flex flex-col flex-1 h-full w-full">
+    <div className="p-3 sm:p-6 gap-6 flex flex-col flex-1 h-full w-full">
       <div className="flex flex-row justify-between items-center gap-4">
-        <h1 className="text-2xl font-bold">Manage Products</h1>
+        <h1 className="text-xl sm:text-2xl font-bold">Manage Products</h1>
         <Button asChild>
           <Link href={"products/add"}>
             <PlusIcon />
@@ -122,12 +122,12 @@ export default function Page() {
           </Link>
         </Button>
       </div>
-      <div className="grid grid-cols-2 gap-6">
-        <Card className="row-span-2">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card className="lg:row-span-2">
           <CardHeader>
             <CardTitle>Lowest Product in stock</CardTitle>
           </CardHeader>
-          <CardContent className="flex-1 grid grid-cols-3 gap-4">
+          <CardContent className="flex-1 grid grid-cols-2 sm:grid-cols-3 gap-4">
             {data?.lowestInStock.map((product) => (
               <Card key={product.id} className="pt-0">
                 <CardHeader
@@ -143,7 +143,7 @@ export default function Page() {
             ))}
           </CardContent>
         </Card>
-        <div className="w-full grid grid-cols-2 gap-6">
+        <div className="w-full grid grid-cols-1 sm:grid-cols-2 gap-6">
           <Card className="">
             <CardHeader>
               <CardTitle>Total in stock (including variants)</CardTitle>
@@ -161,7 +161,7 @@ export default function Page() {
             </CardContent>
           </Card>
         </div>
-        <div className="w-full grid grid-cols-2 gap-6">
+        <div className="w-full grid grid-cols-1 sm:grid-cols-2 gap-6">
           <Card className="">
             <CardHeader>
               <CardTitle>Average Pricing</CardTitle>
@@ -191,7 +191,7 @@ export default function Page() {
         </div>
       </div>
       <Card>
-        <CardContent className="flex justify-between items-center gap-6">
+        <CardContent className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 sm:gap-6">
           <InputGroup>
             <InputGroupAddon>
               <SearchIcon />
@@ -216,8 +216,8 @@ export default function Page() {
       </Card>
 
       <Card className="w-full">
-        <CardContent>
-          <Table>
+        <CardContent className="overflow-x-auto">
+          <Table className="min-w-150">
             <TableHeader>
               <TableRow>
                 {/* <TableHead>Product ID</TableHead> */}

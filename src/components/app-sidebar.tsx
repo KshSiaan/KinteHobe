@@ -115,7 +115,7 @@ const data = {
   navSecondary: [
     {
       title: "Support",
-      url: "#",
+      url: "/admin/support",
       icon: <LifeBuoyIcon />,
     },
     {

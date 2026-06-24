@@ -32,9 +32,9 @@ export default async function Page() {
   const categories: CreateResponseType<{ data: CategoryType }> =
     await response.json();
   return (
-    <div className="p-6 flex flex-col flex-1 h-full w-full">
+    <div className="p-3 sm:p-6 flex flex-col flex-1 h-full w-full">
       <div className="flex flex-row justify-between items-center gap-4 mb-6">
-        <h1 className="text-2xl font-bold">Manage Categories</h1>
+        <h1 className="text-xl sm:text-2xl font-bold">Manage Categories</h1>
         <Suspense
           fallback={
             <Button disabled>
@@ -45,7 +45,8 @@ export default async function Page() {
           <Add />
         </Suspense>
       </div>
-      <Table>
+      <div className="overflow-x-auto">
+      <Table className="min-w-120">
         <TableHeader>
           <TableRow>
             <TableHead>Category Icon</TableHead>
@@ -123,6 +124,7 @@ export default async function Page() {
           ))}
         </TableBody>
       </Table>
+      </div>
     </div>
   );
 }

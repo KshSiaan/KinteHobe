@@ -29,6 +29,7 @@ import {
   HatGlassesIcon,
   LogOut,
   MapPinHouse,
+  MenuIcon,
   ScrollTextIcon,
   SearchIcon,
   UsersIcon,
@@ -110,9 +111,9 @@ export default function Navbar() {
 
   return (
     <>
-      <div className="h-26 border-b fixed top-0 left-0 w-full bg-background z-50 ">
-        <div className="h-16! w-full border-b flex flex-row items-center justify-between px-6">
-          <div className="flex items-center gap-6">
+      <div className="h-16 md:h-26 border-b fixed z-50 top-0 left-0 w-full bg-background">
+        <div className="h-16! w-full border-b flex flex-row items-center justify-between px-4 md:px-6">
+          <div className="flex items-center gap-3 md:gap-6">
             <Link href={"/"} className="hover:opacity-70">
               <Image
                 src={"/img/icon.svg"}
@@ -122,7 +123,7 @@ export default function Navbar() {
                 className="size-10"
               />
             </Link>
-            <InputGroup className="w-[30dvw] border border-muted-foreground/20 bg-background">
+            <InputGroup className="hidden md:flex w-[30dvw] border border-muted-foreground/20 bg-background">
               <InputGroupAddon>
                 <InputGroupButton>
                   <SearchIcon />
@@ -134,30 +135,34 @@ export default function Navbar() {
               />
             </InputGroup>
           </div>
-          <div className="flex gap-6 items-center">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant={"ghost"}>
-                  <GlobeIcon />
-                  English
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                <DropdownMenuItem>Bangla</DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+          <div className="flex gap-2 md:gap-6 items-center">
+            <div className="hidden md:block">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant={"ghost"}>
+                    <GlobeIcon />
+                    English
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuItem>Bangla</DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
             {path === "/" && (
-              <Sheet>
-                <SheetTrigger asChild>
-                  <Button variant={"ghost"}>Filter by</Button>
-                </SheetTrigger>
-                <SheetContent side="bottom">
-                  <SheetHeader>
-                    <SheetTitle>Filter by</SheetTitle>
-                  </SheetHeader>
-                  <div className="h-[40dvh]"></div>
-                </SheetContent>
-              </Sheet>
+              <div className="hidden md:block">
+                <Sheet>
+                  <SheetTrigger asChild>
+                    <Button variant={"ghost"}>Filter by</Button>
+                  </SheetTrigger>
+                  <SheetContent side="bottom">
+                    <SheetHeader>
+                      <SheetTitle>Filter by</SheetTitle>
+                    </SheetHeader>
+                    <div className="h-[40dvh]"></div>
+                  </SheetContent>
+                </Sheet>
+              </div>
             )}
             <Suspense fallback={<Skeleton className="size-8" />}>
               <Cart />
@@ -182,7 +187,7 @@ export default function Navbar() {
                         {data.user.name.slice(0, 2).toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
-                    <span className="text-sm">{data.user.name}</span>
+                    <span className="hidden sm:inline text-sm">{data.user.name}</span>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
@@ -213,7 +218,7 @@ export default function Navbar() {
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <div className="flex gap-2">
+              <div className="hidden md:flex gap-2">
                 <Button variant={"outline"} asChild>
                   <Link href={"/auth/register"}>Sign up</Link>
                 </Button>
@@ -224,9 +229,119 @@ export default function Navbar() {
                 </Button>
               </div>
             )}
+            {/* Mobile hamburger menu */}
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button variant={"ghost"} size={"icon"} className="md:hidden">
+                  <MenuIcon className="size-5" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="right" className="w-70 overflow-y-auto">
+                <SheetHeader>
+                  <SheetTitle>Menu</SheetTitle>
+                </SheetHeader>
+                <div className="mt-4 flex flex-col gap-6">
+                  <InputGroup className="w-full border border-muted-foreground/20 bg-background">
+                    <InputGroupAddon>
+                      <InputGroupButton>
+                        <SearchIcon />
+                      </InputGroupButton>
+                    </InputGroupAddon>
+                    <InputGroupInput className="text-sm" placeholder="Search…" />
+                  </InputGroup>
+                  <div className="flex flex-col gap-1">
+                    <p className="text-xs font-semibold text-muted-foreground uppercase px-2 mb-1">
+                      Explore
+                    </p>
+                    <Button variant={"ghost"} className="justify-start" asChild>
+                      <Link href="/products?preference=best_selling">
+                        Best sellers
+                      </Link>
+                    </Button>
+                    <Button variant={"ghost"} className="justify-start" asChild>
+                      <Link href="/products?preference=trending">Trending</Link>
+                    </Button>
+                    <Button variant={"ghost"} className="justify-start" asChild>
+                      <Link href="/products?preference=most_favorites">
+                        Most favourites
+                      </Link>
+                    </Button>
+                  </div>
+                  {!isPending && !data?.user && (
+                    <div className="flex flex-col gap-2">
+                      <Button variant={"outline"} asChild>
+                        <Link href={"/auth/register"}>Sign up</Link>
+                      </Button>
+                      <Button asChild>
+                        <Link href={"/auth/login"}>
+                          Sign in <DoorOpenIcon className="ml-2 size-4" />
+                        </Link>
+                      </Button>
+                    </div>
+                  )}
+                  {data?.session?.token && (
+                    <div className="flex flex-col gap-1">
+                      <p className="text-xs font-semibold text-muted-foreground uppercase px-2 mb-1">
+                        Account
+                      </p>
+                      <Button
+                        variant={"ghost"}
+                        className="justify-start gap-2"
+                        asChild
+                      >
+                        <Link href="/me/orders">
+                          <ScrollTextIcon className="size-4" />
+                          Orders
+                        </Link>
+                      </Button>
+                      <Button
+                        variant={"ghost"}
+                        className="justify-start gap-2"
+                        asChild
+                      >
+                        <Link href="/people">
+                          <UsersIcon className="size-4" />
+                          People
+                        </Link>
+                      </Button>
+                      <Button
+                        variant={"ghost"}
+                        className="justify-start gap-2"
+                        asChild
+                      >
+                        <Link href="/faq">
+                          <CircleQuestionMarkIcon className="size-4" />
+                          Help
+                        </Link>
+                      </Button>
+                    </div>
+                  )}
+                  <div>
+                    <p className="text-xs font-semibold text-muted-foreground uppercase px-2 mb-1">
+                      Language
+                    </p>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant={"ghost"}
+                          className="justify-start w-full gap-2"
+                        >
+                          <GlobeIcon className="size-4" />
+                          English
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent>
+                        <DropdownMenuItem>Bangla</DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
+                </div>
+              </SheetContent>
+            </Sheet>
           </div>
         </div>
-        <div className="h-10 w-full flex items-center justify-between px-6">
+        {/* Bottom nav row — desktop only */}
+        <div className="hidden md:flex h-10 w-full items-center justify-between px-6">
           <div className="flex gap-2 items-center h-full ">
             <Button variant={"link"} className="text-xs px-0! mr-4" asChild>
               <Link href="/products?preference=best_selling">Best sellers</Link>
@@ -279,13 +394,15 @@ export default function Navbar() {
                 </div>
               </PopoverContent>
             </Popover>
-            <Button variant={"ghost"} size={"icon-sm"}>
-              <CircleQuestionMarkIcon />
+            <Button variant={"ghost"} size={"icon-sm"} asChild>
+              <Link href="/faq">
+                <CircleQuestionMarkIcon />
+              </Link>
             </Button>
           </div>
         </div>
       </div>
-      <div className="h-26 w-full bg-background" />
+      <div className="h-16 md:h-26 w-full bg-background" />
       {data?.session?.impersonatedBy && (
         <AlertDialog>
           <AlertDialogTrigger asChild>

@@ -6,7 +6,7 @@ import { createOpenRouter } from '@openrouter/ai-sdk-provider';
 import z from 'zod';
 import { systemPrompt } from './system';
 const openrouter = createOpenRouter({
-  apiKey: process.env.OPENROUTER_API_KEY,
+    apiKey: process.env.OPENROUTER_API_KEY,
 });
 // const model = wrapLanguageModel({
 //   model: openrouter("openai/gpt-oss-120b:free"),
@@ -15,7 +15,7 @@ const openrouter = createOpenRouter({
 
 
 //! triggerTask is a client-side tool (no execute) — AI SDK routes it to frontend via onToolCall
-const tools:ToolSet = {
+const tools: ToolSet = {
     triggerTask: tool({
         description: "Trigger a UI task on the frontend. Use this to instruct the UI to perform an action. and always follow up with a text response to the user after calling this tool. never end your turn with only a tool call — always provide a text reply summarizing or using the tool result.",
         inputSchema: z.object({
@@ -25,7 +25,7 @@ const tools:ToolSet = {
         }),
     }),
     getProducts: tool({
-        description:"Fetches a list of all products available on the platform, including their IDs, slugs, titles, descriptions, categories, statuses, variant IDs, creation and update timestamps, and variant details such as prices, stock quantities, weights, metadata, positions, kinds, enabled statuses, titles, option names, images, and public images.",
+        description: "Fetches a list of all products available on the platform, including their IDs, slugs, titles, descriptions, categories, statuses, variant IDs, creation and update timestamps, and variant details such as prices, stock quantities, weights, metadata, positions, kinds, enabled statuses, titles, option names, images, and public images.",
         inputSchema: z.object({}),
         execute: async () => {
             const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/product`);
@@ -34,7 +34,7 @@ const tools:ToolSet = {
         }
     }),
     getSpecificProduct: tool({
-        description:"Fetches detailed information about a specific product based its slug",
+        description: "Fetches detailed information about a specific product based its slug",
         inputSchema: z.object({
             slug: z.string().describe("The slug of the product to fetch"),
         }),
@@ -45,7 +45,7 @@ const tools:ToolSet = {
         },
     }),
     pageRoutes: tool({
-        description:"Fetches a list of all page routes for redirection and linking, including their slugs and titles. dont give out page routes that are not meant for public access. Only provide routes that are accessible to users. always provide full links to the pages, including the domain name. If the page is not accessible to users, do not provide the route.",
+        description: "Fetches a list of all page routes for redirection and linking, including their slugs and titles. dont give out page routes that are not meant for public access. Only provide routes that are accessible to users. always provide full links to the pages, including the domain name. If the page is not accessible to users, do not provide the route.",
         inputSchema: z.object({}),
         execute: async () => {
             const res = await fs.readFile(`${process.cwd()}/ROUTING.md`, {
@@ -59,9 +59,9 @@ const tools:ToolSet = {
 export async function POST(request: Request) {
     const { messages }: { messages: UIMessage[] } = await request.json();
     const result = streamText({
-        model:openrouter("openai/gpt-oss-120b:free"),
+        model: openrouter("openai/gpt-oss-120b:free"),
         tools,
-        stopWhen:isLoopFinished(),
+        stopWhen: isLoopFinished(),
         system: systemPrompt,
         messages: await convertToModelMessages(messages),
     })

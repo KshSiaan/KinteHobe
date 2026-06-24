@@ -173,7 +173,7 @@ export default async function Page({
   }
   return (
     <main className="p-4">
-      <div className="grid grid-cols-4 gap-4 min-h-screen">
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 min-h-screen">
         <Suspense fallback={<div>Loading product...</div>}>
           <Product data={data.data ?? null} />
         </Suspense>

@@ -8,3 +8,7 @@ export * from "./schema/wishlist-schema";
 export * from "./schema/notification-schema";
 export * from "./schema/user-address-schema";
 export * from "./schema/legal-schema";
+export * from "./schema/feedback-schema";
+export * from "./schema/support-schema";
+export * from "./schema/faq-schema";
+export * from "./schema/revenue-goal-schema";

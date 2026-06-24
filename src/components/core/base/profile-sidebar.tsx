@@ -43,7 +43,7 @@ export function ProfileSidebar() {
   return (
     <>
       {" "}
-      <nav className="fixed h-14 border-b z-30 top-26 bg-background w-full flex justify-between items-center px-6">
+      <nav className="fixed h-14 border-b z-30 top-16 md:top-26 bg-background w-full flex justify-between items-center px-4 md:px-6">
         {/* Header - Breadcrumb */}
         <Breadcrumb>
           <BreadcrumbList>
@@ -83,7 +83,7 @@ export function ProfileSidebar() {
                 )}
               >
                 <Icon className="w-4 h-4 shrink-0" />
-                <span className="truncate">{item.label}</span>
+                <span className="hidden sm:inline truncate">{item.label}</span>
               </Link>
             );
           })}

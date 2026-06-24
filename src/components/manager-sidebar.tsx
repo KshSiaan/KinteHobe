@@ -22,6 +22,7 @@ import {
   ShoppingCartIcon,
   Ellipsis,
   PackageIcon,
+  MessageSquareIcon,
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -80,15 +81,15 @@ const data = {
   navSecondary: [
     {
       title: "Support",
-      url: "#",
+      url: "/manager/dashboard/support",
       icon: <LifeBuoyIcon />,
     },
   ],
   projects: [
     {
-      name: "Admin Feedbacks",
-      url: "/admin-feedbacks",
-      icon: <LifeBuoyIcon />,
+      name: "My Feedbacks",
+      url: "/manager/dashboard/feedbacks",
+      icon: <MessageSquareIcon />,
     },
   ],
 };
