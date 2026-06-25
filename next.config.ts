@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  reactCompiler:true,
+  reactCompiler: true,
   images: {
     remotePatterns: [
       {
@@ -15,10 +15,11 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "placehold.co",
-      }
+      },
     ],
   },
-  serverExternalPackages:["pdf-parse"]
+  serverExternalPackages: ["pdf-parse"],
+  allowedDevOrigins: ["192.168.0.195"],
 };
 
 export default nextConfig;
