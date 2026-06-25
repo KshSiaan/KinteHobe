@@ -55,7 +55,7 @@ export default function RootLayout({
       className={cn("h-full", "antialiased", inter.className)}
       suppressHydrationWarning
     >
-      <body className="min-h-full flex flex-col">
+      <body className="min-h-full flex flex-col w-dvw overflow-x-hidden">
         <ThemeProvider
           attribute="class"
           defaultTheme="system"

@@ -9,7 +9,11 @@ export const iframeHeight = "800px";
 
 export const description = "A sidebar with a header and a search form.";
 
-export default async function Layout({ children }: { children: React.ReactNode }) {
+export default async function Layout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const data = await auth?.api?.getSession({
     headers: await headers(),
   });

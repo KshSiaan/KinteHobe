@@ -89,7 +89,7 @@ export function NameDescriptionTableField({
 
   return (
     <div className="flex flex-col gap-3 rounded-xl border bg-muted/20 p-4">
-      <div className="flex items-start justify-between gap-3">
+      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
         <div className="flex items-start gap-2">
           <div className="rounded-md border bg-background p-1.5">
             <Rows3Icon />
@@ -101,7 +101,7 @@ export function NameDescriptionTableField({
             ) : null}
           </div>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           {adaptFromBaseRows && adaptFromBaseRows.length > 0 ? (
             <Button
               type="button"
@@ -119,6 +119,7 @@ export function NameDescriptionTableField({
         </div>
       </div>
 
+      <div className="overflow-x-auto">
       <Table>
         <TableHeader>
           <TableRow>
@@ -171,6 +172,7 @@ export function NameDescriptionTableField({
           )}
         </TableBody>
       </Table>
+      </div>
     </div>
   );
 }

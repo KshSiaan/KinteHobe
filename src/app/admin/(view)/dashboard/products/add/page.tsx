@@ -448,12 +448,12 @@ export default function Page() {
               ))}
             </SelectContent>
           </Select>
-          <div className="flex items-start">
-            <Label className="flex-1">Product Status:</Label>
+          <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+            <Label className="flex-1 text-nowrap">Product Status:</Label>
             <RadioGroup
               value={productStatus}
               onValueChange={handleProductStatusChange}
-              className="w-fit flex"
+              className="grid grid-cols-2 lg:flex flex-wrap gap-6 mt-2 lg:mt-0 lg:gap-3"
             >
               <div className="flex items-center gap-3">
                 <RadioGroupItem value="active" id="product-status-active" />
@@ -487,107 +487,116 @@ export default function Page() {
         </CardContent>
       </Card>
       <Card key={resetVersion}>
-        <CardContent className="flex justify-between items-center">
-          <Tabs value={showVariant} onValueChange={setShowVariant}>
-            <TabsList>
-              <TabsTrigger
-                className="data-active:bg-primary data-active:text-primary-foreground"
-                value="base"
-              >
-                Base Variant
-              </TabsTrigger>
-              {colorVariantActive && (
+        <CardContent className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+          <div className="w-full overflow-x-auto">
+            <Tabs value={showVariant} onValueChange={setShowVariant}>
+              <TabsList className="inline-flex h-auto min-w-max flex-wrap gap-1">
                 <TabsTrigger
                   className="data-active:bg-primary data-active:text-primary-foreground"
-                  value="colors"
+                  value="base"
                 >
-                  Color Variant
+                  Base Variant
                 </TabsTrigger>
-              )}
-              {sizeVariantActive && (
-                <TabsTrigger
-                  className="data-active:bg-primary data-active:text-primary-foreground"
-                  value="sizes"
-                >
-                  Size Variant
-                </TabsTrigger>
-              )}
-              {customVariantList.map((_, index) => (
-                <TabsTrigger
-                  // biome-ignore lint/suspicious/noArrayIndexKey: Order is static for user-added labels.
-                  key={index}
-                  className="data-active:bg-primary data-active:text-primary-foreground"
-                  value={`custom-${index}`}
-                >
-                  {customVariantList[index]}
-                </TabsTrigger>
-              ))}
-            </TabsList>
-          </Tabs>
 
-          <div className="items-center space-x-2 flex">
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button variant={"outline"}>
-                  <PlusIcon />
-                  Add Custom Variant
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Add Custom Variant</DialogTitle>
-                </DialogHeader>
-                <div className="space-y-4">
-                  <Label>Variant Title</Label>
-                  <Input
-                    placeholder={`Custom Variant #${customVariantList.length + 1}`}
-                    value={customVariantTitle}
-                    onChange={(e) => setCustomVariantTitle(e.target.value)}
-                  />
-                </div>
-                <DialogFooter>
-                  <Button
-                    onClick={() => {
-                      const safeTitle =
-                        customVariantTitle.trim() ||
-                        `Custom Variant ${customVariantList.length + 1}`;
-                      const nextList = [...customVariantList, safeTitle];
-                      setCustomVariantList([...nextList]);
-                      setCustomVariantTitle("");
-                      setShowVariant(`custom-${nextList.length - 1}`);
-                    }}
+                {colorVariantActive && (
+                  <TabsTrigger
+                    className="data-active:bg-primary data-active:text-primary-foreground"
+                    value="colors"
                   >
-                    Add Variant
+                    Color Variant
+                  </TabsTrigger>
+                )}
+
+                {sizeVariantActive && (
+                  <TabsTrigger
+                    className="data-active:bg-primary data-active:text-primary-foreground"
+                    value="sizes"
+                  >
+                    Size Variant
+                  </TabsTrigger>
+                )}
+
+                {customVariantList.map((_, index) => (
+                  <TabsTrigger
+                    // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
+                    key={index}
+                    className="data-active:bg-primary data-active:text-primary-foreground"
+                    value={`custom-${index}`}
+                  >
+                    {customVariantList[index]}
+                  </TabsTrigger>
+                ))}
+              </TabsList>
+            </Tabs>
+          </div>
+
+          <div className="flex w-full flex-col gap-2 sm:flex-row sm:flex-wrap sm:justify-end lg:w-auto">
+            {/* Dialog */}
+            <div className="flex flex-wrap items-center gap-2">
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button variant={"outline"}>
+                    <PlusIcon />
+                    Add Custom Variant
                   </Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button>
-                  <PlusIcon />
-                  Add Defined variant
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                <DropdownMenuCheckboxItem
-                  checked={colorVariantActive}
-                  onCheckedChange={(checked) =>
-                    setColorVariantActive(checked === true)
-                  }
-                >
-                  Color Variant
-                </DropdownMenuCheckboxItem>
-                <DropdownMenuCheckboxItem
-                  checked={sizeVariantActive}
-                  onCheckedChange={(checked) =>
-                    setSizeVariantActive(checked === true)
-                  }
-                >
-                  Size Variant
-                </DropdownMenuCheckboxItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Add Custom Variant</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4">
+                    <Label>Variant Title</Label>
+                    <Input
+                      placeholder={`Custom Variant #${customVariantList.length + 1}`}
+                      value={customVariantTitle}
+                      onChange={(e) => setCustomVariantTitle(e.target.value)}
+                    />
+                  </div>
+                  <DialogFooter>
+                    <Button
+                      onClick={() => {
+                        const safeTitle =
+                          customVariantTitle.trim() ||
+                          `Custom Variant ${customVariantList.length + 1}`;
+                        const nextList = [...customVariantList, safeTitle];
+                        setCustomVariantList([...nextList]);
+                        setCustomVariantTitle("");
+                        setShowVariant(`custom-${nextList.length - 1}`);
+                      }}
+                    >
+                      Add Variant
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button>
+                    <PlusIcon />
+                    Add Defined variant
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuCheckboxItem
+                    checked={colorVariantActive}
+                    onCheckedChange={(checked) =>
+                      setColorVariantActive(checked === true)
+                    }
+                  >
+                    Color Variant
+                  </DropdownMenuCheckboxItem>
+                  <DropdownMenuCheckboxItem
+                    checked={sizeVariantActive}
+                    onCheckedChange={(checked) =>
+                      setSizeVariantActive(checked === true)
+                    }
+                  >
+                    Size Variant
+                  </DropdownMenuCheckboxItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+            {/* Dropdown */}
           </div>
         </CardContent>
       </Card>
