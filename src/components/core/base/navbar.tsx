@@ -187,7 +187,9 @@ export default function Navbar() {
                         {data.user.name.slice(0, 2).toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
-                    <span className="hidden sm:inline text-sm">{data.user.name}</span>
+                    <span className="hidden sm:inline text-sm">
+                      {data.user.name}
+                    </span>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
@@ -236,7 +238,7 @@ export default function Navbar() {
                   <MenuIcon className="size-5" />
                 </Button>
               </SheetTrigger>
-              <SheetContent side="right" className="w-70 overflow-y-auto">
+              <SheetContent side="right" className="w-70 overflow-y-auto p-4">
                 <SheetHeader>
                   <SheetTitle>Menu</SheetTitle>
                 </SheetHeader>
@@ -247,7 +249,10 @@ export default function Navbar() {
                         <SearchIcon />
                       </InputGroupButton>
                     </InputGroupAddon>
-                    <InputGroupInput className="text-sm" placeholder="Search…" />
+                    <InputGroupInput
+                      className="text-sm"
+                      placeholder="Search…"
+                    />
                   </InputGroup>
                   <div className="flex flex-col gap-1">
                     <p className="text-xs font-semibold text-muted-foreground uppercase px-2 mb-1">
