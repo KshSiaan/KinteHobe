@@ -5,11 +5,6 @@ import ProductSet from "@/components/core/base/product-set";
 import type { CreateResponseType } from "@/lib/backend/message";
 
 async function getCategory(slug: string) {
-  "use cache";
-
-  // 1. Skip fetch during build if it's the build-time 'dummy' slug
-  if (slug === "build-time-dummy") return null;
-
   try {
     const res = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/api/client/category/${slug}`,
@@ -20,14 +15,9 @@ async function getCategory(slug: string) {
 
     if (!res.ok) return null;
     return res.json();
-  } catch (error) {
+  } catch {
     return null;
   }
-}
-
-// 2. Return at least one result to satisfy 'Cache Components' validation
-export async function generateStaticParams() {
-  return [{ slug: "build-time-dummy" }];
 }
 
 export async function generateMetadata({
@@ -54,15 +44,10 @@ export default async function Page({
   const { slug } = await params;
   const data: CreateResponseType<any> = await getCategory(slug);
 
-  // 3. Handle null or dummy data gracefully
   if (!data?.data) {
     return (
       <div className="flex items-center justify-center min-h-[50vh]">
-        <p className="text-muted-foreground italic">
-          {slug === "build-time-dummy"
-            ? "Build validation in progress..."
-            : "Category not found."}
-        </p>
+        <p className="text-muted-foreground italic">Category not found.</p>
       </div>
     );
   }

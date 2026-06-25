@@ -2,16 +2,20 @@ import { legalContent } from "@/db/schema";
 import { db } from "@/lib/db";
 import { eq } from "drizzle-orm";
 import type { LegalPageType } from "@/db/schema";
+import { unstable_cache } from "next/cache";
 
-export async function getLegalContent(type: LegalPageType) {
-	"use cache";
-	const [row] = await db
-		.select()
-		.from(legalContent)
-		.where(eq(legalContent.pageType, type))
-		.limit(1);
-	return row ?? null;
-}
+export const getLegalContent = unstable_cache(
+	async (type: LegalPageType) => {
+		const [row] = await db
+			.select()
+			.from(legalContent)
+			.where(eq(legalContent.pageType, type))
+			.limit(1);
+		return row ?? null;
+	},
+	["legal-content"],
+	{ revalidate: 300, tags: ["legal"] },
+);
 
 export const LEGAL_PAGE_META: Record<
 	LegalPageType,

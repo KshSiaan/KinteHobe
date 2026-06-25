@@ -18,11 +18,6 @@ import Controller from "./controller";
 import { notFound } from "next/navigation";
 
 async function getProduct(slug: string) {
-  "use cache";
-
-  // 1. Skip fetch during build if it's the build-time 'dummy' slug
-  if (slug === "build-time-dummy") return null;
-
   try {
     const res = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/api/product/${slug}`,
@@ -33,14 +28,9 @@ async function getProduct(slug: string) {
 
     if (!res.ok) return null;
     return res.json();
-  } catch (error) {
+  } catch {
     return null;
   }
-}
-
-// 2. Return at least one result to satisfy 'Cache Components' validation
-export async function generateStaticParams() {
-  return [{ slug: "build-time-dummy" }];
 }
 
 export async function generateMetadata({
