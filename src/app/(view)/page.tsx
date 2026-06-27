@@ -22,7 +22,7 @@ export default async function Home() {
         <HeroWrapper />
       </Suspense>
       <main className="max-w-dvw overflow-x-hidden">
-        <section className="container mx-auto grid grid-cols-3 lg:grid-cols-6 gap-8 lg:gap-12 my-24 lg:px-0 max-w-dvw">
+        <section className="container mx-auto grid grid-cols-3 lg:grid-cols-6 gap-8 lg:gap-12 my-24 lg:px-0 ">
           <Suspense
             fallback={Array.from({ length: 6 }).map((_, i) => (
               // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>

@@ -23,13 +23,33 @@ import { useState } from "react";
 import Link from "next/link";
 import { ScreenShareIcon } from "lucide-react";
 import { usePathname } from "next/navigation";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export default function AiAssistant() {
+  const isMobile = useIsMobile();
   const path = usePathname();
   const [input, setInput] = useState("");
 
   if (path === "/khuki") {
     return null; // Don't render the popover if we're already on the chat page
+  }
+  if (isMobile) {
+    return (
+      <Button
+        className="fixed bottom-4 left-4 size-12 p-2! bg-white! overflow-hidden shadow-lg rounded-full"
+        asChild
+      >
+        <Link href="/khuki">
+          <Image
+            src="/assistant-icon.webp"
+            alt="Assistant"
+            width={248}
+            height={248}
+            className="object-contain size-full rounded-full"
+          />
+        </Link>
+      </Button>
+    );
   }
   return (
     <Popover>
