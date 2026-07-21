@@ -22,7 +22,7 @@ export default async function Home() {
         <HeroWrapper />
       </Suspense>
       <main className="max-w-dvw overflow-x-hidden">
-        <section className="container mx-auto grid grid-cols-3 lg:grid-cols-6 gap-8 lg:gap-12 my-24 lg:px-0 max-w-dvw">
+        <section className="container mx-auto grid grid-cols-3 lg:grid-cols-6 gap-8 lg:gap-12 my-24 lg:px-0 max-w-dvw px-4 md:px-0">
           <Suspense
             fallback={Array.from({ length: 6 }).map((_, i) => (
               // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
@@ -39,8 +39,8 @@ export default async function Home() {
             <Categories />
           </Suspense>
         </section>
-        <section className="bg-muted my-24 py-12">
-          <div className="container mx-auto pb-12">
+        <section className="bg-muted my-24 py-12 ">
+          <div className="container mx-auto pb-12 px-4 md:px-0">
             <h2 className="text-base font-semibold">Your daily discover</h2>
           </div>
           <div className="grid grid-cols-2 lg:grid-cols-4 container mx-auto">
@@ -55,13 +55,13 @@ export default async function Home() {
             </Suspense>
           </div>
         </section>
-        <section className="container mx-auto py-12">
+        <section className="container mx-auto py-12 px-4 md:px-0">
           <h2 className="text-base font-semibold">Top Categories</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-6">
             <MinimalCategories />
           </div>
         </section>
-        <section className="container mx-auto py-12">
+        <section className="container mx-auto py-12 px-4 md:px-0">
           <h2 className="text-base font-semibold">Featured Products</h2>
           <div className="grid grid-cols-2 lg:grid-cols-4 container mx-auto mt-12">
             <Suspense
@@ -75,7 +75,7 @@ export default async function Home() {
             </Suspense>
           </div>
         </section>
-        <section className="bg-muted py-20">
+        <section className="bg-muted py-20 px-4 md:px-0">
           <div className="container mx-auto grid grid-cols-1 md:grid-cols-2 gap-12">
             <Card className="flex flex-col overflow-hidden shadow-sm border-0">
               <div className="flex-1 flex flex-col">

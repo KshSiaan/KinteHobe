@@ -57,7 +57,7 @@ export default function Cart() {
         </Button>
       </PopoverTrigger>
 
-      <PopoverContent className="w-96" align="end">
+      <PopoverContent className="w-[90dvw] lg:w-96" align="end">
         <PopoverHeader className="border-b pb-3">
           <PopoverTitle className="text-sm font-semibold">
             Your Cart ({itemCount})
@@ -125,7 +125,9 @@ export default function Cart() {
                           size="icon"
                           className="h-5 w-5 rounded-full"
                           disabled={item.quantity <= 1}
-                          onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                          onClick={() =>
+                            updateQuantity(item.id, item.quantity - 1)
+                          }
                         >
                           <MinusIcon className="size-2.5" />
                         </Button>
@@ -136,8 +138,12 @@ export default function Cart() {
                           variant="ghost"
                           size="icon"
                           className="h-5 w-5 rounded-full"
-                          disabled={item.quantity >= item.selection.stockQuantity}
-                          onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                          disabled={
+                            item.quantity >= item.selection.stockQuantity
+                          }
+                          onClick={() =>
+                            updateQuantity(item.id, item.quantity + 1)
+                          }
                         >
                           <PlusIcon className="size-2.5" />
                         </Button>
