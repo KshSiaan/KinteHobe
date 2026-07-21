@@ -26,14 +26,13 @@ import { usePathname } from "next/navigation";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 export default function AiAssistant() {
+  const isMobile = useIsMobile();
   const path = usePathname();
   const [input, setInput] = useState("");
-  const isMobile = useIsMobile();
 
   if (path === "/khuki") {
     return null;
   }
-
   if (isMobile) {
     return (
       <Button
@@ -52,7 +51,6 @@ export default function AiAssistant() {
       </Button>
     );
   }
-
   return (
     <Popover>
       <PopoverTrigger asChild>
