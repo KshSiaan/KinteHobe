@@ -131,7 +131,6 @@ export default async function Home() {
             </Card>
           </div>
         </section>
-        <AiAssistant />
       </main>
     </>
   );

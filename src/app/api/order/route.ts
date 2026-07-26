@@ -21,6 +21,7 @@ const shippingSchema = z.object({
 
 const bodySchema = z.object({
   shipping: shippingSchema,
+  type: z.enum(["stripe", "cash"]),
   items: z.array(z.object({
     productId: z.string(),
     productSlug: z.string(),
@@ -28,6 +29,7 @@ const bodySchema = z.object({
     quantity: z.number().int().positive(),
     unitPrice: z.number().positive(),
     lineTotal: z.number().positive(),
+   
     selection: z.object({
       variantId: z.string(),
       title: z.string().optional().nullable(),
@@ -58,9 +60,10 @@ export async function POST(request: Request) {
     );
   }
 
-  const { shipping, items } = parsed.data as {
+  const { shipping, items, type } = parsed.data as {
     shipping: ShippingForm;
     items: CartLineItem[];
+    type: "stripe" | "cash";
   };
 
   const subtotalCents = items.reduce((sum, i) => sum + toCents(i.lineTotal), 0);
@@ -77,7 +80,7 @@ export async function POST(request: Request) {
     id: orderId,
     userId: session?.user.id ?? null,
     email: shipping.email,
-    status: "pending_payment",
+    status: type==="stripe"?"pending_payment":"awaiting_cod",
     shippingName: shipping.fullName,
     shippingPhone: shipping.phone,
     shippingAddress: shipping.address,
@@ -85,6 +88,7 @@ export async function POST(request: Request) {
     shippingState: shipping.state,
     shippingZip: shipping.zip,
     shippingCountry: shipping.country,
+    paymentMethod:type === "cash"?"cash_on_delivery":"stripe",
     subtotalCents,
     taxCents,
     shippingCents: 0,

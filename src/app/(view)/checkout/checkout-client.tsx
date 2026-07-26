@@ -91,13 +91,13 @@ export default function CheckoutClient() {
     setStep("review");
   };
 
-  const placeOrder = async () => {
+  const placeOrder = async ({ type }: { type: "stripe" | "cash" }) => {
     setIsLoading(true);
     try {
       const res = await fetch("/api/order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ shipping: shippingForm, items }),
+        body: JSON.stringify({ shipping: shippingForm, items, type }),
       });
       if (!res.ok) {
         const err = await res.json();
@@ -107,8 +107,12 @@ export default function CheckoutClient() {
         });
         return;
       }
-      const { url } = await res.json();
-      window.location.href = url;
+      const { url, orderId } = await res.json();
+      if (type === "stripe" && url) {
+        window.location.href = url;
+      } else {
+        window.location.href = `/order/arriving?order_id=${orderId}`;
+      }
     } catch (e: any) {
       if (e.message === "Unauthorized") {
         sileo.error({

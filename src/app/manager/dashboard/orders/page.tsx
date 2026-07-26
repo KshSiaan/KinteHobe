@@ -57,6 +57,7 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import OrderAction from "./order-action";
+import { Input } from "@/components/ui/input";
 
 type OrderStatus =
   | "pending_payment"
@@ -133,13 +134,20 @@ export default function Page() {
   const [selectedStatus, setSelectedStatus] = useState("all");
   const [search, setSearch] = useState("");
   const [debouncedSearch] = useDebounce(search, 500);
+  const [month, setMonth] = useState("");
 
   const { data, isPending, isFetching, isRefetching, isError } =
     useQuery<ApiResponse>({
-      queryKey: ["orders", debouncedSearch, selectedStatus, selectedFilter],
+      queryKey: [
+        "orders",
+        debouncedSearch,
+        selectedStatus,
+        selectedFilter,
+        month,
+      ],
       queryFn: async () => {
         return fetch(
-          `/api/admin/orders?search=${debouncedSearch}&status=${selectedStatus}&filter=${selectedFilter}`,
+          `/api/admin/orders?search=${debouncedSearch}&status=${selectedStatus}&filter=${selectedFilter}&month=${month}`,
         ).then((res) => res.json());
       },
       placeholderData: (previousData) => previousData,
@@ -232,7 +240,9 @@ export default function Page() {
                 onChange={(e) => setSearch(e.target.value)}
               />
             </InputGroup>
+          </div>
 
+          <div className="overflow-x-auto flex gap-4">
             <Select
               onValueChange={(value) => setSelectedFilter(value)}
               defaultValue="newest"
@@ -248,9 +258,6 @@ export default function Page() {
                 <SelectItem value="high-to-low">High to Low</SelectItem>
               </SelectContent>
             </Select>
-          </div>
-
-          <div className="overflow-x-auto">
             <Tabs
               defaultValue="all"
               value={selectedStatus}
@@ -267,6 +274,12 @@ export default function Page() {
                 <TabsTrigger value="refunded">Refunded</TabsTrigger>
               </TabsList>
             </Tabs>
+            <Input
+              type="month"
+              className="w-full sm:w-40 ml-auto"
+              value={month}
+              onChange={(e) => setMonth(e.target.value)}
+            />
           </div>
         </CardContent>
       </Card>

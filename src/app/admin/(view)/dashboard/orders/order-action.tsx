@@ -21,7 +21,8 @@ type OrderStatus =
   | "shipped"
   | "delivered"
   | "cancelled"
-  | "refunded";
+  | "refunded"
+  | "awaiting_cod";
 
 export default function OrderAction({
   id,

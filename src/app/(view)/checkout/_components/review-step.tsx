@@ -4,12 +4,20 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Spinner } from "@/components/ui/spinner";
 import { useCartStore, formatMoney } from "@/hooks/use-cart-store";
-import { ArrowLeftIcon, LockIcon, MapPinIcon, PackageIcon } from "lucide-react";
+import {
+  ArrowLeftIcon,
+  ClockIcon,
+  CreditCardIcon,
+  LockIcon,
+  MapPinIcon,
+  PackageIcon,
+  TruckIcon,
+} from "lucide-react";
 import type { ShippingForm } from "../types";
 
 type Props = {
   shipping: ShippingForm;
-  onPlace: () => void;
+  onPlace: ({ type }: { type: "stripe" | "cash" }) => void;
   onBack: () => void;
   isLoading: boolean;
 };
@@ -83,9 +91,10 @@ export function ReviewStep({ shipping, onPlace, onBack, isLoading }: Props) {
           Back
         </Button>
         <Button
-          onClick={onPlace}
+          onClick={() => onPlace({ type: "stripe" })}
           disabled={isLoading}
           className="flex-[2] gap-2"
+          variant="success"
         >
           {isLoading ? (
             <>
@@ -94,12 +103,30 @@ export function ReviewStep({ shipping, onPlace, onBack, isLoading }: Props) {
             </>
           ) : (
             <>
-              <LockIcon className="size-4" />
+              <CreditCardIcon className="size-4" />
               Pay with Stripe
             </>
           )}
         </Button>
       </div>
+      <Button
+        onClick={() => onPlace({ type: "cash" })}
+        disabled={isLoading}
+        className="w-full gap-2"
+        variant="default"
+      >
+        {isLoading ? (
+          <>
+            <Spinner className="size-4" />
+            Confirming order...
+          </>
+        ) : (
+          <>
+            <TruckIcon className="size-4" />
+            Confirm Cash on Delivery
+          </>
+        )}
+      </Button>
     </div>
   );
 }

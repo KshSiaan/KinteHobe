@@ -13,6 +13,7 @@ import { user } from "../schema";
 export const orderStatusEnum = pgEnum("order_status", [
   "pending_payment",
   "paid",
+  "awaiting_cod",
   "processing",
   "shipped",
   "delivered",
@@ -25,6 +26,11 @@ export const transactionStatusEnum = pgEnum("transaction_status", [
   "succeeded",
   "failed",
   "refunded",
+]);
+
+export const paymentMethodEnum = pgEnum("payment_method", [
+  "stripe",
+  "cash_on_delivery",
 ]);
 
 export const order = pgTable(
@@ -47,6 +53,9 @@ export const order = pgTable(
     taxCents: integer("tax_cents").notNull(),
     shippingCents: integer("shipping_cents").notNull().default(0),
     totalCents: integer("total_cents").notNull(),
+    paymentMethod: paymentMethodEnum("payment_method")
+    .notNull()
+    .default("stripe"),
     stripeSessionId: text("stripe_session_id").unique(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at")
@@ -86,8 +95,9 @@ export const transaction = pgTable(
     id: text("id").primaryKey(),
     orderId: text("order_id")
       .notNull()
+      .unique()
       .references((): AnyPgColumn => order.id, { onDelete: "cascade" }),
-    stripeSessionId: text("stripe_session_id").notNull().unique(),
+    stripeSessionId: text("stripe_session_id").unique(),
     stripePaymentIntentId: text("stripe_payment_intent_id"),
     amountCents: integer("amount_cents").notNull(),
     currency: text("currency").notNull().default("usd"),

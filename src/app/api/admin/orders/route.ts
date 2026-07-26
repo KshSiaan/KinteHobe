@@ -1,7 +1,7 @@
 import { order } from "@/db/schema";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { sql, and, eq, asc, desc } from "drizzle-orm";
+import { sql, and, eq, asc, desc, gte, lt } from "drizzle-orm";
 
 export async function GET(request: Request) {
   const user = await auth.api.getSession({
@@ -29,6 +29,21 @@ export async function GET(request: Request) {
     100,
   );
   const offset = (page - 1) * limit;
+  const month = searchParams.get("month");
+
+  let monthCondition: ReturnType<typeof and> | undefined;
+
+  if (month) {
+    const [year, mon] = month.split("-").map(Number);
+
+    const start = new Date(Date.UTC(year, mon - 1, 1));
+    const end = new Date(Date.UTC(year, mon, 1));
+
+    monthCondition = and(
+      gte(order.createdAt, start),
+      lt(order.createdAt, end),
+    );
+  }
 
   const conditions = [
     status
@@ -44,9 +59,16 @@ export async function GET(request: Request) {
             | "refunded",
         )
       : undefined,
+
     search
-      ? sql`(${order.id}::text ILIKE ${`%${search}%`} OR ${order.email} ILIKE ${`%${search}%`} OR ${order.shippingName} ILIKE ${`%${search}%`})`
+      ? sql`(
+          ${order.id}::text ILIKE ${`%${search}%`}
+          OR ${order.email} ILIKE ${`%${search}%`}
+          OR ${order.shippingName} ILIKE ${`%${search}%`}
+        )`
       : undefined,
+
+    monthCondition,
   ];
 
   const orderBy =
@@ -66,7 +88,10 @@ export async function GET(request: Request) {
     .limit(limit)
     .offset(offset);
 
-  const totalResult = await db.select({ count: db.$count(order) }).from(order);
+  const totalResult = await db
+  .select({ count: db.$count(order) })
+  .from(order)
+  .where(and(...conditions));
 
   const total = totalResult?.[0]?.count ?? 0;
 

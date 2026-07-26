@@ -20,7 +20,10 @@ import { PackageIcon } from "lucide-react";
 import { PayButton } from "./_components/pay-button";
 
 function formatMoney(amount: number) {
-  return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(amount);
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+  }).format(amount);
 }
 
 const STATUS_LABELS: Record<string, string> = {
@@ -31,6 +34,7 @@ const STATUS_LABELS: Record<string, string> = {
   delivered: "Delivered",
   cancelled: "Cancelled",
   refunded: "Refunded",
+  awaiting_cod: "Cash on Delivery",
 };
 
 const STATUS_VARIANTS: Record<
@@ -172,23 +176,21 @@ export default async function OrdersPage() {
       <div className="mt-8">
         <Tabs defaultValue="all">
           <div className="overflow-x-auto">
-          <TabsList>
-            <TabsTrigger value="all">
-              All ({byStatus.all.length})
-            </TabsTrigger>
-            <TabsTrigger value="pending">
-              Pending ({byStatus.pending.length})
-            </TabsTrigger>
-            <TabsTrigger value="shipped">
-              Shipped ({byStatus.shipped.length})
-            </TabsTrigger>
-            <TabsTrigger value="delivered">
-              Delivered ({byStatus.delivered.length})
-            </TabsTrigger>
-            <TabsTrigger value="cancelled">
-              Cancelled ({byStatus.cancelled.length})
-            </TabsTrigger>
-          </TabsList>
+            <TabsList>
+              <TabsTrigger value="all">All ({byStatus.all.length})</TabsTrigger>
+              <TabsTrigger value="pending">
+                Pending ({byStatus.pending.length})
+              </TabsTrigger>
+              <TabsTrigger value="shipped">
+                Shipped ({byStatus.shipped.length})
+              </TabsTrigger>
+              <TabsTrigger value="delivered">
+                Delivered ({byStatus.delivered.length})
+              </TabsTrigger>
+              <TabsTrigger value="cancelled">
+                Cancelled ({byStatus.cancelled.length})
+              </TabsTrigger>
+            </TabsList>
           </div>
 
           {(

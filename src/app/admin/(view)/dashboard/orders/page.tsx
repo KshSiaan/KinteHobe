@@ -57,6 +57,7 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import OrderAction from "./order-action";
+import { Input } from "@/components/ui/input";
 
 type OrderStatus =
   | "pending_payment"
@@ -65,7 +66,8 @@ type OrderStatus =
   | "shipped"
   | "delivered"
   | "cancelled"
-  | "refunded";
+  | "refunded"
+  | "awaiting_cod";
 
 type Order = {
   id: string;
@@ -116,10 +118,12 @@ const STATUS_BADGE: Record<
   delivered: "success",
   cancelled: "destructive",
   refunded: "destructive",
+  awaiting_cod: "warning",
 };
 
 const STATUS_LABEL: Record<OrderStatus, string> = {
   pending_payment: "Pending Payment",
+  awaiting_cod: "Cash on Delivery",
   paid: "Paid",
   processing: "Processing",
   shipped: "Shipped",
@@ -133,13 +137,20 @@ export default function Page() {
   const [selectedStatus, setSelectedStatus] = useState("all");
   const [search, setSearch] = useState("");
   const [debouncedSearch] = useDebounce(search, 500);
+  const [month, setMonth] = useState("");
 
   const { data, isPending, isFetching, isRefetching, isError } =
     useQuery<ApiResponse>({
-      queryKey: ["orders", debouncedSearch, selectedStatus, selectedFilter],
+      queryKey: [
+        "orders",
+        debouncedSearch,
+        selectedStatus,
+        selectedFilter,
+        month,
+      ],
       queryFn: async () => {
         return fetch(
-          `/api/admin/orders?search=${debouncedSearch}&status=${selectedStatus}&filter=${selectedFilter}`,
+          `/api/admin/orders?search=${debouncedSearch}&status=${selectedStatus}&filter=${selectedFilter}&month=${month}`,
         ).then((res) => res.json());
       },
       placeholderData: (previousData) => previousData,
@@ -258,6 +269,9 @@ export default function Page() {
                 <TabsList className="w-max">
                   <TabsTrigger value="all">All</TabsTrigger>
                   <TabsTrigger value="pending_payment">Pending</TabsTrigger>
+                  <TabsTrigger value="awaiting_cod">
+                    Cash On Delivery
+                  </TabsTrigger>
                   <TabsTrigger value="paid">Paid</TabsTrigger>
                   <TabsTrigger value="processing">Processing</TabsTrigger>
                   <TabsTrigger value="shipped">Shipped</TabsTrigger>
@@ -267,6 +281,12 @@ export default function Page() {
                 </TabsList>
               </Tabs>
             </div>
+            <Input
+              type="month"
+              className="w-full sm:w-40 ml-auto"
+              value={month}
+              onChange={(e) => setMonth(e.target.value)}
+            />
           </div>
         </CardContent>
       </Card>
