@@ -54,7 +54,7 @@ export default function AiAssistant() {
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button className="lg:fixed bottom-4 left-4 size-12 p-2! bg-white! overflow-hidden shadow-lg rounded-full hidden ">
+        <Button className="lg:fixed bottom-4 left-4 size-12 p-2! bg-white! overflow-hidden shadow-lg rounded-full hidden lg:block">
           <Image
             src="/assistant-icon.webp"
             alt="Assistant"

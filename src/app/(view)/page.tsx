@@ -14,6 +14,7 @@ import { Spinner } from "@/components/kibo-ui/spinner";
 import DailyDiscover from "./home/daily-discover";
 import HeroWrapper from "./home/hero-wrapper";
 import MinimalCategories from "./home/minimal-categories";
+import AiAssistant from "@/components/core/base/ai-assistant";
 
 export default async function Home() {
   return (
@@ -130,6 +131,7 @@ export default async function Home() {
             </Card>
           </div>
         </section>
+        <AiAssistant />
       </main>
     </>
   );
