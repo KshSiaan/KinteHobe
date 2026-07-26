@@ -13,7 +13,13 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
@@ -134,9 +140,9 @@ export default function Page() {
   const [contentLoading, setContentLoading] = useState<
     Partial<Record<LegalPageType, boolean>>
   >({});
-  const [saving, setSaving] = useState<
-    Partial<Record<LegalPageType, boolean>>
-  >({});
+  const [saving, setSaving] = useState<Partial<Record<LegalPageType, boolean>>>(
+    {},
+  );
   const [saveError, setSaveError] = useState<
     Partial<Record<LegalPageType, string>>
   >({});
@@ -355,12 +361,18 @@ export default function Page() {
           const didSave = saveSuccess[pt.value] ?? false;
 
           return (
-            <TabsContent key={pt.value} value={pt.value} className="mt-4 flex flex-col gap-6">
+            <TabsContent
+              key={pt.value}
+              value={pt.value}
+              className="mt-4 flex flex-col gap-6"
+            >
               {/* ── Content Editor ── */}
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between gap-4">
                   <div>
-                    <CardTitle className="text-base">{pt.label} — Web Content</CardTitle>
+                    <CardTitle className="text-base">
+                      {pt.label} — Web Content
+                    </CardTitle>
                     <CardDescription className="mt-1">
                       This content is displayed at{" "}
                       <a
@@ -383,7 +395,10 @@ export default function Page() {
                         }
                         disabled={isSaving || isContentLoading}
                       />
-                      <Label htmlFor={`published-${pt.value}`} className="text-sm">
+                      <Label
+                        htmlFor={`published-${pt.value}`}
+                        className="text-sm"
+                      >
                         {draft?.isPublished ? "Published" : "Draft"}
                       </Label>
                     </div>
@@ -489,7 +504,9 @@ export default function Page() {
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between gap-4">
                   <div>
-                    <CardTitle className="text-base">{pt.label} — PDF Documents</CardTitle>
+                    <CardTitle className="text-base">
+                      {pt.label} — PDF Documents
+                    </CardTitle>
                     <CardDescription className="mt-1">
                       Upload and manage PDF versions of this page.
                     </CardDescription>
