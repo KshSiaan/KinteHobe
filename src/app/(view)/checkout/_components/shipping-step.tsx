@@ -32,6 +32,8 @@ function mapAddressToShipping(a: UserAddress): Partial<ShippingForm> {
     address: [a.address_line, a.area].filter(Boolean).join(", "),
     city: a.city,
     state: a.district,
+    zip: a.zip_code ?? "",
+    country: a.country,
   };
 }
 

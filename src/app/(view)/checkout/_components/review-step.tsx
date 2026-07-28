@@ -6,6 +6,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { useCartStore, formatMoney } from "@/hooks/use-cart-store";
 import {
   ArrowLeftIcon,
+  BanknoteIcon,
   ClockIcon,
   CreditCardIcon,
   LockIcon,
@@ -14,6 +15,15 @@ import {
   TruckIcon,
 } from "lucide-react";
 import type { ShippingForm } from "../types";
+import Image from "next/image";
+import Link from "next/link";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 type Props = {
   shipping: ShippingForm;
@@ -127,6 +137,60 @@ export function ReviewStep({ shipping, onPlace, onBack, isLoading }: Props) {
           </>
         )}
       </Button>
+      {/* <div className="flex items-center gap-6">
+        <div className="border-t flex-1"></div>
+        <p className="text-sm text-muted-foreground text-center">or</p>
+        <div className="border-t flex-1"></div>
+      </div>
+      <Button
+        onClick={() => onPlace({ type: "cash" })}
+        disabled={isLoading}
+        className="w-full gap-2"
+        variant="default"
+      >
+        {isLoading ? (
+          <>
+            <Spinner className="size-4" />
+            Preparing payment options...
+          </>
+        ) : (
+          <>
+            <BanknoteIcon className="size-4" />
+            Pay Now
+          </>
+        )}
+      </Button> */}
+
+      <div className="flex items-center gap-6">
+        <div className="border-t flex-1"></div>
+        <p className="text-sm text-muted-foreground text-center">or</p>
+        <div className="border-t flex-1"></div>
+      </div>
+
+      {/* <Link
+        href="https://securepay.sslcommerz.com/"
+        target="_blank"
+        className="flex justify-center"
+      >
+
+      </Link> */}
+      <Dialog>
+        <DialogTrigger className="cursor-pointer" asChild>
+          <Image
+            src="https://securepay.sslcommerz.com/public/image/SSLCommerz-Pay-With-logo-All-Size-01.png"
+            height={300}
+            width={1200}
+            className="hover:scale-95 transition-transform"
+            alt="SSLCommerz"
+          />
+        </DialogTrigger>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Pay Online with SSLCommerz</DialogTitle>
+          </DialogHeader>
+          <div className=""></div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

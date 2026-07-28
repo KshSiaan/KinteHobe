@@ -48,6 +48,8 @@ const locationSchema = z.object({
   district: z.string().min(1, "District is required"),
   city: z.string().min(1, "City is required"),
   area: z.string().min(1, "Area is required"),
+  country: z.string(),
+  zip_code: z.string().optional(),
   address_line: z.string().min(1, "Address line is required"),
   is_default: z.boolean().optional(),
 });
@@ -82,6 +84,16 @@ function LocationForm({
     resolver: zodResolver(locationSchema),
     defaultValues,
   });
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
+  useEffect(() => {
+    fetch("https://ipapi.co/country_name/")
+      .then((res) => res.text())
+      .then((country) => {
+        console.log(country);
+        setValue("country", country, { shouldValidate: true });
+      });
+  }, []);
 
   const currentLabel = watch("label");
 
@@ -154,6 +166,26 @@ function LocationForm({
             </p>
           )}
         </Field>
+        <div className="grid grid-cols-2 gap-4 col-span-3">
+          <Field>
+            <FieldLabel>Zip Code (Optional)</FieldLabel>
+            <Input placeholder="12000" {...register("zip_code")} />
+            {errors.zip_code && (
+              <p className="text-xs text-destructive mt-1">
+                {errors.zip_code.message}
+              </p>
+            )}
+          </Field>
+          <Field>
+            <FieldLabel>Country</FieldLabel>
+            <Input placeholder="Bangladesh" {...register("country")} />
+            {errors.country && (
+              <p className="text-xs text-destructive mt-1">
+                {errors.country.message}
+              </p>
+            )}
+          </Field>
+        </div>
         <Field className="col-span-3">
           <FieldLabel>Address Line</FieldLabel>
           <Input placeholder="123 Main Street" {...register("address_line")} />
@@ -260,7 +292,6 @@ export default function Location() {
       <CardHeader>
         <div className="flex justify-between items-center">
           <CardTitle>Saved Locations</CardTitle>
-
           <Dialog open={addOpen} onOpenChange={setAddOpen}>
             <DialogTrigger asChild>
               <Button>
@@ -284,6 +315,8 @@ export default function Location() {
                   area: "",
                   address_line: "",
                   is_default: addresses.length === 0,
+                  country: "Bangladesh",
+                  zip_code: "",
                 }}
                 onSubmit={handleAdd}
                 submitting={submitting}
@@ -349,6 +382,8 @@ export default function Location() {
                 area: editAddress.area,
                 address_line: editAddress.address_line,
                 is_default: editAddress.is_default,
+                country: editAddress.country,
+                zip_code: editAddress.zip_code as string | undefined,
               }}
               onSubmit={handleEdit}
               submitting={submitting}

@@ -22,6 +22,8 @@ export const userAddresses = pgTable(
     district: text("district").notNull(),
     city: text("city").notNull(),
     area: text("area").notNull(),
+    country: text("country").notNull(),
+    zip_code: text("zip_code"),
     address_line: text("address_line").notNull(),
     is_default: boolean("is_default").default(false).notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),

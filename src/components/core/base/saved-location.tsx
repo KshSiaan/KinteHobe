@@ -23,6 +23,8 @@ export type UserAddress = {
   district: string;
   city: string;
   area: string;
+  country: string;
+  zip_code: string | null | undefined;
   address_line: string;
   is_default: boolean;
   createdAt: string;

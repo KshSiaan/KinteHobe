@@ -16,6 +16,10 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "placehold.co",
       },
+      {
+        protocol: "https",
+        hostname: "securepay.sslcommerz.com",
+      }
     ],
   },
   serverExternalPackages: ["pdf-parse"],

@@ -12,6 +12,8 @@ const locationSchema = z.object({
   district: z.string().min(1),
   city: z.string().min(1),
   area: z.string().min(1),
+  country: z.string().min(1),
+  zip_code: z.string().min(1).optional().nullable(),
   address_line: z.string().min(1),
   is_default: z.boolean().optional(),
 });
