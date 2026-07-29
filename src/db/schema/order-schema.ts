@@ -31,6 +31,7 @@ export const transactionStatusEnum = pgEnum("transaction_status", [
 export const paymentMethodEnum = pgEnum("payment_method", [
   "stripe",
   "cash_on_delivery",
+  "online"
 ]);
 
 export const order = pgTable(
@@ -99,6 +100,8 @@ export const transaction = pgTable(
       .references((): AnyPgColumn => order.id, { onDelete: "cascade" }),
     stripeSessionId: text("stripe_session_id").unique(),
     stripePaymentIntentId: text("stripe_payment_intent_id"),
+    onlinePaymentId: text("online_payment_id"),
+    paymentProvider: text("payment_provider"),
     amountCents: integer("amount_cents").notNull(),
     currency: text("currency").notNull().default("usd"),
     status: transactionStatusEnum("status").default("pending").notNull(),

@@ -24,10 +24,17 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { cn } from "@/lib/utils";
 
 type Props = {
   shipping: ShippingForm;
-  onPlace: ({ type }: { type: "stripe" | "cash" }) => void;
+  onPlace: ({
+    type,
+    provider,
+  }: {
+    type: "stripe" | "cash" | "online";
+    provider?: "bkash" | "nagad" | "rocket";
+  }) => void;
   onBack: () => void;
   isLoading: boolean;
 };
@@ -103,7 +110,7 @@ export function ReviewStep({ shipping, onPlace, onBack, isLoading }: Props) {
         <Button
           onClick={() => onPlace({ type: "stripe" })}
           disabled={isLoading}
-          className="flex-[2] gap-2"
+          className="flex-2 gap-2"
           variant="success"
         >
           {isLoading ? (
@@ -166,31 +173,65 @@ export function ReviewStep({ shipping, onPlace, onBack, isLoading }: Props) {
         <p className="text-sm text-muted-foreground text-center">or</p>
         <div className="border-t flex-1"></div>
       </div>
-
-      {/* <Link
-        href="https://securepay.sslcommerz.com/"
-        target="_blank"
-        className="flex justify-center"
+      <div
+        className={cn(
+          "grid grid-cols-3 gap-4 bg-muted p-6 rounded-2xl divide-x",
+          shipping.country !== "Bangladesh" && "hidden",
+        )}
       >
-
-      </Link> */}
-      <Dialog>
-        <DialogTrigger className="cursor-pointer" asChild>
+        <button
+          type="button"
+          className={cn(
+            "cursor-pointer",
+            isLoading && "opacity-50 cursor-not-allowed",
+          )}
+          disabled={shipping.country !== "Bangladesh" || isLoading}
+          onClick={() => onPlace({ type: "online", provider: "bkash" })}
+        >
           <Image
-            src="https://securepay.sslcommerz.com/public/image/SSLCommerz-Pay-With-logo-All-Size-01.png"
-            height={300}
-            width={1200}
-            className="hover:scale-95 transition-transform"
-            alt="SSLCommerz"
+            src="https://cdn.brandfetch.io/id_4D40okd/theme/dark/logo.svg?c=1bxid64Mup7aczewSAYMX&t=1773019906981"
+            alt="bkash.com_logo"
+            height={251}
+            width={369}
+            className="hover:scale-105 transition-transform h-14"
           />
-        </DialogTrigger>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Pay Online with SSLCommerz</DialogTitle>
-          </DialogHeader>
-          <div className=""></div>
-        </DialogContent>
-      </Dialog>
+        </button>
+        <button
+          type="button"
+          className={cn(
+            "cursor-pointer",
+            isLoading && "opacity-50 cursor-not-allowed",
+          )}
+          disabled={shipping.country !== "Bangladesh" || isLoading}
+          onClick={() => onPlace({ type: "online", provider: "nagad" })}
+        >
+          <Image
+            src="https://cdn.brandfetch.io/idPKXOsXfF/w/512/h/512/theme/dark/logo.png?c=1bxid64Mup7aczewSAYMX&t=1778051284059"
+            alt="nagad_logo"
+            unoptimized
+            height={206}
+            width={206}
+            className="hover:scale-105 transition-transform h-14 object-contain"
+          />
+        </button>
+        <button
+          type="button"
+          className={cn(
+            "cursor-pointer",
+            isLoading && "opacity-50 cursor-not-allowed",
+          )}
+          disabled={shipping.country !== "Bangladesh" || isLoading}
+          onClick={() => onPlace({ type: "online", provider: "rocket" })}
+        >
+          <Image
+            src="https://upload.wikimedia.org/wikipedia/commons/4/45/Rocket_mobile_banking_logo.svg"
+            alt="bkash.com logo"
+            height={251}
+            width={369}
+            className="hover:scale-105 transition-transform h-12"
+          />
+        </button>
+      </div>
     </div>
   );
 }

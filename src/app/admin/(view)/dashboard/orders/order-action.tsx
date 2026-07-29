@@ -24,13 +24,17 @@ type OrderStatus =
   | "refunded"
   | "awaiting_cod";
 
+type OrderActionProps = {
+  id: string;
+  status: OrderStatus;
+  provider?: "bkash" | "nagad" | "rocket";
+};
+
 export default function OrderAction({
   id,
   status,
-}: {
-  id: string;
-  status: OrderStatus;
-}) {
+  provider,
+}: OrderActionProps) {
   const [value, setValue] = useState<OrderStatus>(status);
   const queryClient = useQueryClient();
 

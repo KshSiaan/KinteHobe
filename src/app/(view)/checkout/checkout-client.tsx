@@ -91,8 +91,60 @@ export default function CheckoutClient() {
     setStep("review");
   };
 
-  const placeOrder = async ({ type }: { type: "stripe" | "cash" }) => {
+  const placeOrder = async ({
+    type,
+    provider,
+  }: {
+    type: "stripe" | "cash" | "online";
+    provider?: "bkash" | "nagad" | "rocket";
+  }) => {
     setIsLoading(true);
+
+    if (type === "online") {
+      console.log("Placing online order with provider:", provider);
+      try {
+        const res = await fetch("/api/commerz", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            shipping: shippingForm,
+            items,
+            type,
+            provider,
+          }),
+        });
+        if (!res.ok) {
+          const err = await res.json();
+          sileo.error({
+            title: "Checkout failed",
+            description: err.message ?? "Something went wrong",
+          });
+          return;
+        }
+        const { url } = await res.json();
+        if (url) {
+          window.location.href = url;
+        }
+      } catch (e: any) {
+        if (e.message === "Unauthorized") {
+          sileo.error({
+            title: "Checkout failed",
+            description: "You must be logged in to place an order.",
+          });
+          window.location.href = "/auth/login";
+        } else {
+          sileo.error({
+            title: "Checkout failed",
+            description: "Unable to reach payment provider. Try again.",
+          });
+        }
+      } finally {
+        setIsLoading(false);
+      }
+      return;
+    }
+
+    // for stripe and cash on delivery
     try {
       const res = await fetch("/api/order", {
         method: "POST",
