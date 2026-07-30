@@ -120,7 +120,7 @@ export async function POST(request: Request) {
         shippingState: shipping.state,
         shippingZip: shipping.zip,
         shippingCountry: shipping.country,
-        paymentMethod:type === "online"?"cash_on_delivery":"stripe",
+        paymentMethod:"online",
         subtotalCents: items.reduce((sum, i) => sum + Math.round(i.lineTotal * 100), 0),
         taxCents: 0,
         shippingCents: 0,
