@@ -34,7 +34,12 @@ async function verificationFailed(
 }
 
 export async function POST(request: Request) {
-    const ipnData = (await request.json()) as SSLIPNRequest;
+    const formData = await request.formData();
+
+    const ipnData = Object.fromEntries(
+        formData.entries()
+    ) as unknown as SSLIPNRequest;
+
     const orderId = ipnData.tran_id;
 
     const [orderRecord] = await db
