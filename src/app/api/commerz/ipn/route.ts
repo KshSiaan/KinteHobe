@@ -9,29 +9,32 @@ const FAILURE_MESSAGE =
 
 async function verificationFailed(
     orderId: string,
-    userId: string,
+    userId: string | null | undefined,
     code: string
 ) {
-    const notificationCreated = await createNotification({
-        title: "Order Verification Failed",
-        body: `Order Verification failed while processing for order ID: ${orderId}, Please contact support for further assistance. CODE: ${code}`,
-        type: "order_cancelled",
-        metadata: { orderId },
-        userId,
-    });
+    if (userId) {
+        const notificationCreated = await createNotification({
+            title: "Order Verification Failed",
+            body: `Order Verification failed while processing for order ID: ${orderId}, Please contact support for further assistance. CODE: ${code}`,
+            type: "order_cancelled",
+            metadata: { orderId },
+            userId,
+        });
 
-    if (!notificationCreated) {
-        return Response.json(
-            { message: "Something went wrong" },
-            { status: 500 }
-        );
+        if (!notificationCreated) {
+            return Response.json(
+                { message: "Something went wrong" },
+                { status: 500 }
+            );
+        }
     }
 
     return Response.json(
         { message: FAILURE_MESSAGE },
         { status: 400 }
     );
-}
+};
+
 
 export async function POST(request: Request) {
     const formData = await request.formData();
@@ -43,11 +46,26 @@ export async function POST(request: Request) {
     const orderId = ipnData.tran_id;
 
     const [orderRecord] = await db
-        .select()
-        .from(order)
-        .where(eq(order.id, orderId));
+    .select()
+    .from(order)
+    .where(eq(order.id, orderId));
 
-    const userId = orderRecord?.userId ?? "";
+    if (!orderRecord) {
+        return Response.json(
+            { message: "Order not found" },
+            { status: 400 }
+        );
+    }
+
+    if (!orderRecord.userId) {
+        return Response.json(
+            { message: "Order has no associated user" },
+            { status: 400 }
+        );
+    }
+
+    const userId = orderRecord.userId;
+
 
     // Validate order
     if (!orderRecord || orderRecord.id !== orderId || ipnData.currency !== "BDT") {
