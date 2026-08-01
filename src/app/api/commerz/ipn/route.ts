@@ -138,6 +138,20 @@ export async function POST(request: Request) {
         );
     }
 
+    const [updatedTransaction] = await db
+        .update(transaction)
+        .set({ status: "succeeded" })
+        .where(eq(transaction.orderId, orderId))
+        .returning({ id: transaction.id });
+
+    if (!updatedTransaction) {
+        return verificationFailed(
+            orderId,
+            userId,
+            "TRANSACTION_UPDATE_FAILED"
+        );
+    }
+
     // Notify user about successful payment
     const notificationCreated = await createNotification({
         userId,

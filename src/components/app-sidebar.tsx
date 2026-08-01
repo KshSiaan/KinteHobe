@@ -94,6 +94,10 @@ const data = {
           title: "Transactions",
           url: "/transactions",
         },
+        {
+          title: "Fraud Reports",
+          url: "/fraud",
+        },
       ],
     },
     {
