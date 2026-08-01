@@ -156,7 +156,7 @@ export async function POST(request: Request) {
       store_passwd: process.env.SSL_COMMERZ_STORE_PASSWORD || "",
       total_amount: items.reduce((acc, item) => acc + item.lineTotal, 0),
       currency: "BDT",
-      tran_id: crypto.randomUUID(),
+      tran_id: orderId,
       success_url: `${origin}/order/success?order_id=${orderId}`,
       fail_url: `${origin}/order/cancel?order_id=${orderId}`,
       cancel_url: `${origin}/order/cancel?order_id=${orderId}`,
