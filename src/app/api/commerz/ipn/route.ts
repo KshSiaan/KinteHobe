@@ -53,14 +53,14 @@ export async function POST(request: Request) {
     if (!orderRecord) {
         return Response.json(
             { message: "Order not found" },
-            { status: 400 }
+            { status: 401 }
         );
     }
 
     if (!orderRecord.userId) {
         return Response.json(
             { message: "Order has no associated user" },
-            { status: 400 }
+            { status: 402 }
         );
     }
 
