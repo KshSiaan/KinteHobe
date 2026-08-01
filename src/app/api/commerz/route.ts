@@ -160,7 +160,7 @@ export async function POST(request: Request) {
       success_url: `${origin}/order/success?order_id=${orderId}`,
       fail_url: `${origin}/order/cancel?order_id=${orderId}`,
       cancel_url: `${origin}/order/cancel?order_id=${orderId}`,
-      ipn_url: `${origin}/order/ipn`,
+      ipn_url: `${origin}/api/commerz/ipn`,
       shipping_method: "Courier",
       product_name: items.map((item) => item.productTitle).join(", "),
       cus_name: shipping.fullName,
