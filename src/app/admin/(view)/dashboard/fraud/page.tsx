@@ -86,7 +86,7 @@ export default function Page() {
       ],
       queryFn: async () => {
         return fetch(
-          `/api/admin/transactions?search=${debouncedSearch}&status=${selectedStatus}&filter=${selectedFilter === "all" ? "" : selectedFilter}`,
+          `/api/admin/fraud?search=${debouncedSearch}&status=${selectedStatus}&filter=${selectedFilter === "all" ? "" : selectedFilter}`,
         ).then((res) => res.json());
       },
       placeholderData: (previousData) => previousData,
