@@ -213,6 +213,7 @@ export default function Page() {
           <Table className="min-w-150">
             <TableHeader>
               <TableRow>
+                <TableHead>Order ID</TableHead>
                 <TableHead>Transaction ID</TableHead>
                 <TableHead>Date</TableHead>
                 <TableHead>Amount</TableHead>
@@ -233,6 +234,9 @@ export default function Page() {
                   ))
                 : transactions.map((txn) => (
                     <TableRow key={txn.id}>
+                      <TableCell className="font-mono text-sm">
+                        {txn.id}
+                      </TableCell>
                       <TableCell className="font-mono text-sm">
                         {txn.id}
                       </TableCell>

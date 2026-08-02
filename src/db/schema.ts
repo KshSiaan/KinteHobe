@@ -12,3 +12,4 @@ export * from "./schema/feedback-schema";
 export * from "./schema/support-schema";
 export * from "./schema/faq-schema";
 export * from "./schema/revenue-goal-schema";
+export * from "./schema/fraud-schema";
