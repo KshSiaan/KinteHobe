@@ -33,6 +33,7 @@ import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
+import Loading from "@/app/loading";
 
 export default function Page() {
   const { data, isPending } = useQuery({
@@ -109,7 +110,11 @@ export default function Page() {
   });
 
   if (isPending) {
-    return <div>Loading...</div>;
+    return (
+      <div className="h-full! w-full flex justify-center items-center">
+        <Loading />
+      </div>
+    );
   }
   return (
     <div className="p-3 sm:p-6 gap-6 flex flex-col flex-1 h-full w-full">

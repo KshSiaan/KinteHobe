@@ -8,6 +8,7 @@ import GodProvider from "@/provider/god-provider";
 import { Suspense } from "react";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Analytics } from "@vercel/analytics/next";
+import Loading from "./loading";
 const inter = Onest({
   weight: ["300", "400", "700", "100", "200", "500", "600", "800", "900"],
   subsets: ["latin", "latin-ext", "cyrillic", "cyrillic-ext"],
@@ -63,7 +64,13 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <Suspense fallback={<div>loading..</div>}>
+          <Suspense
+            fallback={
+              <div className="min-h-dvh! w-full flex justify-center items-center">
+                <Loading />
+              </div>
+            }
+          >
             <GodProvider>
               <TooltipProvider>{children}</TooltipProvider>
             </GodProvider>

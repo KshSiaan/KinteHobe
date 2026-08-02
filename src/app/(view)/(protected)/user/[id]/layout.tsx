@@ -1,3 +1,4 @@
+import Loading from "@/app/loading";
 import Navbar from "@/components/core/base/navbar";
 import { ProfileSidebar } from "@/components/core/base/profile-sidebar";
 import { DetailedFooter } from "@/components/footer-detailed";
@@ -14,7 +15,15 @@ export default async function Layout({
       <main className="w-full min-h-screen">
         {/* <ProfileSidebar /> */}
         <div className="">
-          <Suspense fallback={null}>{children}</Suspense>
+          <Suspense
+            fallback={
+              <div className="h-full! w-full flex justify-center items-center">
+                <Loading />
+              </div>
+            }
+          >
+            {children}
+          </Suspense>
         </div>
       </main>
       <DetailedFooter />

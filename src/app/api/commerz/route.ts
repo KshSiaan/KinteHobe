@@ -21,7 +21,7 @@ const shippingSchema = z.object({
 const bodySchema = z.object({
   shipping: shippingSchema,
   type: z.enum(["stripe", "cash", "online"]),
-  provider: z.enum(["bkash", "nagad", "rocket"]),
+  provider: z.enum(["bkash", "nagad", "dbblmobilebanking"]),
   items: z.array(z.object({
     productId: z.string(),
     productSlug: z.string(),
@@ -93,7 +93,7 @@ export async function POST(request: Request) {
         shipping: ShippingForm;
         items: CartLineItem[];
         type: "stripe" | "cash" | "online";
-        provider: "bkash" | "nagad" | "rocket";
+        provider: "bkash" | "nagad" | "dbblmobilebanking";
       };
 
       if (type !== "online") {

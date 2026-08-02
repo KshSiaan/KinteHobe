@@ -33,7 +33,7 @@ type Props = {
     provider,
   }: {
     type: "stripe" | "cash" | "online";
-    provider?: "bkash" | "nagad" | "rocket";
+    provider?: "bkash" | "nagad" | "dbblmobilebanking";
   }) => void;
   onBack: () => void;
   isLoading: boolean;
@@ -221,7 +221,9 @@ export function ReviewStep({ shipping, onPlace, onBack, isLoading }: Props) {
             isLoading && "opacity-50 cursor-not-allowed",
           )}
           disabled={shipping.country !== "Bangladesh" || isLoading}
-          onClick={() => onPlace({ type: "online", provider: "rocket" })}
+          onClick={() =>
+            onPlace({ type: "online", provider: "dbblmobilebanking" })
+          }
         >
           <Image
             src="https://upload.wikimedia.org/wikipedia/commons/4/45/Rocket_mobile_banking_logo.svg"

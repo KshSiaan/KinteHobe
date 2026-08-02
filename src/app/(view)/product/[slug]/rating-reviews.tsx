@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/kibo-ui/spinner";
 import { howl } from "@/lib/utils";
 import { sileo } from "sileo";
+import Loading from "@/app/loading";
 
 export default function RatingReviews() {
   const slug = useParams().slug;
@@ -303,7 +304,13 @@ export default function RatingReviews() {
       </div>
       <Separator className="my-6" />
       <div className="">
-        <Suspense fallback={<div>Loading review form...</div>}>
+        <Suspense
+          fallback={
+            <div className="h-full! w-full flex justify-center items-center">
+              <Loading />
+            </div>
+          }
+        >
           <Write
             published={reviews.some(
               (r) => r.user.id === session?.data?.session.userId,

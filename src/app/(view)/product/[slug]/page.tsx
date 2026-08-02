@@ -16,6 +16,7 @@ import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { CheckIcon, TruckIcon } from "lucide-react";
 import Controller from "./controller";
 import { notFound } from "next/navigation";
+import Loading from "@/app/loading";
 
 async function getProduct(slug: string) {
   try {
@@ -158,16 +159,37 @@ export default async function Page({
       }>;
     };
   }> = await getProduct(slug);
+
   if (!data) {
-    return notFound();
+    return (
+      <>
+        <pre className="bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900 text-amber-400 rounded-xl p-6 shadow-lg overflow-x-auto text-sm leading-relaxed border border-zinc-700">
+          <code className="whitespace-pre-wrap">
+            {JSON.stringify(data, null, 2)}
+          </code>
+        </pre>
+      </>
+    );
   }
   return (
     <main className="p-4">
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 min-h-screen">
-        <Suspense fallback={<div>Loading product...</div>}>
+        <Suspense
+          fallback={
+            <div className="h-full! w-full flex justify-center items-center">
+              <Loading />
+            </div>
+          }
+        >
           <Product data={data.data ?? null} />
         </Suspense>
-        <Suspense fallback={<div>Loading controller...</div>}>
+        <Suspense
+          fallback={
+            <div className="h-full! w-full flex justify-center items-center">
+              <Loading />
+            </div>
+          }
+        >
           <Controller data={data.data ?? null} />
         </Suspense>
       </div>

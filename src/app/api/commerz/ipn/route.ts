@@ -3,7 +3,7 @@ import { SSLIPNRequest, SSLVerifyResponse } from "../type";
 import { order, transaction } from "@/db/schema/order-schema";
 import { eq } from "drizzle-orm";
 import { createNotification } from "@/lib/notifications";
-
+import * as Sentry from "@sentry/nextjs";
 const FAILURE_MESSAGE =
     "Order Verification failed, Please contact support for further assistance.";
 
@@ -84,6 +84,9 @@ export async function POST(request: Request) {
             "R_LEVEL_HIGH"
         );
     }
+    Sentry.logger.info("IPN Data recieved: ", {
+        data:ipnData
+    });
 
     // Validate transaction
     const [transactionRecord] = await db

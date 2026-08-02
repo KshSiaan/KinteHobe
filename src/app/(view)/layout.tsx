@@ -4,6 +4,7 @@ import { DetailedFooter } from "@/components/footer-detailed";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { Suspense } from "react";
+import Loading from "../loading";
 
 export default async function Layout({
   children,
@@ -13,7 +14,15 @@ export default async function Layout({
   return (
     <>
       <Navbar />
-      <Suspense fallback={<>loading..</>}>{children}</Suspense>
+      <Suspense
+        fallback={
+          <div className="h-full! w-full flex justify-center items-center">
+            <Loading />
+          </div>
+        }
+      >
+        {children}
+      </Suspense>
       <AiAssistant />
       <DetailedFooter />
     </>
