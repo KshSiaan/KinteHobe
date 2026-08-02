@@ -96,7 +96,7 @@ export default function CheckoutClient() {
     provider,
   }: {
     type: "stripe" | "cash" | "online";
-    provider?: "bkash" | "nagad" | "rocket";
+    provider?: "bkash" | "nagad" | "dbblmobilebanking";
   }) => {
     setIsLoading(true);
 
