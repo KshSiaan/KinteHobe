@@ -64,13 +64,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <Suspense
-            fallback={
-              <div className="min-h-dvh! w-full flex justify-center items-center">
-                <Loading />
-              </div>
-            }
-          >
+          <Suspense fallback={<Loading />}>
             <GodProvider>
               <TooltipProvider>{children}</TooltipProvider>
             </GodProvider>

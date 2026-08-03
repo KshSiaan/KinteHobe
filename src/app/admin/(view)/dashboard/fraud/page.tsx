@@ -38,30 +38,67 @@ import {
   CheckCircle,
   Clock,
   XCircle,
+  GalleryVerticalEndIcon,
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useState } from "react";
 import { useDebounce } from "use-debounce";
-type Transaction = {
+import { User } from "better-auth";
+import FraudAction from "./fraud-action";
+
+export type FraudDataset = {
   id: string;
   orderId: string;
-  stripeSessionId: string;
-  stripePaymentIntentId?: string;
-  amountCents: number;
-  currency: string;
-  status: string;
+  transactionId: string;
+  current_status: string;
+  resolvedBy: null;
   createdAt: string;
   updatedAt: string;
+  transaction: {
+    id: string;
+    orderId: string;
+    stripeSessionId: null;
+    stripePaymentIntentId: null;
+    onlinePaymentId: string;
+    paymentProvider: string;
+    amountCents: number;
+    currency: string;
+    status: string;
+    createdAt: string;
+    updatedAt: string;
+  };
+  order: {
+    id: string;
+    userId: string;
+    email: string;
+    status: string;
+    shippingName: string;
+    shippingPhone: string;
+    shippingAddress: string;
+    shippingCity: string;
+    shippingState: string;
+    shippingZip: string;
+    shippingCountry: string;
+    subtotalCents: number;
+    taxCents: number;
+    shippingCents: number;
+    totalCents: number;
+    paymentMethod: string;
+    stripeSessionId: null;
+    createdAt: string;
+    updatedAt: string;
+  };
+  user: User;
 };
 
 type ApiResponse = {
-  data: Transaction[];
+  data: FraudDataset[];
   stats: {
-    totalVolume: string;
-    completedCount: string;
-    pendingCount: string;
-    failedCount: string;
+    total_records: string;
+    reviewedCount: string;
+    resolvedCount: string;
+    rejectedCount: string;
   };
   pagination: {
     page: number;
@@ -78,12 +115,7 @@ export default function Page() {
   const [debouncedSearch] = useDebounce(search, 500);
   const { data, isPending, isFetching, isRefetching, isError } =
     useQuery<ApiResponse>({
-      queryKey: [
-        "transactions",
-        debouncedSearch,
-        selectedStatus,
-        selectedFilter,
-      ],
+      queryKey: ["fraud", debouncedSearch, selectedStatus, selectedFilter],
       queryFn: async () => {
         return fetch(
           `/api/admin/fraud?search=${debouncedSearch}&status=${selectedStatus}&filter=${selectedFilter === "all" ? "" : selectedFilter}`,
@@ -95,6 +127,13 @@ export default function Page() {
   const transactions = data?.data ?? [];
   const stats = data?.stats;
 
+  // return (
+  //   <pre className="bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900 text-amber-400 rounded-xl p-6 shadow-lg overflow-x-auto text-sm leading-relaxed border border-zinc-700">
+  //     <code className="whitespace-pre-wrap">
+  //       {JSON.stringify(data, null, 2)}
+  //     </code>
+  //   </pre>
+  // );
   return (
     <div className="p-3 sm:p-6 gap-6 flex flex-col flex-1 h-full w-full">
       <div className="flex flex-col gap-4">
@@ -110,15 +149,10 @@ export default function Page() {
               {isPending ? (
                 <Skeleton className="h-6 w-20" />
               ) : (
-                `$${stats?.totalVolume ?? 0}`
+                stats?.total_records
               )}
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground">
-              All processed transactions
-            </p>
-          </CardContent>
         </Card>
 
         <Card>
@@ -128,7 +162,7 @@ export default function Page() {
               {isPending ? (
                 <Skeleton className="h-6 w-20" />
               ) : (
-                stats?.completedCount
+                stats?.resolvedCount
               )}
             </CardTitle>
           </CardHeader>
@@ -141,7 +175,7 @@ export default function Page() {
               {isPending ? (
                 <Skeleton className="h-6 w-20" />
               ) : (
-                stats?.pendingCount
+                stats?.reviewedCount
               )}
             </CardTitle>
           </CardHeader>
@@ -154,7 +188,7 @@ export default function Page() {
               {isPending ? (
                 <Skeleton className="h-6 w-20" />
               ) : (
-                stats?.failedCount
+                stats?.rejectedCount
               )}
             </CardTitle>
           </CardHeader>
@@ -169,7 +203,7 @@ export default function Page() {
               <SearchIcon />
             </InputGroupAddon>
             <InputGroupInput
-              placeholder="Search Transaction ID"
+              placeholder="Search here"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
@@ -186,8 +220,6 @@ export default function Page() {
             <SelectContent>
               <SelectItem value="newest">Newest</SelectItem>
               <SelectItem value="oldest">Oldest</SelectItem>
-              <SelectItem value="low-to-high">Low to High</SelectItem>
-              <SelectItem value="high-to-low">High to Low</SelectItem>
             </SelectContent>
           </Select>
 
@@ -198,10 +230,10 @@ export default function Page() {
           >
             <TabsList>
               <TabsTrigger value="all">All</TabsTrigger>
-              {/* "pending" | "refunded" | "succeeded" | "failed" */}
-              <TabsTrigger value="succeeded">Succeeded</TabsTrigger>
               <TabsTrigger value="pending">Pending</TabsTrigger>
-              <TabsTrigger value="failed">Failed</TabsTrigger>
+              <TabsTrigger value="resolved">Resolved</TabsTrigger>
+              <TabsTrigger value="reviewed">Reviewed</TabsTrigger>
+              <TabsTrigger value="rejected">Rejected</TabsTrigger>
             </TabsList>
           </Tabs>
         </CardContent>
@@ -216,6 +248,7 @@ export default function Page() {
                 <TableHead>Order ID</TableHead>
                 <TableHead>Transaction ID</TableHead>
                 <TableHead>Date</TableHead>
+                <TableHead>User</TableHead>
                 <TableHead>Amount</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Action</TableHead>
@@ -244,54 +277,45 @@ export default function Page() {
                       <TableCell className="text-sm">
                         {new Date(txn.createdAt).toLocaleString()}
                       </TableCell>
+                      <TableCell className="font-mono text-sm">
+                        {txn.user?.name}
+                      </TableCell>
 
                       <TableCell className="font-semibold">
-                        ${txn.amountCents / 100} {txn.currency.toUpperCase()}
+                        ${txn?.transaction?.amountCents / 100}{" "}
+                        {txn?.transaction?.currency?.toUpperCase()}
                       </TableCell>
 
                       <TableCell>
                         <Badge
                           variant={
-                            txn.status === "succeeded"
+                            txn.current_status === "resolved"
                               ? "success"
-                              : txn.status === "pending"
+                              : txn.current_status === "reviewed" ||
+                                  txn.current_status === "pending"
                                 ? "secondary"
                                 : "destructive"
                           }
                         >
-                          {txn.status === "succeeded" && (
+                          {txn.current_status === "resolved" && (
                             <CheckCircle className="mr-1 h-3 w-3" />
                           )}
-                          {txn.status === "pending" && (
-                            <Clock className="mr-1 h-3 w-3" />
-                          )}
-                          {txn.status === "failed" && (
+
+                          {txn.current_status === "reviewed" ||
+                            (txn.current_status === "pending" && (
+                              <Clock className="mr-1 h-3 w-3" />
+                            ))}
+                          {txn.current_status === "rejected" && (
                             <XCircle className="mr-1 h-3 w-3" />
                           )}
-                          {txn.status}
+                          {txn.current_status}
                         </Badge>
                       </TableCell>
 
                       {/* ACTION ROW KEPT AS REQUESTED */}
                       <TableCell>
                         <div className="flex gap-2">
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            className="h-8 w-8 p-0"
-                          >
-                            <Eye className="h-4 w-4" />
-                          </Button>
-
-                          {txn.status === "completed" && (
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              className="h-8 w-8 p-0 text-yellow-600"
-                            >
-                              <RotateCcw className="h-4 w-4" />
-                            </Button>
-                          )}
+                          <FraudAction txn={txn} />
                         </div>
                       </TableCell>
                     </TableRow>

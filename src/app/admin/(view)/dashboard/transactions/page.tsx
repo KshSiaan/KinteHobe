@@ -242,7 +242,7 @@ export default function Page() {
                       </TableCell>
 
                       <TableCell className="font-semibold">
-                        ${txn.amountCents / 100} {txn.currency.toUpperCase()}
+                        ${txn.amountCents / 100} {txn?.currency?.toUpperCase()}
                       </TableCell>
 
                       <TableCell>

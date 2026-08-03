@@ -27,7 +27,7 @@ type OrderStatus =
 type OrderActionProps = {
   id: string;
   status: OrderStatus;
-  provider?: "bkash" | "nagad" | "rocket";
+  provider?: "bkash" | "nagad" | "dbblmobilebanking";
 };
 
 export default function OrderAction({
