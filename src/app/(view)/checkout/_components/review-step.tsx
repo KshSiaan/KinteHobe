@@ -25,6 +25,8 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
+import HCaptcha from "@hcaptcha/react-hcaptcha";
+import React from "react";
 
 type Props = {
   shipping: ShippingForm;
@@ -40,6 +42,7 @@ type Props = {
 };
 
 export function ReviewStep({ shipping, onPlace, onBack, isLoading }: Props) {
+  const [captchaToken, setCaptchaToken] = React.useState<string | null>(null);
   const { subtotal } = useCartStore();
   const total = subtotal;
 
@@ -97,6 +100,17 @@ export function ReviewStep({ shipping, onPlace, onBack, isLoading }: Props) {
         </div>
       </div>
 
+      <div className="w-min! ml-auto">
+        <HCaptcha
+          sentry={true}
+          sitekey={process.env.NEXT_PUBLIC_CAPTCHA_SITE_KEY!}
+          onVerify={(token, ekey) => {
+            setCaptchaToken(token);
+            // handleVerificationSuccess(token, ekey);
+          }}
+        />
+      </div>
+
       <div className="flex gap-3">
         <Button
           variant="outline"
@@ -109,7 +123,7 @@ export function ReviewStep({ shipping, onPlace, onBack, isLoading }: Props) {
         </Button>
         <Button
           onClick={() => onPlace({ type: "stripe" })}
-          disabled={isLoading}
+          disabled={isLoading || !captchaToken}
           className="flex-2 gap-2"
           variant="success"
         >
@@ -128,7 +142,7 @@ export function ReviewStep({ shipping, onPlace, onBack, isLoading }: Props) {
       </div>
       <Button
         onClick={() => onPlace({ type: "cash" })}
-        disabled={isLoading}
+        disabled={isLoading || !captchaToken}
         className="w-full gap-2"
         variant="default"
       >
@@ -182,10 +196,12 @@ export function ReviewStep({ shipping, onPlace, onBack, isLoading }: Props) {
         <button
           type="button"
           className={cn(
-            "cursor-pointer",
+            "cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed",
             isLoading && "opacity-50 cursor-not-allowed",
           )}
-          disabled={shipping.country !== "Bangladesh" || isLoading}
+          disabled={
+            shipping.country !== "Bangladesh" || isLoading || !captchaToken
+          }
           onClick={() => onPlace({ type: "online", provider: "bkash" })}
         >
           <Image
@@ -199,10 +215,12 @@ export function ReviewStep({ shipping, onPlace, onBack, isLoading }: Props) {
         <button
           type="button"
           className={cn(
-            "cursor-pointer",
+            "cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed",
             isLoading && "opacity-50 cursor-not-allowed",
           )}
-          disabled={shipping.country !== "Bangladesh" || isLoading}
+          disabled={
+            shipping.country !== "Bangladesh" || isLoading || !captchaToken
+          }
           onClick={() => onPlace({ type: "online", provider: "nagad" })}
         >
           <Image
@@ -217,10 +235,12 @@ export function ReviewStep({ shipping, onPlace, onBack, isLoading }: Props) {
         <button
           type="button"
           className={cn(
-            "cursor-pointer",
+            "cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed",
             isLoading && "opacity-50 cursor-not-allowed",
           )}
-          disabled={shipping.country !== "Bangladesh" || isLoading}
+          disabled={
+            shipping.country !== "Bangladesh" || isLoading || !captchaToken
+          }
           onClick={() =>
             onPlace({ type: "online", provider: "dbblmobilebanking" })
           }
