@@ -18,13 +18,14 @@ import Link from "next/link";
 import { authClient } from "@/lib/auth-client";
 import { sileo } from "sileo";
 import { useRouter } from "next/navigation";
-
+import HCaptcha from "@hcaptcha/react-hcaptcha";
 export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"form">) {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const [formData, setFormData] = useState<LoginInput>({
     email: "",
     password: "",
@@ -41,6 +42,10 @@ export function LoginForm({
         return newErrors;
       });
     }
+  };
+
+  const handleVerificationSuccess = (token: string, ekey: string) => {
+    setCaptchaToken(token);
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -66,9 +71,14 @@ export function LoginForm({
         {
           email: result.data.email,
           password: result.data.password,
+          fetchOptions: {
+            headers: {
+              "x-captcha-response": captchaToken ?? "",
+            },
+          },
         },
         {
-          onError: (error) => {
+          onError: (error: { error?: { message?: string } }) => {
             setIsLoading(false);
             sileo.error({
               title: "Login failed",
@@ -93,6 +103,7 @@ export function LoginForm({
       });
     }
   };
+
   return (
     <form
       onSubmit={handleSubmit}
@@ -154,15 +165,37 @@ export function LoginForm({
             </FieldDescription>
           )}
         </Field>
+        <Field className="flex! justify-end! items-end">
+          <div className="w-min!">
+            <HCaptcha
+              sentry={true}
+              sitekey={process.env.NEXT_PUBLIC_CAPTCHA_SITE_KEY!}
+              onVerify={(token, ekey) => handleVerificationSuccess(token, ekey)}
+            />
+          </div>
+        </Field>
         <Field>
-          <Button type="submit" disabled={isLoading} className="gap-2">
+          <Button
+            type="submit"
+            disabled={isLoading || !captchaToken}
+            className="gap-2"
+          >
             {isLoading && <Spinner className="size-4" />}
-            {isLoading ? "Logging in..." : "Login"}
+            {isLoading
+              ? "Logging in..."
+              : !captchaToken
+                ? "Please complete the captcha"
+                : "Login"}
           </Button>
         </Field>
         <FieldSeparator>Or continue with</FieldSeparator>
         <Field>
-          <Button variant="outline" type="button" disabled={isLoading}>
+          <Button
+            variant="outline"
+            type="button"
+            disabled={isLoading || !captchaToken}
+            className="gap-2"
+          >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 48 48"

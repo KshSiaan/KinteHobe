@@ -21,6 +21,7 @@ import Link from "next/link";
 import { authClient } from "@/lib/auth-client";
 import { sileo } from "sileo";
 import { useRouter } from "next/navigation";
+import HCaptcha from "@hcaptcha/react-hcaptcha";
 
 export function RegisterForm({
   className,
@@ -29,6 +30,7 @@ export function RegisterForm({
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState<RegisterInput>({
@@ -49,6 +51,9 @@ export function RegisterForm({
         return newErrors;
       });
     }
+  };
+  const handleVerificationSuccess = (token: string, ekey: string) => {
+    setCaptchaToken(token);
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -71,30 +76,41 @@ export function RegisterForm({
 
     try {
       const { confirmPassword, ...signUpData } = result.data;
-      authClient.signUp.email(signUpData, {
-        onError: (error) => {
-          setIsLoading(false);
-          sileo.error({
-            title: "Registration failed",
-            description:
-              error?.error?.message || "An error occurred during registration",
-          });
+      authClient.signUp.email(
+        {
+          ...signUpData,
+          fetchOptions: {
+            headers: {
+              "x-captcha-response": captchaToken ?? "",
+            },
+          },
         },
-        onSuccess: () => {
-          setIsLoading(false);
-          if (rememberMe) {
-            localStorage.setItem("rememberEmail", signUpData.email);
-          }
+        {
+          onError: (error: { error?: { message?: string } }) => {
+            setIsLoading(false);
+            sileo.error({
+              title: "Registration failed",
+              description:
+                error?.error?.message ||
+                "An error occurred during registration",
+            });
+          },
+          onSuccess: () => {
+            setIsLoading(false);
+            if (rememberMe) {
+              localStorage.setItem("rememberEmail", signUpData.email);
+            }
 
-          sileo.success({
-            title: "Registration successful",
-            description:
-              "Your account has been created successfully. Please check your email to verify your account.",
-          });
+            sileo.success({
+              title: "Registration successful",
+              description:
+                "Your account has been created successfully. Please check your email to verify your account.",
+            });
 
-          navig.push("/auth/login");
+            navig.push("/auth/login");
+          },
         },
-      });
+      );
     } catch (error) {
       console.error("Registration error:", error);
       setIsLoading(false);
@@ -219,24 +235,42 @@ export function RegisterForm({
         </Field>
 
         <div className="flex items-center justify-end gap-4 rounded-lg px-3 py-2">
-          <Switch
-            id="rememberMe"
-            checked={rememberMe}
-            onCheckedChange={(checked) => setRememberMe(checked)}
-            disabled={isLoading}
-          />
-          <FieldLabel
-            htmlFor="rememberMe"
-            className="font-normal cursor-pointer"
-          >
-            Remember me
-          </FieldLabel>
+          <Field className="flex flex-row! gap-2 justify-start!">
+            <Switch
+              id="rememberMe"
+              checked={rememberMe}
+              onCheckedChange={(checked) => setRememberMe(checked)}
+              disabled={isLoading}
+            />
+            <FieldLabel
+              htmlFor="rememberMe"
+              className="font-normal cursor-pointer text-nowrap w-min!"
+            >
+              Remember me
+            </FieldLabel>
+          </Field>
+          <Field className="w-min!">
+            <HCaptcha
+              sitekey={process.env.NEXT_PUBLIC_CAPTCHA_SITE_KEY!}
+              size="normal"
+              sentry={true}
+              onVerify={(token, ekey) => handleVerificationSuccess(token, ekey)}
+            />
+          </Field>
         </div>
 
         <Field>
-          <Button type="submit" disabled={isLoading} className="gap-2">
+          <Button
+            type="submit"
+            disabled={isLoading || !captchaToken}
+            className="gap-2"
+          >
             {isLoading && <Spinner className="size-4" />}
-            {isLoading ? "Creating account..." : "Register"}
+            {isLoading
+              ? "Creating account..."
+              : !captchaToken
+                ? "Please verify captcha"
+                : "Register"}
           </Button>
         </Field>
         <FieldSeparator>Or continue with</FieldSeparator>

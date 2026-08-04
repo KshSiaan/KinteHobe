@@ -4,6 +4,7 @@ import { admin as AdminPlugin } from "better-auth/plugins/admin";
 import { db } from "./db"; // your drizzle instance
 import { ac, admin, manager, user } from "./auth/permissions";
 // import { SendVerificationEmail } from "./mail/send-verification-email";
+import { captcha } from "better-auth/plugins"; 
 export const auth = betterAuth({
     database: drizzleAdapter(db, {
         provider: "pg",
@@ -31,5 +32,10 @@ export const auth = betterAuth({
             admin,
             manager
         }
-    })]
+    }),
+    captcha({ 
+        provider: "hcaptcha",
+        siteKey: process.env.NEXT_PUBLIC_CAPTCHA_SITE_KEY!,
+        secretKey: process.env.CAPTCHA_SECRET_KEY!, 
+    }), ]
 });
