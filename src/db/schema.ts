@@ -13,3 +13,5 @@ export * from "./schema/support-schema";
 export * from "./schema/faq-schema";
 export * from "./schema/revenue-goal-schema";
 export * from "./schema/fraud-schema";
+export * from "./schema/activity-schema";
+export * from "./schema/activity_read-schema";

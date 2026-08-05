@@ -1,7 +1,7 @@
 import UnderlineTabs from "@/components/shadcn-studio/tabs/tabs-29";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { followRequest } from "@/db/schema";
+import { followRelation } from "@/db/schema";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import {
@@ -12,10 +12,7 @@ import {
 } from "lucide-react";
 import { headers } from "next/headers";
 import Image from "next/image";
-import Activity from "./_me/activity";
-import Purchases from "./_me/purchases";
 import Saved from "./_me/saved";
-import Insights from "./_me/insights";
 import { and, count, eq } from "drizzle-orm";
 import Link from "next/link";
 
@@ -30,20 +27,20 @@ export default async function Page() {
   const [[{ followers }], [{ following }]] = await Promise.all([
     db
       .select({ followers: count() })
-      .from(followRequest)
+      .from(followRelation)
       .where(
         and(
-          eq(followRequest.followingId, userId),
-          eq(followRequest.status, "accepted"),
+          eq(followRelation.followingId, userId),
+          eq(followRelation.status, "accepted"),
         ),
       ),
     db
       .select({ following: count() })
-      .from(followRequest)
+      .from(followRelation)
       .where(
         and(
-          eq(followRequest.followerId, userId),
-          eq(followRequest.status, "accepted"),
+          eq(followRelation.followerId, userId),
+          eq(followRelation.status, "accepted"),
         ),
       ),
   ]);

@@ -1,7 +1,7 @@
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { stripe } from "@/lib/stripe";
-import { order, orderItem, transaction } from "@/db/schema";
+import { activity, followRelation, order, orderItem, transaction } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import type { CartLineItem } from "@/hooks/use-cart-store";
 import type { ShippingForm } from "@/app/(view)/checkout/types";
@@ -156,6 +156,26 @@ export async function POST(request: Request) {
     .update(order)
     .set({ stripeSessionId: stripeSession.id })
     .where(eq(order.id, orderId));
+
+  const friend = await db.query.followRelation.findFirst({
+    where: eq(followRelation.followerId, session.user.id),
+  });
+
+  const hasFriends = !!friend;
+
+  if (hasFriends) {
+    try{
+      await db.insert(activity).values({
+        id: crypto.randomUUID(),
+        actorId: session.user.id,
+        type: "order_placed",
+        entityId: orderId,
+        metaData: { orderId, totalCents, itemsCount: items.length },
+      });
+    }catch(e){
+      // sentry
+    }
+  }
 
   return Response.json({ url: stripeSession.url, orderId });
 }

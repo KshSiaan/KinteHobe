@@ -3,7 +3,7 @@ import { headers } from "next/headers";
 import Link from "next/link";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { order, orderItem } from "@/db/schema";
+import { followRelation, order, orderItem } from "@/db/schema";
 import { eq, desc } from "drizzle-orm";
 
 import { Badge } from "@/components/ui/badge";
