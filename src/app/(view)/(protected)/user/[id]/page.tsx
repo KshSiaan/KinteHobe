@@ -1,7 +1,7 @@
 import FollowButton from "@/components/core/extra/follow-button";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { followRequest } from "@/db/schema";
+import { followRelation } from "@/db/schema";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { and, count, eq } from "drizzle-orm";
@@ -29,20 +29,20 @@ export default async function Page({
   const [[{ followers }], [{ following }]] = await Promise.all([
     db
       .select({ followers: count() })
-      .from(followRequest)
+      .from(followRelation)
       .where(
         and(
-          eq(followRequest.followingId, uid),
-          eq(followRequest.status, "accepted"),
+          eq(followRelation.followingId, uid),
+          eq(followRelation.status, "accepted"),
         ),
       ),
     db
       .select({ following: count() })
-      .from(followRequest)
+      .from(followRelation)
       .where(
         and(
-          eq(followRequest.followerId, uid),
-          eq(followRequest.status, "accepted"),
+          eq(followRelation.followerId, uid),
+          eq(followRelation.status, "accepted"),
         ),
       ),
   ]);
