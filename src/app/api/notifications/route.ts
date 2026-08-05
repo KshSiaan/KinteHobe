@@ -38,7 +38,7 @@ export async function GET(request: Request) {
       SELECT
         ${notification.id} AS id,
         'notification'::text AS source,
-        ${notification.type} AS type,
+        ${notification.type}::text AS type,
         ${notification.title} AS title,
         ${notification.body} AS body,
 
@@ -67,7 +67,7 @@ export async function GET(request: Request) {
       SELECT
         ${activity.id} AS id,
         'activity'::text AS source,
-        ${activity.type} AS type,
+        ${activity.type}::text AS type,
 
         NULL::text AS title,
         NULL::text AS body,
