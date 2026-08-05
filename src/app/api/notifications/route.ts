@@ -3,6 +3,7 @@ import {
   activityRead,
   followRelation,
   notification,
+  user,
 } from "@/db/schema";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
@@ -31,83 +32,92 @@ export async function GET(request: Request) {
   const userId = session.user.id;
 
   const feed = await db.execute(sql`
-    WITH unified_feed AS (
-      /* =========================
-       * NOTIFICATIONS
-       * ========================= */
-      SELECT
-        ${notification.id} AS id,
-        'notification'::text AS source,
-        ${notification.type}::text AS type,
-        ${notification.title} AS title,
-        ${notification.body} AS body,
+  WITH unified_feed AS (
+    /* =========================
+     * NOTIFICATIONS
+     * ========================= */
+    SELECT
+      ${notification.id} AS id,
+      'notification'::text AS source,
+      ${notification.type}::text AS type,
+      ${notification.title} AS title,
+      ${notification.body} AS body,
 
-        NULL::text AS actor_id,
-        NULL::text AS entity_id,
+      NULL::jsonb AS actor,
 
-        ${notification.metadata} AS metadata,
+      NULL::text AS entity_id,
 
-        ${notification.createdAt} AS created_at,
+      ${notification.metadata} AS metadata,
 
-        ${notification.isRead} AS is_read,
+      ${notification.createdAt} AS created_at,
 
-        ${notification.readAt} AS read_at
+      ${notification.isRead} AS is_read,
 
-      FROM ${notification}
+      ${notification.readAt} AS read_at
 
-      WHERE ${notification.userId} = ${userId}
+    FROM ${notification}
 
-
-      UNION ALL
+    WHERE ${notification.userId} = ${userId}
 
 
-      /* =========================
-       * ACTIVITIES
-       * ========================= */
-      SELECT
-        ${activity.id} AS id,
-        'activity'::text AS source,
-        ${activity.type}::text AS type,
+    UNION ALL
 
-        NULL::text AS title,
-        NULL::text AS body,
 
-        ${activity.actorId} AS actor_id,
-        ${activity.entityId} AS entity_id,
+    /* =========================
+     * ACTIVITIES
+     * ========================= */
+    SELECT
+      ${activity.id} AS id,
+      'activity'::text AS source,
+      ${activity.type}::text AS type,
 
-        ${activity.metaData} AS metadata,
+      NULL::text AS title,
+      NULL::text AS body,
 
-        ${activity.createdAt} AS created_at,
+      jsonb_build_object(
+        'id', ${user.id},
+        'name', ${user.name},
+        'image', ${user.image}
+      ) AS actor,
 
-        CASE
-          WHEN ${activityRead.id} IS NOT NULL
-          THEN true
-          ELSE false
-        END AS is_read,
+      ${activity.entityId} AS entity_id,
 
-        ${activityRead.readAt} AS read_at
+      ${activity.metaData} AS metadata,
 
-      FROM ${activity}
+      ${activity.createdAt} AS created_at,
 
-      INNER JOIN ${followRelation}
-        ON ${followRelation.followingId} = ${activity.actorId}
+      CASE
+        WHEN ${activityRead.id} IS NOT NULL
+        THEN true
+        ELSE false
+      END AS is_read,
 
-      LEFT JOIN ${activityRead}
-        ON ${activityRead.activityId} = ${activity.id}
-        AND ${activityRead.userId} = ${userId}
+      ${activityRead.readAt} AS read_at
 
-      WHERE ${followRelation.followerId} = ${userId}
-        AND ${activity.actorId} != ${userId}
-    )
+    FROM ${activity}
 
-    SELECT *
-    FROM unified_feed
+    INNER JOIN ${followRelation}
+      ON ${followRelation.followingId} = ${activity.actorId}
 
-    ORDER BY created_at DESC
+    INNER JOIN ${user}
+      ON ${user.id} = ${activity.actorId}
 
-    LIMIT ${limit}
-    OFFSET ${offset}
-  `);
+    LEFT JOIN ${activityRead}
+      ON ${activityRead.activityId} = ${activity.id}
+      AND ${activityRead.userId} = ${userId}
+
+    WHERE ${followRelation.followerId} = ${userId}
+      AND ${activity.actorId} != ${userId}
+  )
+
+  SELECT *
+  FROM unified_feed
+
+  ORDER BY created_at DESC
+
+  LIMIT ${limit}
+  OFFSET ${offset}
+`);
 
   const countResult = await db.execute(sql`
   SELECT COUNT(*)::int AS total
