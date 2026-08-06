@@ -15,7 +15,6 @@ import { useEffect, useState, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 
-
 // {
 //     id: string;
 //     source: string;
@@ -30,7 +29,7 @@ import Link from "next/link";
 //     created_at: string;
 //     is_read: boolean;
 //     read_at: string;
-//   }
+// }
 
 type Notification = {
   id: string;
@@ -41,17 +40,19 @@ type Notification = {
     | "order_refunded"
     | "order_delivered"
     | "review_submitted";
-  entityId?: string;
+  entity_id?: string;
   metaData?: Record<string, any>;
-  actor?:any;
+  actor?: {
+    id: string;
+    name: string;
+    image: null;
+  };
   title?: string;
   body?: string;
   is_read: boolean;
   read_at: string | null;
   created_at: string;
 };
-
-
 
 type Pagination = {
   page: number;
@@ -147,14 +148,10 @@ export default function NotificationsPage() {
           </Button>
         )}
       </div>
-<pre className='bg-gradient-to-br max-h-[80dvh] overflow-scroll fixed top-1/2 left-1/2 -translate-1/2 w-[90dvw] z-50 from-zinc-900/60 via-zinc-800/40 to-zinc-900/20 text-amber-400 rounded-xl p-6 shadow-lg overflow-x-auto text-sm leading-relaxed border border-zinc-700/20'>
-<code className='whitespace-pre-wrap'>
-{JSON.stringify(notifications[0] , null , 2)}
-</code>
-</pre>
       <div className="mt-6 space-y-2">
         {loading ? (
           Array.from({ length: LIMIT }).map((_, i) => (
+            // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
             <div key={i} className="h-20 rounded-lg bg-muted animate-pulse" />
           ))
         ) : notifications.length === 0 ? (
@@ -177,22 +174,26 @@ export default function NotificationsPage() {
             <button
               key={n.id}
               type="button"
-              onClick={() => !n.isRead && markOneRead(n.id)}
+              onClick={() => !n.is_read && markOneRead(n.id)}
               className={`w-full text-left rounded-lg border px-4 py-4 flex gap-4 items-start transition-colors hover:bg-muted/50 ${
-                !n.isRead ? "bg-primary/5 border-primary/20" : "border-border"
+                !n.is_read ? "bg-primary/5 border-primary/20" : "border-border"
               }`}
             >
               <span
-                className={`mt-0.5 shrink-0 ${!n.isRead ? "text-primary" : "text-muted-foreground"}`}
+                className={`mt-0.5 shrink-0 ${!n.is_read ? "text-primary" : "text-muted-foreground"}`}
               >
                 {TYPE_ICON[n.type]}
               </span>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
                   <p
-                    className={`text-sm font-semibold ${!n.isRead ? "text-foreground" : "text-muted-foreground"}`}
+                    className={`text-sm font-semibold ${!n.is_read ? "text-foreground" : "text-muted-foreground"}`}
                   >
-                    {n.title}
+                    {n.entity_id
+                      ? n.type === "review_submitted"
+                        ? `A friend reviewed a product`
+                        : n.title
+                      : n.title}
                   </p>
                   <Badge
                     variant="secondary"
@@ -201,13 +202,16 @@ export default function NotificationsPage() {
                     {TYPE_LABEL[n.type]}
                   </Badge>
                 </div>
-                <p className="text-sm text-muted-foreground mt-1">{n.body}</p>
+                <p className="text-sm text-muted-foreground mt-1">
+                  {n?.entity_id
+                    ? `${n.actor?.name} reviewed reviewed a product you might be interested in.`
+                    : n.body}
+                </p>
                 <p className="text-xs text-muted-foreground/60 mt-2">
                   {new Date(n.created_at).toLocaleString()}
-                
                 </p>
               </div>
-              {!n.isRead && (
+              {!n.is_read && (
                 <span className="mt-2 size-2 shrink-0 rounded-full bg-primary" />
               )}
             </button>
@@ -246,7 +250,10 @@ export default function NotificationsPage() {
               .map((p, i) =>
                 p === "..." ? (
                   <span
-                    key={`ellipsis-${i}`}
+                    key={`ellipsis-${
+                      // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
+                      i
+                    }`}
                     className="flex items-center px-2 text-muted-foreground"
                   >
                     …

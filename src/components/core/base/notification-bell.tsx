@@ -28,11 +28,19 @@ type Notification = {
     | "order_status_changed"
     | "order_cancelled"
     | "order_refunded"
-    | "order_delivered";
+    | "order_delivered"
+    | "review_submitted";
+  entity_id?: string;
+  metaData?: Record<string, any>;
+  actor?: {
+    id: string;
+    name: string;
+    image: null;
+  };
   title: string;
   body: string;
-  isRead: boolean;
-  createdAt: string;
+  is_read: boolean;
+  created_at: string;
 };
 
 const TYPE_ICON: Record<Notification["type"], React.ReactNode> = {
@@ -41,6 +49,7 @@ const TYPE_ICON: Record<Notification["type"], React.ReactNode> = {
   order_cancelled: <PackageXIcon className="size-4" />,
   order_refunded: <RotateCcwIcon className="size-4" />,
   order_delivered: <PackageCheckIcon className="size-4" />,
+  review_submitted: <PackageIcon className="size-4" />,
 };
 
 export default function NotificationBell() {
@@ -120,9 +129,9 @@ export default function NotificationBell() {
               <button
                 key={n.id}
                 type="button"
-                onClick={() => !n.isRead && markOneRead(n.id)}
+                onClick={() => !n.is_read && markOneRead(n.id)}
                 className={`w-full text-left px-4 py-3 hover:bg-muted/50 transition-colors ${
-                  !n.isRead ? "bg-primary/5" : ""
+                  !n.is_read ? "bg-primary/5" : ""
                 }`}
               >
                 <div className="flex gap-3 items-start">
@@ -131,18 +140,24 @@ export default function NotificationBell() {
                   </span>
                   <div className="flex-1 min-w-0">
                     <p
-                      className={`text-sm font-medium line-clamp-1 ${!n.isRead ? "text-foreground" : "text-muted-foreground"}`}
+                      className={`text-sm font-medium line-clamp-1 ${!n.is_read ? "text-foreground" : "text-muted-foreground"}`}
                     >
-                      {n.title}
+                      {n.entity_id
+                        ? n.type === "review_submitted"
+                          ? `A friend reviewed a product`
+                          : n.title
+                        : n.title}
                     </p>
                     <p className="text-xs text-muted-foreground line-clamp-2 mt-0.5">
-                      {n.body}
+                      {n?.entity_id
+                        ? `${n.actor?.name} reviewed reviewed a product you might be interested in.`
+                        : n.body}
                     </p>
                     <p className="text-[10px] text-muted-foreground/60 mt-1">
-                      {new Date(n.createdAt).toLocaleString()}
+                      {new Date(n.created_at).toLocaleString()}
                     </p>
                   </div>
-                  {!n.isRead && (
+                  {!n.is_read && (
                     <span className="mt-1.5 size-2 shrink-0 rounded-full bg-primary" />
                   )}
                 </div>
