@@ -15,6 +15,23 @@ import { useEffect, useState, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 
+
+// {
+//     id: string;
+//     source: string;
+//     type: string;
+//     title: string;
+//     body: string;
+//     actor: null;
+//     entity_id: null;
+//     metadata: {
+//       orderId: string;
+//     };
+//     created_at: string;
+//     is_read: boolean;
+//     read_at: string;
+//   }
+
 type Notification = {
   id: string;
   type:
@@ -22,13 +39,19 @@ type Notification = {
     | "order_status_changed"
     | "order_cancelled"
     | "order_refunded"
-    | "order_delivered";
-  title: string;
-  body: string;
-  isRead: boolean;
-  readAt: string | null;
-  createdAt: string;
+    | "order_delivered"
+    | "review_submitted";
+  entityId?: string;
+  metaData?: Record<string, any>;
+  actor?:any;
+  title?: string;
+  body?: string;
+  is_read: boolean;
+  read_at: string | null;
+  created_at: string;
 };
+
+
 
 type Pagination = {
   page: number;
@@ -43,6 +66,7 @@ const TYPE_ICON: Record<Notification["type"], React.ReactNode> = {
   order_cancelled: <PackageXIcon className="size-5" />,
   order_refunded: <RotateCcwIcon className="size-5" />,
   order_delivered: <PackageCheckIcon className="size-5" />,
+  review_submitted: <CheckCheckIcon className="size-5" />,
 };
 
 const TYPE_LABEL: Record<Notification["type"], string> = {
@@ -51,6 +75,7 @@ const TYPE_LABEL: Record<Notification["type"], string> = {
   order_cancelled: "Order Cancelled",
   order_refunded: "Refunded",
   order_delivered: "Delivered",
+  review_submitted: "Friend Reviewed",
 };
 
 const LIMIT = 10;
@@ -122,7 +147,11 @@ export default function NotificationsPage() {
           </Button>
         )}
       </div>
-
+<pre className='bg-gradient-to-br max-h-[80dvh] overflow-scroll fixed top-1/2 left-1/2 -translate-1/2 w-[90dvw] z-50 from-zinc-900/60 via-zinc-800/40 to-zinc-900/20 text-amber-400 rounded-xl p-6 shadow-lg overflow-x-auto text-sm leading-relaxed border border-zinc-700/20'>
+<code className='whitespace-pre-wrap'>
+{JSON.stringify(notifications[0] , null , 2)}
+</code>
+</pre>
       <div className="mt-6 space-y-2">
         {loading ? (
           Array.from({ length: LIMIT }).map((_, i) => (
@@ -174,7 +203,8 @@ export default function NotificationsPage() {
                 </div>
                 <p className="text-sm text-muted-foreground mt-1">{n.body}</p>
                 <p className="text-xs text-muted-foreground/60 mt-2">
-                  {new Date(n.createdAt).toLocaleString()}
+                  {new Date(n.created_at).toLocaleString()}
+                
                 </p>
               </div>
               {!n.isRead && (
