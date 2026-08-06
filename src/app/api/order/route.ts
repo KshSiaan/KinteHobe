@@ -29,7 +29,7 @@ const bodySchema = z.object({
     quantity: z.number().int().positive(),
     unitPrice: z.number().positive(),
     lineTotal: z.number().positive(),
-   
+
     selection: z.object({
       variantId: z.string(),
       title: z.string().optional().nullable(),
@@ -80,7 +80,7 @@ export async function POST(request: Request) {
     id: orderId,
     userId: session?.user.id ?? null,
     email: shipping.email,
-    status: type==="stripe"?"pending_payment":"awaiting_cod",
+    status: type === "stripe" ? "pending_payment" : "awaiting_cod",
     shippingName: shipping.fullName,
     shippingPhone: shipping.phone,
     shippingAddress: shipping.address,
@@ -88,7 +88,7 @@ export async function POST(request: Request) {
     shippingState: shipping.state,
     shippingZip: shipping.zip,
     shippingCountry: shipping.country,
-    paymentMethod:type === "cash"?"cash_on_delivery":"stripe",
+    paymentMethod: type === "cash" ? "cash_on_delivery" : "stripe",
     subtotalCents,
     taxCents,
     shippingCents: 0,
@@ -164,7 +164,7 @@ export async function POST(request: Request) {
   const hasFriends = !!friend;
 
   if (hasFriends) {
-    try{
+    try {
       await db.insert(activity).values({
         id: crypto.randomUUID(),
         actorId: session.user.id,
@@ -172,7 +172,7 @@ export async function POST(request: Request) {
         entityId: orderId,
         metaData: { orderId, totalCents, itemsCount: items.length },
       });
-    }catch(e){
+    } catch (e) {
       // sentry
     }
   }
