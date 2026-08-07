@@ -3,6 +3,7 @@ import React from "react";
 import { Button } from "./ui/button";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
+import Image from "next/image";
 
 const AppName = process.env.NEXT_PUBLIC_APP_NAME || "KinteHobe";
 
@@ -52,11 +53,13 @@ export const DetailedFooter = () => {
         <div className="grid grid-cols-2 gap-8 md:grid-cols-4 lg:grid-cols-5">
           <div className="col-span-2 lg:col-span-1">
             <div className="flex items-center gap-2 mb-6">
-              <div className="size-8 rounded bg-foreground flex items-center justify-center">
-                <span className="text-background font-bold text-xs">
-                  {AppName.charAt(0).toUpperCase()}
-                </span>
-              </div>
+              <Image
+                src="/img/icon.svg"
+                alt="Logo"
+                width={32}
+                height={32}
+                className="size-12"
+              />
               <span className="text-foreground font-semibold tracking-tight">
                 {AppName}
               </span>

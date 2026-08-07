@@ -63,6 +63,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import SavedLocation from "./saved-location";
+import SearchInput from "./search-input";
 
 export default function Navbar() {
   const { isPending, data } = authClient.useSession();
@@ -123,17 +124,7 @@ export default function Navbar() {
                 className="size-10"
               />
             </Link>
-            <InputGroup className="hidden md:flex w-[30dvw] border border-muted-foreground/20 bg-background">
-              <InputGroupAddon>
-                <InputGroupButton>
-                  <SearchIcon />
-                </InputGroupButton>
-              </InputGroupAddon>
-              <InputGroupInput
-                className="text-sm"
-                placeholder="What are you looking for? Ask AI"
-              />
-            </InputGroup>
+            <SearchInput />
           </div>
           <div className="flex gap-2 md:gap-6 items-center">
             <div className="hidden md:block">

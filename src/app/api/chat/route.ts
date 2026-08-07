@@ -76,7 +76,7 @@ const tools: ToolSet = {
 export async function POST(request: Request) {
   const { messages }: { messages: UIMessage[] } = await request.json();
   const result = streamText({
-    model: openrouter("openai/gpt-oss-20b:free"),
+    model: openrouter("nvidia/nemotron-3-super-120b-a12b:free"),
     tools,
     stopWhen: isLoopFinished(),
     system: systemPrompt,
