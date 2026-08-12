@@ -15,22 +15,6 @@ import { useEffect, useState, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 
-// {
-//     id: string;
-//     source: string;
-//     type: string;
-//     title: string;
-//     body: string;
-//     actor: null;
-//     entity_id: null;
-//     metadata: {
-//       orderId: string;
-//     };
-//     created_at: string;
-//     is_read: boolean;
-//     read_at: string;
-// }
-
 type Notification = {
   id: string;
   type:
