@@ -64,9 +64,13 @@ import {
 } from "@/components/ui/popover";
 import SavedLocation from "./saved-location";
 import SearchInput from "./search-input";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
+import React from "react";
 
 export default function Navbar() {
   const { isPending, data } = authClient.useSession();
+  const [aiSearch, setSearchType] = React.useState<boolean>(false);
   const path = usePathname();
   const router = useRouter();
 
@@ -114,7 +118,7 @@ export default function Navbar() {
     <>
       <div className="h-16 md:h-26 border-b fixed z-50 top-0 left-0 w-full bg-background">
         <div className="h-16! w-full border-b flex flex-row items-center justify-between px-4 md:px-6">
-          <div className="flex items-center gap-3 md:gap-6">
+          <div className="flex items-center gap-2">
             <Link href={"/"} className="hover:opacity-70">
               <Image
                 src={"/img/icon.svg"}
@@ -125,6 +129,20 @@ export default function Navbar() {
               />
             </Link>
             <SearchInput />
+            <div className="flex items-center gap-2 h-8 border px-2 rounded-full">
+              <Switch
+                size="sm"
+                id="ai-search"
+                checked={aiSearch}
+                onCheckedChange={setSearchType}
+              />
+              <Label
+                htmlFor="ai-search"
+                className="text-nowrap text-sm font-semibold text-muted-foreground"
+              >
+                AI Search
+              </Label>
+            </div>
           </div>
           <div className="flex gap-2 md:gap-6 items-center">
             <div className="hidden md:block">

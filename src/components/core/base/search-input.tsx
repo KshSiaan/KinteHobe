@@ -39,7 +39,10 @@ export default function SearchInput() {
   }, []);
 
   return (
-    <div ref={containerRef} className="relative hidden w-[30dvw] md:block">
+    <div
+      ref={containerRef}
+      className="relative hidden w-[30dvw] md:flex gap-2 "
+    >
       <InputGroup
         className={`
           relative z-20
@@ -122,6 +125,7 @@ export default function SearchInput() {
                   "Gaming Mouse",
                   "Wireless Earbuds",
                   "Ask AI for recommendations",
+                  "Find people with similar interests",
                 ].map((item, i) => (
                   <motion.button
                     key={item}

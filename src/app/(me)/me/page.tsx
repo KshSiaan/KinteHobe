@@ -21,7 +21,6 @@ export default async function Page() {
     headers: await headers(),
   });
   const user = data?.user;
-
   const userId = user?.id ?? "";
 
   const [[{ followers }], [{ following }]] = await Promise.all([
