@@ -1,8 +1,6 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import React from "react";
-import { ArrowRightIcon } from "@animateicons/react/lucide";
-import Link from "next/link";
 import Variants from "./variants";
 import { Card, CardContent, CardDescription } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
@@ -10,11 +8,40 @@ import { Input } from "@/components/ui/input";
 import { CheckCheck, Trash2 } from "lucide-react";
 import Appearance from "./appearance";
 import PromotionBanner from "@/components/core/extra/promotion-banner";
+import { useMutation } from "@tanstack/react-query";
+import { howl } from "@/lib/utils";
+import { sileo } from "sileo";
+import { Spinner } from "@/components/kibo-ui/spinner";
 export default function Page() {
   const [selectedVariant, setSelectedVariant] = React.useState("primary");
   const [selectedAppearance, setSelectedAppearance] = React.useState("a");
   const [promotionTitle, setPromotionTitle] = React.useState("");
   const [promotionUrl, setPromotionUrl] = React.useState("");
+
+  const { mutate, isPending } = useMutation({
+    mutationKey: ["add_promotion"],
+    mutationFn: () => {
+      return howl(`/api/admin/promotion`, {
+        method: "POST",
+        body: {
+          variant: selectedVariant,
+          appearance: selectedAppearance,
+          title: promotionTitle,
+          url: promotionUrl,
+        },
+      });
+    },
+    onError: (err) => {
+      sileo.error({
+        title: "Failed to complete this request",
+        description:
+          err.message ?? "An error occurred while completing this request.",
+      });
+    },
+    onSuccess: (res: any) => {
+      sileo.success(res.message ?? "Success!");
+    },
+  });
   return (
     <section className="w-full h-full space-y-6">
       <PromotionBanner
@@ -81,10 +108,18 @@ export default function Page() {
           <span className="text-green-600">Active</span>
         </div>
         <div className="space-x-2">
-          <Button>
-            <CheckCheck /> Confirm Promotion
+          <Button disabled={isPending} onClick={() => mutate()}>
+            {isPending ? (
+              <>
+                <Spinner variant="ring" /> Processing...
+              </>
+            ) : (
+              <>
+                <CheckCheck /> Confirm Promotion
+              </>
+            )}
           </Button>
-          <Button variant="destructive">
+          <Button variant="destructive" disabled={isPending}>
             <Trash2 /> Discard Promotion
           </Button>
         </div>
