@@ -15,7 +15,7 @@ const productSchema = z.object({
 
 export async function ImageToText({ imageData }: { imageData: ArrayBuffer }) {
   const result = await generateText({
-    model: openrouter("nvidia/nemotron-nano-12b-v2-vl:free"),
+    model: openrouter("nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free"),
     system: "You are a product catalog assistant. Analyze the product image and return structured e-commerce product data. Be specific and accurate.",
     messages: [
       {

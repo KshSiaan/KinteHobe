@@ -1,6 +1,9 @@
-import { relations } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
+import type { SQL } from "drizzle-orm";
+
 import {
   boolean,
+  customType,
   index,
   integer,
   jsonb,
@@ -12,6 +15,7 @@ import {
 } from "drizzle-orm/pg-core";
 import { category } from "./category-schema";
 import type { MetadataTableRow } from "@/lib/validations/metadata-table";
+
 
 export const productStatusEnum = pgEnum("product_status", [
   "active",
@@ -25,6 +29,15 @@ export const productVariantKindEnum = pgEnum("product_variant_kind", [
   "size",
   "custom",
 ]);
+
+const tsvector = customType<{
+  data: string;
+  driverData: string;
+}>({
+  dataType() {
+    return "tsvector";
+  },
+});
 
 export const product = pgTable(
   "product",
@@ -96,6 +109,15 @@ export const productVariant = pgTable(
 
     createdAt: timestamp("created_at").defaultNow().notNull(),
 
+    bodySearch: tsvector("body_search")
+      .notNull()
+      .generatedAlwaysAs(
+        (): SQL =>
+          sql`to_tsvector(
+            'english',
+            coalesce("title", '') || ' ' || coalesce("details", '')
+          )`,
+      ),
     updatedAt: timestamp("updated_at")
       .defaultNow()
       .$onUpdate(() => new Date())
@@ -103,6 +125,10 @@ export const productVariant = pgTable(
   },
   (table) => [
     index("product_variant_group_idx").on(table.groupId),
+    index("product_variant_body_search_idx").using(
+      "gin",
+      table.bodySearch,
+    ),
   ],
 );
 
