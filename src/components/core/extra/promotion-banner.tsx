@@ -38,9 +38,13 @@ export default function PromotionBanner({
       )}
       {["b", "c"].includes(selectedAppearance) && (
         <>
-          <span>{promotionTitle || "Promotion Title Here"}</span>
-          <Button variant="secondary" className="text-xs" size="xs">
-            Get Now <ArrowRightIcon className="" />
+          <span className="text-xs md:text-sm ">
+            {promotionTitle || "Promotion Title Here"}
+          </span>
+          <Button variant="secondary" className="text-xs" size="xs" asChild>
+            <Link href={promotionUrl ?? "#"}>
+              Get Now <ArrowRightIcon className="" />
+            </Link>
           </Button>
         </>
       )}

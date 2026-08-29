@@ -6,12 +6,7 @@ import { ChartTooltip } from "@/components/charts/tooltip/chart-tooltip";
 import XAxis from "@/components/charts/x-axis";
 import { RevenueGoalCard } from "@/components/dashboard/revenue-goal-card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Select,
   SelectContent,
@@ -121,7 +116,7 @@ export default function Page() {
                 {isPending ? (
                   <Skeleton className="h-8 w-20" />
                 ) : (
-                  kpis?.totalUsers.toLocaleString() ?? "—"
+                  (kpis?.totalUsers.toLocaleString() ?? "—")
                 )}
               </CardContent>
             </Card>
@@ -145,7 +140,7 @@ export default function Page() {
                 {isPending ? (
                   <Skeleton className="h-8 w-20" />
                 ) : (
-                  kpis?.inventoryCount.toLocaleString() ?? "—"
+                  (kpis?.inventoryCount.toLocaleString() ?? "—")
                 )}
               </CardContent>
             </Card>
@@ -166,7 +161,9 @@ export default function Page() {
           {/* Sale Performance chart */}
           <Card>
             <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-              <CardTitle className="text-sm sm:text-base">Sale Performance</CardTitle>
+              <CardTitle className="text-sm sm:text-base">
+                Sale Performance
+              </CardTitle>
               <Select
                 value={String(chartMonths)}
                 onValueChange={(v) => setChartMonths(Number(v))}
@@ -185,9 +182,17 @@ export default function Page() {
               {isPending || chartData.length === 0 ? (
                 <Skeleton className="h-full w-full rounded-lg" />
               ) : (
-                <AreaChart className="h-full w-full" data={chartData} xDataKey="date">
+                <AreaChart
+                  className="h-full w-full"
+                  data={chartData}
+                  xDataKey="date"
+                >
                   <Grid horizontal />
-                  <Area dataKey="revenue" fill="var(--chart-2)" fillOpacity={0.4} />
+                  <Area
+                    dataKey="revenue"
+                    fill="var(--chart-2)"
+                    fillOpacity={0.4}
+                  />
                   <XAxis />
                   <ChartTooltip />
                 </AreaChart>
@@ -208,7 +213,9 @@ export default function Page() {
                   <Skeleton className="h-20 w-20 rounded-full" />
                 </>
               ) : top3.length === 0 ? (
-                <p className="text-sm text-muted-foreground text-center">No customer sales data yet.</p>
+                <p className="text-sm text-muted-foreground text-center">
+                  No customer sales data yet.
+                </p>
               ) : (
                 <>
                   {/* 3rd (left) */}
@@ -217,12 +224,22 @@ export default function Page() {
                       <>
                         <Avatar className="size-16 sm:size-20 md:size-28">
                           <AvatarImage src={podium[0].image ?? undefined} />
-                          <AvatarFallback>{getInitials(podium[0].name)}</AvatarFallback>
+                          <AvatarFallback>
+                            {getInitials(podium[0].name)}
+                          </AvatarFallback>
                         </Avatar>
                         <div className="text-center">
-                          <p className="text-xs font-semibold truncate max-w-20">{podium[0].name}</p>
-                          <p className="text-xs text-muted-foreground">{formatUSD(podium[0].totalSpentCents)}</p>
-                          <span className={`inline-block text-xs px-2 py-1 rounded-full mt-1 ${RANK_BADGE_CLASS[2]}`}>3rd</span>
+                          <p className="text-xs font-semibold truncate max-w-20">
+                            {podium[0].name}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            {formatUSD(podium[0].totalSpentCents)}
+                          </p>
+                          <span
+                            className={`inline-block text-xs px-2 py-1 rounded-full mt-1 ${RANK_BADGE_CLASS[2]}`}
+                          >
+                            3rd
+                          </span>
                         </div>
                       </>
                     ) : (
@@ -238,15 +255,21 @@ export default function Page() {
                       </span>
                       <Avatar className="size-20 sm:size-28 md:size-36">
                         <AvatarImage src={podium[1]?.image ?? undefined} />
-                        <AvatarFallback>{podium[1] ? getInitials(podium[1].name) : "—"}</AvatarFallback>
+                        <AvatarFallback>
+                          {podium[1] ? getInitials(podium[1].name) : "—"}
+                        </AvatarFallback>
                       </Avatar>
                     </div>
                     <div className="text-center">
-                      <p className="text-xs sm:text-sm font-bold truncate max-w-25">{podium[1]?.name ?? "—"}</p>
+                      <p className="text-xs sm:text-sm font-bold truncate max-w-25">
+                        {podium[1]?.name ?? "—"}
+                      </p>
                       <p className="text-xs sm:text-sm text-muted-foreground font-semibold">
                         {podium[1] ? formatUSD(podium[1].totalSpentCents) : "—"}
                       </p>
-                      <span className={`inline-block text-xs px-2 py-1 rounded-full mt-1 ${RANK_BADGE_CLASS[0]}`}>
+                      <span
+                        className={`inline-block text-xs px-2 py-1 rounded-full mt-1 ${RANK_BADGE_CLASS[0]}`}
+                      >
                         {RANK_LABEL[0]}
                       </span>
                     </div>
@@ -258,12 +281,22 @@ export default function Page() {
                       <>
                         <Avatar className="size-16 sm:size-20 md:size-28">
                           <AvatarImage src={podium[2].image ?? undefined} />
-                          <AvatarFallback>{getInitials(podium[2].name)}</AvatarFallback>
+                          <AvatarFallback>
+                            {getInitials(podium[2].name)}
+                          </AvatarFallback>
                         </Avatar>
                         <div className="text-center">
-                          <p className="text-xs font-semibold truncate max-w-20">{podium[2].name}</p>
-                          <p className="text-xs text-muted-foreground">{formatUSD(podium[2].totalSpentCents)}</p>
-                          <span className={`inline-block text-xs px-2 py-1 rounded-full mt-1 ${RANK_BADGE_CLASS[1]}`}>2nd</span>
+                          <p className="text-xs font-semibold truncate max-w-20">
+                            {podium[2].name}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            {formatUSD(podium[2].totalSpentCents)}
+                          </p>
+                          <span
+                            className={`inline-block text-xs px-2 py-1 rounded-full mt-1 ${RANK_BADGE_CLASS[1]}`}
+                          >
+                            2nd
+                          </span>
                         </div>
                       </>
                     ) : (
@@ -298,7 +331,9 @@ export default function Page() {
                 </div>
               ) : topProduct === null ? (
                 <div className="flex flex-col items-center justify-center py-8 gap-2 text-center">
-                  <p className="text-sm text-muted-foreground">No product sales data yet.</p>
+                  <p className="text-sm text-muted-foreground">
+                    No product sales data yet.
+                  </p>
                 </div>
               ) : (
                 <>
@@ -316,20 +351,30 @@ export default function Page() {
                   )}
 
                   <div className="space-y-1 shrink-0">
-                    <h3 className="text-sm font-bold line-clamp-2">{topProduct.productTitle}</h3>
+                    <h3 className="text-sm font-bold line-clamp-2">
+                      {topProduct.productTitle}
+                    </h3>
                     {topProduct.variantTitle && (
-                      <p className="text-xs text-muted-foreground">{topProduct.variantTitle}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {topProduct.variantTitle}
+                      </p>
                     )}
                   </div>
 
                   <div className="grid grid-cols-2 gap-2 shrink-0">
                     <div className="bg-muted p-2 rounded">
-                      <p className="text-xs text-muted-foreground">Units Sold</p>
-                      <p className="text-lg font-bold">{topProduct.unitsSold.toLocaleString()}</p>
+                      <p className="text-xs text-muted-foreground">
+                        Units Sold
+                      </p>
+                      <p className="text-lg font-bold">
+                        {topProduct.unitsSold.toLocaleString()}
+                      </p>
                     </div>
                     <div className="bg-muted p-2 rounded">
                       <p className="text-xs text-muted-foreground">Revenue</p>
-                      <p className="text-lg font-bold">{formatUSD(topProduct.revenueCents)}</p>
+                      <p className="text-lg font-bold">
+                        {formatUSD(topProduct.revenueCents)}
+                      </p>
                     </div>
                   </div>
 

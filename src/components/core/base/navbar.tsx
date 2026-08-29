@@ -67,12 +67,38 @@ import SearchInput from "./search-input";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import React from "react";
+import { cn, howl } from "@/lib/utils";
+import { useQuery } from "@tanstack/react-query";
+import PromotionBanner from "../extra/promotion-banner";
 
 export default function Navbar() {
   const { isPending, data } = authClient.useSession();
   const [aiSearch, setSearchType] = React.useState<boolean>(false);
   const path = usePathname();
   const router = useRouter();
+
+  const { data: promotions, isPending: promotionsPending } = useQuery({
+    queryKey: ["promotions"],
+    queryFn: async (): Promise<{
+      message: string;
+      ok: boolean;
+      data: {
+        id: string;
+        promotionTitle: string;
+        promotionUrl: string;
+        appearance: string;
+        variant: string;
+        createdAt: string;
+      }[];
+    }> => {
+      return howl(`/api/client/promotions`);
+    },
+  });
+
+  const currentPromotion =
+    promotions?.data[
+      Math.floor(Math.random() * (promotions?.data.length ?? 1))
+    ];
 
   const handleLogout = async () => {
     try {
@@ -114,10 +140,29 @@ export default function Navbar() {
     }
   };
 
+  //   {currentPromotion && (
+  //   <PromotionBanner
+  //     selectedAppearance={currentPromotion?.appearance}
+  //     promotionTitle={currentPromotion?.promotionTitle}
+  //     promotionUrl={currentPromotion?.promotionUrl}
+  //     selectedVariant={currentPromotion?.variant}
+  //   />
+  // )}
+
   return (
     <>
-      <div className="h-16 md:h-26 border-b fixed z-50 top-0 left-0 w-full bg-background">
-        <div className="h-16! w-full border-b flex flex-row items-center justify-between px-4 md:px-6">
+      <div
+        className={cn(
+          "border-b fixed z-50 top-0 left-0 w-full bg-background",
+          currentPromotion ? "h-24 md:h-36" : "h-16 md:h-26",
+        )}
+      >
+        <div
+          className={cn(
+            "w-full border-b flex flex-row items-center justify-between px-4 md:px-6",
+            "h-16",
+          )}
+        >
           <div className="flex items-center gap-2">
             <Link href={"/"} className="hover:opacity-70">
               <Image
@@ -129,7 +174,7 @@ export default function Navbar() {
               />
             </Link>
             <SearchInput />
-            <div className="flex items-center gap-2 h-8 border px-2 rounded-full">
+            <div className="hidden md:flex items-center gap-2 h-8 border px-2 rounded-full ">
               <Switch
                 size="sm"
                 id="ai-search"
@@ -415,8 +460,21 @@ export default function Navbar() {
             </Button>
           </div>
         </div>
+        {currentPromotion && (
+          <PromotionBanner
+            selectedAppearance={currentPromotion?.appearance}
+            promotionTitle={currentPromotion?.promotionTitle}
+            promotionUrl={currentPromotion?.promotionUrl}
+            selectedVariant={currentPromotion?.variant}
+          />
+        )}
       </div>
-      <div className="h-16 md:h-26 w-full bg-background" />
+      <div
+        className={cn(
+          "w-full bg-background",
+          currentPromotion ? "h-24 md:h-36" : "h-16 md:h-26",
+        )}
+      />
       {data?.session?.impersonatedBy && (
         <AlertDialog>
           <AlertDialogTrigger asChild>

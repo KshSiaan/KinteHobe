@@ -1,5 +1,7 @@
+import { promotion } from "@/db/schema";
 import { auth } from "@/lib/auth";
 import { CreateResponse } from "@/lib/backend/message";
+import { db } from "@/lib/db";
 import z from "zod";
 
 
@@ -7,7 +9,7 @@ const promotionSchema = z.object({
     variant: z.string().min(1, "Variant is required"),
     appearance: z.string().min(1, "Appearance is required"),
     title: z.string().min(1, "Title is required"),
-    url: z.string().url("Invalid URL").optional(),
+    url: z.url("Invalid URL").optional(),
 });
 
 export async function POST(req: Request) {
@@ -33,12 +35,28 @@ export async function POST(req: Request) {
             "status": 400
         });
     }
+    const [res] = await db.insert(promotion).values({
+        id: crypto.randomUUID(),
+        promotionTitle: validationResult.data.title,
+        promotionUrl: validationResult.data.url,
+        appearance: validationResult.data.appearance,
+        variant: validationResult.data.variant,
+    }).returning();
 
+    if (!res) {
+        return CreateResponse({
+            "ok": false,
+            "message": "Failed to create promotion",
+            "status": 500
+        });
+    }
     
-
     return CreateResponse({
         "ok": true,
         "message": "Promotion created successfully",
         "status": 200
     })
 }
+
+
+

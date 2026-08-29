@@ -10,10 +10,13 @@ import {
   InputGroupButton,
   InputGroupInput,
 } from "@/components/ui/input-group";
-
+import { useDebounce } from "react-haiku";
+import { useQuery } from "@tanstack/react-query";
+import { howl } from "@/lib/utils";
 export default function SearchInput() {
   const [open, setOpen] = useState(false);
-
+  const [searchQuery, setSearchQuery] = useState("");
+  const debouncedSearchQuery = useDebounce(searchQuery, 300);
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -37,6 +40,16 @@ export default function SearchInput() {
       document.removeEventListener("keydown", handleKey);
     };
   }, []);
+
+  const { data, isPending } = useQuery({
+    queryKey: ["search", debouncedSearchQuery],
+    enabled: !!debouncedSearchQuery,
+    queryFn: async () => {
+      return howl(`/api/client/search?q=${debouncedSearchQuery}`);
+    },
+  });
+
+  console.log("search data", data);
 
   return (
     <div
@@ -72,6 +85,8 @@ export default function SearchInput() {
         <InputGroupInput
           placeholder="What are you looking for? Ask AI"
           className="text-sm"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
           onFocus={() => setOpen(true)}
         />
       </InputGroup>

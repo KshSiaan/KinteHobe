@@ -20,9 +20,9 @@ export default function Hero() {
   const bannerUrl = data?.data;
 
   return (
-    <header className="bg-background h-[30dvh] lg:h-[60dvh] border-b">
+    <header className="bg-background h-[30dvh] lg:h-[60dvh] flex items-center justify-center">
       <Image
-        className="w-full h-full object-cover"
+        className="w-full h-full object-contain"
         src={bannerUrl || "/placeholder-banner.webp"}
         width={1920}
         height={1080}

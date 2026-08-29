@@ -78,6 +78,7 @@
         "react-dom": "19.2.4",
         "react-dropzone": "^15.0.0",
         "react-easy-crop": "^5.5.7",
+        "react-haiku": "^2.4.1",
         "react-hook-form": "^7.73.1",
         "react-jsx-parser": "^2.4.1",
         "react-pdf": "^10.4.1",
@@ -2033,6 +2034,8 @@
     "react-dropzone": ["react-dropzone@15.0.0", "", { "dependencies": { "attr-accept": "^2.2.4", "file-selector": "^2.1.0", "prop-types": "^15.8.1" }, "peerDependencies": { "react": ">= 16.8 || 18.0.0" } }, "sha512-lGjYV/EoqEjEWPnmiSvH4v5IoIAwQM2W4Z1C0Q/Pw2xD0eVzKPS359BQTUMum+1fa0kH2nrKjuavmTPOGhpLPg=="],
 
     "react-easy-crop": ["react-easy-crop@5.5.7", "", { "dependencies": { "normalize-wheel": "^1.0.1", "tslib": "^2.0.1" }, "peerDependencies": { "react": ">=16.4.0", "react-dom": ">=16.4.0" } }, "sha512-kYo4NtMeXFQB7h1U+h5yhUkE46WQbQdq7if54uDlbMdZHdRgNehfvaFrXnFw5NR1PNoUOJIfTwLnWmEx/MaZnA=="],
+
+    "react-haiku": ["react-haiku@2.4.1", "", { "dependencies": { "react": ">=16.8.0" } }, "sha512-8f3JVL+VvmkHhd3OFQCtY46vmPJuVqNeaYH7aoZsh7mACvsafu3Sh3xvynBciaWi6/cl7ABIe9pR+Ur1kSJ69Q=="],
 
     "react-hook-form": ["react-hook-form@7.73.1", "", { "peerDependencies": { "react": "^16.8.0 || ^17 || ^18 || ^19" } }, "sha512-VAfVYOPcx3piiEVQy95vyFmBwbVUsP/AUIN+mpFG8h11yshDd444nn0VyfaGWSRnhOLVgiDu7HIuBtAIzxn9dA=="],
 

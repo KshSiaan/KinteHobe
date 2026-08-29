@@ -1,129 +1,77 @@
-"use client";
-import { Button } from "@/components/ui/button";
-import React from "react";
-import Variants from "./variants";
-import { Card, CardContent, CardDescription } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { CheckCheck, Trash2 } from "lucide-react";
-import Appearance from "./appearance";
-import PromotionBanner from "@/components/core/extra/promotion-banner";
-import { useMutation } from "@tanstack/react-query";
-import { howl } from "@/lib/utils";
-import { sileo } from "sileo";
+import { Suspense } from "react";
+import Add from "./add";
 import { Spinner } from "@/components/kibo-ui/spinner";
-export default function Page() {
-  const [selectedVariant, setSelectedVariant] = React.useState("primary");
-  const [selectedAppearance, setSelectedAppearance] = React.useState("a");
-  const [promotionTitle, setPromotionTitle] = React.useState("");
-  const [promotionUrl, setPromotionUrl] = React.useState("");
-
-  const { mutate, isPending } = useMutation({
-    mutationKey: ["add_promotion"],
-    mutationFn: () => {
-      return howl(`/api/admin/promotion`, {
-        method: "POST",
-        body: {
-          variant: selectedVariant,
-          appearance: selectedAppearance,
-          title: promotionTitle,
-          url: promotionUrl,
-        },
-      });
-    },
-    onError: (err) => {
-      sileo.error({
-        title: "Failed to complete this request",
-        description:
-          err.message ?? "An error occurred while completing this request.",
-      });
-    },
-    onSuccess: (res: any) => {
-      sileo.success(res.message ?? "Success!");
-    },
-  });
+import { howl } from "@/lib/utils";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { PencilLineIcon, Trash2Icon } from "lucide-react";
+import DeletePromotionButton from "./delete-promotion-button";
+export default async function Page() {
+  const promotions: {
+    message: string;
+    ok: boolean;
+    data: {
+      id: string;
+      promotionTitle: string;
+      promotionUrl: string;
+      appearance: string;
+      variant: string;
+      createdAt: string;
+    }[];
+  } = await howl(`${process.env.NEXT_PUBLIC_API_URL}/api/client/promotions`);
   return (
-    <section className="w-full h-full space-y-6">
-      <PromotionBanner
-        selectedVariant={selectedVariant}
-        selectedAppearance={selectedAppearance}
-        promotionTitle={promotionTitle}
-        promotionUrl={promotionUrl}
-      />
-      <div className="px-6">
+    <div className="w-full h-full flex flex-col gap-4 justify-start">
+      <Suspense
+        fallback={
+          <div className="w-full flex items-center justify-center">
+            <Spinner variant="bars" />
+          </div>
+        }
+      >
+        <Add />
+      </Suspense>
+      <section className="p-6 pt-2">
         <Card>
-          {/* <CardHeader>
-            <CardTitle></CardTitle>
-          </CardHeader> */}
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="promotion-title">Promotion Title</Label>
-              <Input
-                id="promotion-title"
-                type="text"
-                placeholder="eg. Summer Sale"
-                value={promotionTitle}
-                onChange={(e) => setPromotionTitle(e.target.value)}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="promotion-url">
-                Product URL (e.g. https://www.example.com/product/k23j4)
-              </Label>
-              <CardDescription>
-                This is the URL that will be used to track the promotion. It
-                should be a valid URL that points to a landing page for the
-                promotion.
-              </CardDescription>
-              <Input
-                id="promotion-url"
-                type="url"
-                placeholder="https://www.example.com/product/k23j4"
-                value={promotionUrl}
-                onChange={(e) => setPromotionUrl(e.target.value)}
-              />
-            </div>
+          <CardContent>
+            <Table className="w-full">
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Title</TableHead>
+                  <TableHead>URL</TableHead>
+                  <TableHead>Variant</TableHead>
+                  <TableHead>Appearance</TableHead>
+                  <TableHead>Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {promotions.data.map((promotion) => (
+                  <TableRow key={promotion.id}>
+                    <TableCell>{promotion.promotionTitle}</TableCell>
+                    <TableCell>{promotion.promotionUrl}</TableCell>
+                    <TableCell className="capitalize">
+                      {promotion.variant}
+                    </TableCell>
+                    <TableCell className="capitalize">
+                      Type {promotion.appearance}
+                    </TableCell>
+                    <TableCell className="flex gap-2 items-center">
+                      <DeletePromotionButton promotionId={promotion.id} />
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
           </CardContent>
         </Card>
-      </div>
-      {selectedAppearance !== "c" && (
-        <div className="px-6 space-y-2">
-          <h4 className="text-sm font-medium">Select Color Variant</h4>
-          <Variants
-            selectedVariant={selectedVariant}
-            setSelectedVariant={setSelectedVariant}
-          />
-        </div>
-      )}
-      <div className="px-6 space-y-2">
-        <h4 className="text-sm font-medium">Select Appearance</h4>
-        <Appearance
-          selectedVariant={selectedAppearance}
-          setSelectedVariant={setSelectedAppearance}
-        />
-      </div>
-      <div className="flex justify-between items-center px-6">
-        <div className="text-sm font-semibold text-muted-foreground">
-          Current Promotion Status:{" "}
-          <span className="text-green-600">Active</span>
-        </div>
-        <div className="space-x-2">
-          <Button disabled={isPending} onClick={() => mutate()}>
-            {isPending ? (
-              <>
-                <Spinner variant="ring" /> Processing...
-              </>
-            ) : (
-              <>
-                <CheckCheck /> Confirm Promotion
-              </>
-            )}
-          </Button>
-          <Button variant="destructive" disabled={isPending}>
-            <Trash2 /> Discard Promotion
-          </Button>
-        </div>
-      </div>
-    </section>
+      </section>
+    </div>
   );
 }
