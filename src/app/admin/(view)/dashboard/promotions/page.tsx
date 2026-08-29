@@ -14,6 +14,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { PencilLineIcon, Trash2Icon } from "lucide-react";
 import DeletePromotionButton from "./delete-promotion-button";
+
+export const dynamic = "force-dynamic";
+
 export default async function Page() {
   const promotions: {
     message: string;
