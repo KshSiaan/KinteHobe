@@ -3,10 +3,11 @@ import { auth } from "@/lib/auth";
 import { CreateResponse } from "@/lib/backend/message";
 import { db } from "@/lib/db";
 import { createSupabaseStorageClient } from "@/lib/storage/supabase";
+import { eq } from "drizzle-orm";
 
 export async function GET() {
     try {
-        const categories = await db.select().from(category);
+        const categories = await db.select().from(category).where(eq(category.isActive, true)).orderBy(category.name);
         const sb = createSupabaseStorageClient();
         const data = categories.map((cat) => ({
             id: cat.id,

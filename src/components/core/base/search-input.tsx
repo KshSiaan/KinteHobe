@@ -13,6 +13,9 @@ import {
 import { useDebounce } from "react-haiku";
 import { useQuery } from "@tanstack/react-query";
 import { howl } from "@/lib/utils";
+import Image from "next/image";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 export default function SearchInput() {
   const [open, setOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -41,10 +44,42 @@ export default function SearchInput() {
     };
   }, []);
 
-  const { data, isPending } = useQuery({
+  const { data } = useQuery({
     queryKey: ["search", debouncedSearchQuery],
     enabled: !!debouncedSearchQuery,
-    queryFn: async () => {
+    queryFn: async (): Promise<{
+      message: string;
+      ok: boolean;
+      q: string;
+      data: Array<{
+        id: string;
+        groupId: string;
+        code: any;
+        sku: string;
+        price: string;
+        compareAtPrice: string;
+        stockQuantity: number;
+        weight: string;
+        details: string;
+        metadata: Array<{
+          id: string;
+          name: string;
+          description: string;
+        }>;
+        position: number;
+        kind: string;
+        enabled: boolean;
+        title: string;
+        optionName: any;
+        images: Array<string>;
+        createdAt: string;
+        bodySearch: string;
+        updatedAt: string;
+        rank: number;
+        publicImages: Array<string>;
+        lol: string;
+      }>;
+    }> => {
       return howl(`/api/client/search?q=${debouncedSearchQuery}`);
     },
   });
@@ -130,20 +165,23 @@ export default function SearchInput() {
             "
           >
             <div className="p-5">
-              <p className="mb-4 text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                Quick Search
-              </p>
+              <div className="flex justify-between items-center mb-4">
+                <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                  Quick Search
+                </p>
+                <Button
+                  variant="link"
+                  size="sm"
+                  className="text-xs text-muted-foreground"
+                >
+                  <Link href="/search">Explore More</Link>
+                </Button>
+              </div>
 
               <div className="space-y-2">
-                {[
-                  "Macbook Pro M4",
-                  "Gaming Mouse",
-                  "Wireless Earbuds",
-                  "Ask AI for recommendations",
-                  "Find people with similar interests",
-                ].map((item, i) => (
+                {data?.data?.map((item, i) => (
                   <motion.button
-                    key={item}
+                    key={item.id}
                     initial={{
                       opacity: 0,
                       x: -10,
@@ -169,8 +207,21 @@ export default function SearchInput() {
                       hover:bg-accent
                     "
                   >
-                    <SearchIcon className="h-4 w-4 text-muted-foreground" />
-                    {item}
+                    {item.publicImages?.[0] && (
+                      <Image
+                        src={item?.publicImages[0] || "/images/placeholder.png"}
+                        alt={item.title}
+                        className="size-12 rounded-md object-cover"
+                        height={48}
+                        width={48}
+                      />
+                    )}
+                    <div className="">
+                      <h4>{item.title}</h4>
+                      <p className="text-xs text-muted-foreground line-clamp-1">
+                        {item.details}
+                      </p>
+                    </div>
                   </motion.button>
                 ))}
               </div>

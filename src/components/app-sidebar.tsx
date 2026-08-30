@@ -71,10 +71,10 @@ const data = {
           title: "Product Categories",
           url: "/categories",
         },
-        {
-          title: "Coupons & Discounts",
-          url: "/coupons",
-        },
+        // {
+        //   title: "Coupons & Discounts",
+        //   url: "/coupons",
+        // },
       ],
     },
     {

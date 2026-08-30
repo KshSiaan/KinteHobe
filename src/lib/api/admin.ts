@@ -1,7 +1,5 @@
 "use client"
 
-import { CreateResponseType } from "../backend/message";
-
 export type CreateCategoryPayload = FormData;
 
 type CreateCategoryResponse = {
@@ -32,6 +30,38 @@ export async function createCategory(values: CreateCategoryPayload) {
     }
 
     return (await response.json()) as CreateCategoryResponse;
+}
+
+export type UpdateCategoryPayload = FormData;
+
+type UpdateCategoryResponse = {
+    message?: string;
+};
+
+export async function updateCategory(categoryId: string, values: UpdateCategoryPayload) {
+    const response = await fetch(`/api/admin/category/${categoryId}`, {
+        method: "PUT",
+        body: values,
+    });
+
+    const contentType = response.headers.get("content-type") ?? "";
+    const isJson = contentType.includes("application/json");
+
+    if (!response.ok) {
+        if (isJson) {
+            const data = (await response.json()) as { message?: string };
+            throw new Error(data.message ?? "Failed to update category");
+        }
+
+        const text = await response.text();
+        throw new Error(text || "Failed to update category");
+    }
+
+    if (!isJson) {
+        return { message: await response.text() } satisfies UpdateCategoryResponse;
+    }
+
+    return (await response.json()) as UpdateCategoryResponse;
 }
 
 export type DeleteCategoryPayload = {

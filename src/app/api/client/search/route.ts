@@ -1,7 +1,15 @@
 import { productVariant } from "@/db/schema";
 import { CreateResponse } from "@/lib/backend/message";
 import { db } from "@/lib/db";
+import { createSupabaseStorageClient } from "@/lib/storage/supabase";
 import { getTableColumns, sql } from "drizzle-orm";
+
+function toProductPublicUrl(path: string) {
+  return createSupabaseStorageClient()
+    .storage
+    .from("product")
+    .getPublicUrl(path).data.publicUrl;
+}
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -34,12 +42,17 @@ export async function GET(request: Request) {
     .orderBy(sql`rank DESC`)
     .limit(5);
 
+  const data = res.map((product) => ({
+    ...product,
+    publicImages: product.images.map(toProductPublicUrl),
+  }));
+
   return CreateResponse({
     status: 200,
     message: "Search results fetched successfully",
     additionalData: {
       q,
-      data: res,
+      data,
     },
   });
 }

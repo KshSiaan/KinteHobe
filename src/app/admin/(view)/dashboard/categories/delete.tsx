@@ -56,9 +56,9 @@ export default function Delete({ data }: { data: CategoryType[number] }) {
           size="sm"
           variant="ghost"
           title="Delete category"
-          className="h-8 w-8 p-0 text-red-600"
+          className=" text-red-600"
         >
-          <Trash2Icon className="h-4 w-4" />
+          <Trash2Icon />
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent>

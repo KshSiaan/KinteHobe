@@ -27,7 +27,7 @@ export default function Categories() {
         }[];
       }>
     > => {
-      const res = await fetch("/api/category");
+      const res = await fetch("/api/client/category");
       if (!res.ok) throw new Error("Failed to fetch categories");
       return res.json();
     },
