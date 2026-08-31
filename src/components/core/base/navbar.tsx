@@ -70,12 +70,15 @@ import React from "react";
 import { cn, howl } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import PromotionBanner from "../extra/promotion-banner";
+import { useIsMobile } from "@/hooks/use-mobile";
+import MobileSearch from "./mobile-search";
 
 export default function Navbar() {
   const { isPending, data } = authClient.useSession();
   const [aiSearch, setSearchType] = React.useState<boolean>(false);
   const path = usePathname();
   const router = useRouter();
+  const isMobile = useIsMobile();
 
   const { data: promotions, isPending: promotionsPending } = useQuery({
     queryKey: ["promotions"],
@@ -173,21 +176,25 @@ export default function Navbar() {
                 className="size-10"
               />
             </Link>
-            <SearchInput />
-            <div className="hidden md:flex items-center gap-2 h-8 border px-2 rounded-full ">
-              <Switch
-                size="sm"
-                id="ai-search"
-                checked={aiSearch}
-                onCheckedChange={setSearchType}
-              />
-              <Label
-                htmlFor="ai-search"
-                className="text-nowrap text-sm font-semibold text-muted-foreground"
-              >
-                AI Search
-              </Label>
-            </div>
+            {!isMobile && (
+              <>
+                <SearchInput />
+                <div className="hidden md:flex items-center gap-2 h-8 border px-2 rounded-full ">
+                  <Switch
+                    size="sm"
+                    id="ai-search"
+                    checked={aiSearch}
+                    onCheckedChange={setSearchType}
+                  />
+                  <Label
+                    htmlFor="ai-search"
+                    className="text-nowrap text-sm font-semibold text-muted-foreground"
+                  >
+                    AI Search
+                  </Label>
+                </div>
+              </>
+            )}
           </div>
           <div className="flex gap-2 md:gap-6 items-center">
             <div className="hidden md:block">
@@ -203,7 +210,7 @@ export default function Navbar() {
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
-            {path === "/" && (
+            {/* {path === "/" && (
               <div className="hidden md:block">
                 <Sheet>
                   <SheetTrigger asChild>
@@ -217,7 +224,10 @@ export default function Navbar() {
                   </SheetContent>
                 </Sheet>
               </div>
-            )}
+            )} */}
+            <Suspense fallback={<Skeleton className="size-8" />}>
+              <MobileSearch aiSearch={aiSearch} setSearchType={setSearchType} />
+            </Suspense>
             <Suspense fallback={<Skeleton className="size-8" />}>
               <Cart />
             </Suspense>
@@ -228,7 +238,11 @@ export default function Navbar() {
             ) : data?.user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant={"ghost"} className="gap-2" size={"lg"}>
+                  <Button
+                    variant={"ghost"}
+                    className="gap-2"
+                    size={isMobile ? "icon" : "lg"}
+                  >
                     <Avatar className="size-8">
                       <AvatarImage
                         src={
@@ -293,11 +307,11 @@ export default function Navbar() {
                 </Button>
               </SheetTrigger>
               <SheetContent side="right" className="w-70 overflow-y-auto p-4">
-                <SheetHeader>
+                <SheetHeader className="hidden">
                   <SheetTitle>Menu</SheetTitle>
                 </SheetHeader>
                 <div className="mt-4 flex flex-col gap-6">
-                  <InputGroup className="w-full border border-muted-foreground/20 bg-background">
+                  {/* <InputGroup className="w-full border border-muted-foreground/20 bg-background">
                     <InputGroupAddon>
                       <InputGroupButton>
                         <SearchIcon />
@@ -307,25 +321,8 @@ export default function Navbar() {
                       className="text-sm"
                       placeholder="Search…"
                     />
-                  </InputGroup>
-                  <div className="flex flex-col gap-1">
-                    <p className="text-xs font-semibold text-muted-foreground uppercase px-2 mb-1">
-                      Explore
-                    </p>
-                    <Button variant={"ghost"} className="justify-start" asChild>
-                      <Link href="/products?preference=best_selling">
-                        Best sellers
-                      </Link>
-                    </Button>
-                    <Button variant={"ghost"} className="justify-start" asChild>
-                      <Link href="/products?preference=trending">Trending</Link>
-                    </Button>
-                    <Button variant={"ghost"} className="justify-start" asChild>
-                      <Link href="/products?preference=most_favorites">
-                        Most favourites
-                      </Link>
-                    </Button>
-                  </div>
+                  </InputGroup> */}
+
                   {!isPending && !data?.user && (
                     <div className="flex flex-col gap-2">
                       <Button variant={"outline"} asChild>
@@ -375,6 +372,24 @@ export default function Navbar() {
                       </Button>
                     </div>
                   )}
+                  <div className="flex flex-col gap-1">
+                    <p className="text-xs font-semibold text-muted-foreground uppercase px-2 mb-1">
+                      Explore
+                    </p>
+                    <Button variant={"ghost"} className="justify-start" asChild>
+                      <Link href="/products?preference=best_selling">
+                        Best sellers
+                      </Link>
+                    </Button>
+                    <Button variant={"ghost"} className="justify-start" asChild>
+                      <Link href="/products?preference=trending">Trending</Link>
+                    </Button>
+                    <Button variant={"ghost"} className="justify-start" asChild>
+                      <Link href="/products?preference=most_favorites">
+                        Most favourites
+                      </Link>
+                    </Button>
+                  </div>
                   <div>
                     <p className="text-xs font-semibold text-muted-foreground uppercase px-2 mb-1">
                       Language

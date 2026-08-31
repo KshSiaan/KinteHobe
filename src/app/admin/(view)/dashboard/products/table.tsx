@@ -7,7 +7,7 @@ import { Eye, Trash2Icon } from "lucide-react";
 import React from "react";
 import { products } from "./products-data";
 export default function ProductTable() {
-  return products.map((product) => (
+  return products?.map((product) => (
     <TableRow key={product.id}>
       <TableCell className="font-mono text-sm">{product.id}</TableCell>
       <TableCell className="font-mono text-sm">

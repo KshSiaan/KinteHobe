@@ -94,7 +94,7 @@ export default function DailyDiscover() {
         className="p-0! flex flex-col transition-transform relative rounded-none shadow-none border-dashed overflow-visible"
       >
         <CardHeader className="w-full aspect-video rounded-none relative">
-          {base?.compareAtPrice && (
+          {base?.compareAtPrice && base?.price !== base?.compareAtPrice && (
             <Badge
               className="absolute z-20 top-2 left-2 bg-background/40 text-primary backdrop-blur-sm border border-primary/20 py-3!"
               variant={"outline"}

@@ -91,7 +91,7 @@ export default function SearchInput() {
   });
 
   const { data: dailyDiscoverData } = useQuery({
-    queryKey: ["dailyDiscover"],
+    queryKey: ["dailyDiscover", 4],
     queryFn: async (): Promise<
       CreateResponseType<{
         data: {
@@ -145,7 +145,7 @@ export default function SearchInput() {
         }[];
       }>
     > => {
-      const res = await fetch("/api/product?limit=6");
+      const res = await fetch("/api/product?limit=4");
       const data = await res.json();
       return data;
     },
@@ -181,7 +181,7 @@ export default function SearchInput() {
   return (
     <div
       ref={containerRef}
-      className="relative hidden w-[30dvw] md:flex gap-2 "
+      className="relative w-full md:w-[30dvw] md:flex gap-2 "
     >
       <InputGroup
         className={`
@@ -245,7 +245,7 @@ export default function SearchInput() {
               left-0
               top-full
               z-10
-              w-[40dvw]
+              md:w-[40dvw]
               overflow-hidden
               rounded-b-2xl
               rounded-tr-2xl
@@ -338,20 +338,20 @@ export default function SearchInput() {
 
                 {!isEnabled &&
                   dailyDiscoverData?.data?.map((item, i) => (
-                    <motion.button
-                      key={item.id}
-                      initial={{
-                        opacity: 0,
-                        x: -10,
-                      }}
-                      animate={{
-                        opacity: 1,
-                        x: 0,
-                      }}
-                      transition={{
-                        delay: i * 0.05,
-                      }}
-                      className="
+                    <Link href={`/product/${item.slug}`} key={item.id}>
+                      <motion.button
+                        initial={{
+                          opacity: 0,
+                          x: -10,
+                        }}
+                        animate={{
+                          opacity: 1,
+                          x: 0,
+                        }}
+                        transition={{
+                          delay: i * 0.05,
+                        }}
+                        className="
                       flex
                       w-full
                       items-center
@@ -364,26 +364,27 @@ export default function SearchInput() {
                       transition-colors
                       hover:bg-accent
                     "
-                    >
-                      {item.variants[0].publicImages && (
-                        <Image
-                          src={
-                            item?.variants[0].publicImages[0] ||
-                            "/images/placeholder.png"
-                          }
-                          alt={item.title}
-                          className="size-12 rounded-md object-cover"
-                          height={48}
-                          width={48}
-                        />
-                      )}
-                      <div className="">
-                        <h4>{item.title}</h4>
-                        <p className="text-xs text-muted-foreground line-clamp-1">
-                          {item.variants[0].details}
-                        </p>
-                      </div>
-                    </motion.button>
+                      >
+                        {item.variants[0].publicImages && (
+                          <Image
+                            src={
+                              item?.variants[0].publicImages[0] ||
+                              "/images/placeholder.png"
+                            }
+                            alt={item.title}
+                            className="size-12 rounded-md object-cover"
+                            height={48}
+                            width={48}
+                          />
+                        )}
+                        <div className="">
+                          <h4>{item.variants[0].title}</h4>
+                          <p className="text-xs text-muted-foreground line-clamp-1">
+                            {item.variants[0].details}
+                          </p>
+                        </div>
+                      </motion.button>
+                    </Link>
                   ))}
                 {isEnabled && isSearchPending && (
                   <div className="flex justify-center items-center p-4">

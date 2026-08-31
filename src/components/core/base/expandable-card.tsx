@@ -181,9 +181,9 @@ export function ExpandableScreenContent({
             {showCloseButton && (
               <motion.button
                 onClick={collapse}
-                className={`absolute right-6 top-6 z-30 flex h-10 w-10 items-center justify-center transition-colors rounded-full ${
+                className={`absolute border right-2 top-2 z-30 flex h-10 w-10 items-center justify-center transition-colors rounded-full ${
                   closeButtonClassName ||
-                  "text-primary-foreground bg-transparent hover:bg-primary-foreground/10"
+                  "text-primary bg-background hover:bg-primary-foreground/10"
                 }`}
                 aria-label="Close"
               >

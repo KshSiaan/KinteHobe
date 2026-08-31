@@ -487,7 +487,7 @@ export default function Page() {
         </CardContent>
       </Card>
       <Card key={resetVersion}>
-        <CardContent className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+        <CardContent className="flex flex-row gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div className="w-full overflow-x-auto">
             <Tabs value={showVariant} onValueChange={setShowVariant}>
               <TabsList className="inline-flex h-auto min-w-max flex-wrap gap-1">
@@ -530,7 +530,7 @@ export default function Page() {
             </Tabs>
           </div>
 
-          <div className="flex w-full flex-col gap-2 sm:flex-row sm:flex-wrap sm:justify-end lg:w-auto">
+          <div className="flex w-full flex-col gap-2 sm:flex-row! sm:flex-wrap sm:justify-end ">
             {/* Dialog */}
             <div className="flex flex-wrap items-center gap-2">
               <Dialog>
@@ -569,33 +569,33 @@ export default function Page() {
                   </DialogFooter>
                 </DialogContent>
               </Dialog>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button>
-                    <PlusIcon />
-                    Add Defined variant
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent>
-                  <DropdownMenuCheckboxItem
-                    checked={colorVariantActive}
-                    onCheckedChange={(checked) =>
-                      setColorVariantActive(checked === true)
-                    }
-                  >
-                    Color Variant
-                  </DropdownMenuCheckboxItem>
-                  <DropdownMenuCheckboxItem
-                    checked={sizeVariantActive}
-                    onCheckedChange={(checked) =>
-                      setSizeVariantActive(checked === true)
-                    }
-                  >
-                    Size Variant
-                  </DropdownMenuCheckboxItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
             </div>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button>
+                  <PlusIcon />
+                  Add Defined variant
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuCheckboxItem
+                  checked={colorVariantActive}
+                  onCheckedChange={(checked) =>
+                    setColorVariantActive(checked === true)
+                  }
+                >
+                  Color Variant
+                </DropdownMenuCheckboxItem>
+                <DropdownMenuCheckboxItem
+                  checked={sizeVariantActive}
+                  onCheckedChange={(checked) =>
+                    setSizeVariantActive(checked === true)
+                  }
+                >
+                  Size Variant
+                </DropdownMenuCheckboxItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
             {/* Dropdown */}
           </div>
         </CardContent>

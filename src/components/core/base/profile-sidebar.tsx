@@ -1,11 +1,6 @@
 "use client";
 
-import {
-  UserCircle,
-  Package2,
-  Settings,
-  BellIcon,
-} from "lucide-react";
+import { UserCircle, Package2, Settings, BellIcon } from "lucide-react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { cn } from "@/lib/utils";

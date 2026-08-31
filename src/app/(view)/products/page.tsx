@@ -83,27 +83,8 @@ export default function Page() {
 
   return (
     <main className="py-4">
-      <section className="container mx-auto mb-6">
-        <h3 className="text-sm font-semibold">Related Links</h3>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <Button variant="link" asChild>
-            <Link href="/categories">Categories</Link>
-          </Button>
-          <Button variant="link" asChild>
-            <Link href="/categories">Categories</Link>
-          </Button>
-          <Button variant="link" asChild>
-            <Link href="/categories">Categories</Link>
-          </Button>
-          <Button variant="link" asChild>
-            <Link href="/categories">Categories</Link>
-          </Button>
-        </div>
-      </section>
-      <Separator className="my-6" />
-      <h1 className="text-2xl font-bold mb-4 container mx-auto">Products</h1>
       <div className="flex justify-between items-center container mx-auto mb-6">
-        <div className=""></div>
+        <h1 className="text-2xl font-bold my-4 container mx-auto">Products</h1>
         <div className="flex gap-4">
           <Select>
             <SelectTrigger className="min-w-[180px]">

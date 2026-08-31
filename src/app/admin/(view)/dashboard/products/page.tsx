@@ -133,7 +133,7 @@ export default function Page() {
             <CardTitle>Lowest Product in stock</CardTitle>
           </CardHeader>
           <CardContent className="flex-1 grid grid-cols-2 sm:grid-cols-3 gap-4">
-            {data?.lowestInStock.map((product) => (
+            {data?.lowestInStock?.map((product) => (
               <Card key={product.id} className="pt-0">
                 <CardHeader
                   className="flex-1 w-full bg-muted bg-cover bg-center bg-no-repeat h-full"
@@ -154,7 +154,7 @@ export default function Page() {
               <CardTitle>Total in stock (including variants)</CardTitle>
             </CardHeader>
             <CardContent className="text-3xl font-bold">
-              {data?.stats.totalInStock.toLocaleString()}
+              {data?.stats?.totalInStock?.toLocaleString()}
             </CardContent>
           </Card>
           <Card className="">
@@ -162,7 +162,7 @@ export default function Page() {
               <CardTitle>Total out of stock</CardTitle>
             </CardHeader>
             <CardContent className="text-3xl font-bold">
-              {data?.stats.totalOutOfStock.toLocaleString()}
+              {data?.stats?.totalOutOfStock?.toLocaleString()}
             </CardContent>
           </Card>
         </div>
@@ -172,7 +172,7 @@ export default function Page() {
               <CardTitle>Average Pricing</CardTitle>
             </CardHeader>
             <CardContent className="text-3xl font-bold">
-              ${data?.stats.averagePrice.toFixed(2)}
+              ${data?.stats?.averagePrice?.toFixed(2)}
             </CardContent>
           </Card>
           <Card className="">
@@ -180,7 +180,7 @@ export default function Page() {
               <CardTitle>Last Updated</CardTitle>
             </CardHeader>
             <CardContent className="text-3xl font-bold">
-              {data?.stats.lastUpdated
+              {data?.stats?.lastUpdated
                 ? (() => {
                     const days = Math.floor(
                       (new Date().getTime() -
@@ -237,7 +237,7 @@ export default function Page() {
             </TableHeader>
             <TableBody>
               {/* <ProductTable /> */}
-              {data?.data.map((product) => {
+              {data?.data?.map((product) => {
                 const base = product.variants.find((x) => x.kind === "base");
                 return (
                   <TableRow key={product.id}>

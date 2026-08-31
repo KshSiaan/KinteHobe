@@ -16,7 +16,11 @@ function toCategoryPublicUrl(path: string | null | undefined) {
     .publicUrl;
 }
 
-export async function GET() {
+export async function GET(req: Request) {
+
+  const url = new URL(req.url);
+  const searchParams = url.searchParams;
+  const limit = searchParams.get("limit") ? parseInt(searchParams.get("limit") as string) : 60;
   try {
     const rows = await db
       .select({
@@ -27,6 +31,7 @@ export async function GET() {
       .from(product)
       .leftJoin(category, eq(product.categoryId, category.id))
       .leftJoin(productVariant, eq(product.id, productVariant.groupId))
+      .limit(limit)
       .orderBy(desc(product.createdAt), desc(productVariant.position));
 
     const productMap = new Map<
