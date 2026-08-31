@@ -136,7 +136,7 @@ export async function PUT(
     });
 
     if (!parsed.success) {
-        const { fieldErrors: issues } = z.flattenErrors(parsed.error);
+const { fieldErrors: issues } = z.flattenError(parsed.error);
         return Response.json(
             {
                 message: "Validation failed",
