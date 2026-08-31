@@ -22,6 +22,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import Image from "next/image";
 
 export default function MobileSearch({
   aiSearch,
@@ -38,10 +39,18 @@ export default function MobileSearch({
         </Button>
       </SheetTrigger>
       <SheetContent side="top">
-        <SheetHeader className="hidden">
-          <SheetTitle>Search</SheetTitle>
+        <SheetHeader className="p-4">
+          <SheetTitle>
+            <Image
+              src={"/img/icon.svg"}
+              height={124}
+              width={124}
+              alt="icon"
+              className="size-10"
+            />
+          </SheetTitle>
         </SheetHeader>
-        <div className="flex items-center gap-2 mt-10">
+        <div className="flex items-center gap-2">
           <InputGroup className="bg-background has-[[data-slot=input-group-control]:focus-visible]:border-0 ring-0!">
             <InputGroupInput placeholder="Search Here.." />
             <InputGroupAddon align="block-end">
@@ -60,7 +69,7 @@ export default function MobileSearch({
             </InputGroupAddon>
           </InputGroup>
         </div>
-        <div className="h-[50dvh]"></div>
+        <div className="h-[50dvh] border-t"></div>
       </SheetContent>
     </Sheet>
   );
