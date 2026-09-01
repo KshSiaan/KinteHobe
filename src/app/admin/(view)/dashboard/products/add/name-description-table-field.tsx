@@ -120,58 +120,58 @@ export function NameDescriptionTableField({
       </div>
 
       <div className="overflow-x-auto">
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead className="w-1/3">Name</TableHead>
-            <TableHead>Description</TableHead>
-            <TableHead className="w-18 text-right">Action</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {value.length === 0 ? (
+        <Table>
+          <TableHeader>
             <TableRow>
-              <TableCell className="text-muted-foreground" colSpan={3}>
-                No rows added yet.
-              </TableCell>
+              <TableHead className="w-1/3">Name</TableHead>
+              <TableHead>Description</TableHead>
+              <TableHead className="w-18 text-right">Action</TableHead>
             </TableRow>
-          ) : (
-            value.map((row) => (
-              <TableRow key={row.id}>
-                <TableCell>
-                  <Input
-                    placeholder={namePlaceholder}
-                    value={row.name}
-                    onChange={(event) =>
-                      updateRow(row.id, "name", event.target.value)
-                    }
-                  />
-                </TableCell>
-                <TableCell>
-                  <Input
-                    placeholder={descriptionPlaceholder}
-                    value={row.description}
-                    onChange={(event) =>
-                      updateRow(row.id, "description", event.target.value)
-                    }
-                  />
-                </TableCell>
-                <TableCell className="text-right">
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    className="size-8"
-                    onClick={() => removeRow(row.id)}
-                  >
-                    <Trash2Icon />
-                  </Button>
+          </TableHeader>
+          <TableBody>
+            {value.length === 0 ? (
+              <TableRow>
+                <TableCell className="text-muted-foreground" colSpan={3}>
+                  No rows added yet.
                 </TableCell>
               </TableRow>
-            ))
-          )}
-        </TableBody>
-      </Table>
+            ) : (
+              value.map((row) => (
+                <TableRow key={row.id}>
+                  <TableCell>
+                    <Input
+                      placeholder={namePlaceholder}
+                      value={row.name}
+                      onChange={(event) =>
+                        updateRow(row.id, "name", event.target.value)
+                      }
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <Input
+                      placeholder={descriptionPlaceholder}
+                      value={row.description}
+                      onChange={(event) =>
+                        updateRow(row.id, "description", event.target.value)
+                      }
+                    />
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="size-8"
+                      onClick={() => removeRow(row.id)}
+                    >
+                      <Trash2Icon />
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
+          </TableBody>
+        </Table>
       </div>
     </div>
   );

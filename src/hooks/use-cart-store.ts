@@ -145,7 +145,10 @@ export const useCartStore = create<CartStoreState>()(
             (item) => item.id === nextItem.id,
           );
 
-          const maxQuantity = Math.max(1, nextItem.selection.stockQuantity || 1);
+          const maxQuantity = Math.max(
+            1,
+            nextItem.selection.stockQuantity || 1,
+          );
 
           if (existingIndex === -1) {
             const quantity = Math.min(nextItem.quantity, maxQuantity);

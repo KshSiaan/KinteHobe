@@ -30,7 +30,12 @@ import { NameDescriptionTableField } from "./name-description-table-field";
 
 import { Textarea } from "@/components/ui/textarea";
 
-import { BrainCircuitIcon, Loader2Icon, UploadCloudIcon, XIcon } from "lucide-react";
+import {
+  BrainCircuitIcon,
+  Loader2Icon,
+  UploadCloudIcon,
+  XIcon,
+} from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
 async function generateDatasetFromImages(images: File[]) {
@@ -202,9 +207,11 @@ export default function Base({ onChange, initialDraftValues }: BaseProps) {
                   try {
                     const result = await generateDatasetFromImages(bannerFiles);
                     if (result.title) setField("title", result.title);
-                    if (result.description) setField("description", result.description);
+                    if (result.description)
+                      setField("description", result.description);
                     if (result.weight) setField("weight", result.weight);
-                    if (result.metadataRows?.length) setField("metadataRows", result.metadataRows);
+                    if (result.metadataRows?.length)
+                      setField("metadataRows", result.metadataRows);
                   } catch {
                     // silently fail — user can retry
                   } finally {

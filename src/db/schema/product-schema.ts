@@ -16,7 +16,6 @@ import {
 import { category } from "./category-schema";
 import type { MetadataTableRow } from "@/lib/validations/metadata-table";
 
-
 export const productStatusEnum = pgEnum("product_status", [
   "active",
   "draft",
@@ -125,10 +124,7 @@ export const productVariant = pgTable(
   },
   (table) => [
     index("product_variant_group_idx").on(table.groupId),
-    index("product_variant_body_search_idx").using(
-      "gin",
-      table.bodySearch,
-    ),
+    index("product_variant_body_search_idx").using("gin", table.bodySearch),
   ],
 );
 

@@ -1,11 +1,5 @@
 import { relations } from "drizzle-orm";
-import {
-  index,
-  pgTable,
-  text,
-  timestamp,
-  unique,
-} from "drizzle-orm/pg-core";
+import { index, pgTable, text, timestamp, unique } from "drizzle-orm/pg-core";
 import type { AnyPgColumn } from "drizzle-orm/pg-core";
 
 import { activity } from "./activity-schema";
@@ -40,17 +34,14 @@ export const activityRead = pgTable(
   ],
 );
 
-export const activityReadRelations = relations(
-  activityRead,
-  ({ one }) => ({
-    activity: one(activity, {
-      fields: [activityRead.activityId],
-      references: [activity.id],
-    }),
-
-    user: one(user, {
-      fields: [activityRead.userId],
-      references: [user.id],
-    }),
+export const activityReadRelations = relations(activityRead, ({ one }) => ({
+  activity: one(activity, {
+    fields: [activityRead.activityId],
+    references: [activity.id],
   }),
-);
+
+  user: one(user, {
+    fields: [activityRead.userId],
+    references: [user.id],
+  }),
+}));

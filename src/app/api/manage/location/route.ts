@@ -24,7 +24,8 @@ async function getSession() {
 
 export async function GET() {
   const session = await getSession();
-  if (!session?.user) return Response.json({ error: "Unauthorized" }, { status: 401 });
+  if (!session?.user)
+    return Response.json({ error: "Unauthorized" }, { status: 401 });
 
   const addresses = await db
     .select()
@@ -36,11 +37,13 @@ export async function GET() {
 
 export async function POST(request: Request) {
   const session = await getSession();
-  if (!session?.user) return Response.json({ error: "Unauthorized" }, { status: 401 });
+  if (!session?.user)
+    return Response.json({ error: "Unauthorized" }, { status: 401 });
 
   const body = await request.json();
   const parsed = locationSchema.safeParse(body);
-  if (!parsed.success) return Response.json({ error: parsed.error.flatten() }, { status: 400 });
+  if (!parsed.success)
+    return Response.json({ error: parsed.error.flatten() }, { status: 400 });
 
   const { is_default, ...fields } = parsed.data;
 
@@ -66,7 +69,8 @@ export async function POST(request: Request) {
 
 export async function PUT(request: Request) {
   const session = await getSession();
-  if (!session?.user) return Response.json({ error: "Unauthorized" }, { status: 401 });
+  if (!session?.user)
+    return Response.json({ error: "Unauthorized" }, { status: 401 });
 
   const { searchParams } = new URL(request.url);
   const id = searchParams.get("id");
@@ -74,17 +78,21 @@ export async function PUT(request: Request) {
 
   const body = await request.json();
   const parsed = locationSchema.safeParse(body);
-  if (!parsed.success) return Response.json({ error: parsed.error.flatten() }, { status: 400 });
+  if (!parsed.success)
+    return Response.json({ error: parsed.error.flatten() }, { status: 400 });
 
   const { is_default, ...fields } = parsed.data;
 
   const existing = await db
     .select()
     .from(userAddresses)
-    .where(and(eq(userAddresses.id, id), eq(userAddresses.userId, session.user.id)))
+    .where(
+      and(eq(userAddresses.id, id), eq(userAddresses.userId, session.user.id)),
+    )
     .limit(1);
 
-  if (!existing.length) return Response.json({ error: "Not found" }, { status: 404 });
+  if (!existing.length)
+    return Response.json({ error: "Not found" }, { status: 404 });
 
   if (is_default) {
     await db
@@ -96,7 +104,9 @@ export async function PUT(request: Request) {
   const [updated] = await db
     .update(userAddresses)
     .set({ ...fields, is_default: is_default ?? existing[0].is_default })
-    .where(and(eq(userAddresses.id, id), eq(userAddresses.userId, session.user.id)))
+    .where(
+      and(eq(userAddresses.id, id), eq(userAddresses.userId, session.user.id)),
+    )
     .returning();
 
   return Response.json({ data: updated });
@@ -104,7 +114,8 @@ export async function PUT(request: Request) {
 
 export async function DELETE(request: Request) {
   const session = await getSession();
-  if (!session?.user) return Response.json({ error: "Unauthorized" }, { status: 401 });
+  if (!session?.user)
+    return Response.json({ error: "Unauthorized" }, { status: 401 });
 
   const { searchParams } = new URL(request.url);
   const id = searchParams.get("id");
@@ -113,14 +124,19 @@ export async function DELETE(request: Request) {
   const existing = await db
     .select()
     .from(userAddresses)
-    .where(and(eq(userAddresses.id, id), eq(userAddresses.userId, session.user.id)))
+    .where(
+      and(eq(userAddresses.id, id), eq(userAddresses.userId, session.user.id)),
+    )
     .limit(1);
 
-  if (!existing.length) return Response.json({ error: "Not found" }, { status: 404 });
+  if (!existing.length)
+    return Response.json({ error: "Not found" }, { status: 404 });
 
   await db
     .delete(userAddresses)
-    .where(and(eq(userAddresses.id, id), eq(userAddresses.userId, session.user.id)));
+    .where(
+      and(eq(userAddresses.id, id), eq(userAddresses.userId, session.user.id)),
+    );
 
   return Response.json({ success: true });
 }

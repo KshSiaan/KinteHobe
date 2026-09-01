@@ -40,7 +40,7 @@ const ImageViewer_Motion = ({
             height={300}
             className={cn(
               "rounded-lg object-cover transition-opacity hover:opacity-90",
-              classNameThumbnailViewer
+              classNameThumbnailViewer,
             )}
           />
         </div>

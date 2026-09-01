@@ -26,7 +26,9 @@ export default function Page() {
       <InDev />
       {/* Header */}
       <div className="flex flex-col gap-2">
-        <h1 className="text-xl sm:text-3xl font-bold tracking-tight">Coupon Management</h1>
+        <h1 className="text-xl sm:text-3xl font-bold tracking-tight">
+          Coupon Management
+        </h1>
         <p className="text-muted-foreground">
           Create, manage, and track coupon codes for your products
         </p>

@@ -12,7 +12,9 @@ import { z } from "zod";
 type ProductVariantInsert = typeof productVariant.$inferInsert;
 
 function normalizeFileName(fileName: string) {
-  const value = fileName.replace(/\.[^.]+$/, "").replace(/[^a-zA-Z0-9_-]+/g, "-");
+  const value = fileName
+    .replace(/\.[^.]+$/, "")
+    .replace(/[^a-zA-Z0-9_-]+/g, "-");
   return value.length > 0 ? value : "file";
 }
 
@@ -37,10 +39,14 @@ async function uploadFiles(files: File[], folder: string) {
 
   for (const [index, file] of files.entries()) {
     const path = `${folder}/${Date.now()}_${index}_${normalizeFileName(file.name)}${getFileExtension(file.name)}`;
-    const { data, error } = await storage.upload(path, await file.arrayBuffer(), {
-      contentType: file.type || "application/octet-stream",
-      upsert: false,
-    });
+    const { data, error } = await storage.upload(
+      path,
+      await file.arrayBuffer(),
+      {
+        contentType: file.type || "application/octet-stream",
+        upsert: false,
+      },
+    );
 
     if (error || !data) {
       throw new Error(error?.message || `Failed to upload ${file.name}`);
@@ -77,7 +83,9 @@ function buildBaseVariant(
     sku: payload.base.sku ?? null,
     price: String(payload.base.price),
     compareAtPrice:
-      payload.base.compareAtPrice != null ? String(payload.base.compareAtPrice) : null,
+      payload.base.compareAtPrice != null
+        ? String(payload.base.compareAtPrice)
+        : null,
     stockQuantity: payload.base.stockQuantity,
     weight: payload.base.weight ?? null,
     details: payload.base.description,
@@ -88,14 +96,16 @@ function buildBaseVariant(
 }
 
 function toProductPublicUrl(path: string) {
-  return createSupabaseStorageClient().storage.from("product").getPublicUrl(path).data
-    .publicUrl;
+  return createSupabaseStorageClient()
+    .storage.from("product")
+    .getPublicUrl(path).data.publicUrl;
 }
 
 function toCategoryPublicUrl(path: string | null | undefined) {
   if (!path) return null;
-  return createSupabaseStorageClient().storage.from("category").getPublicUrl(path).data
-    .publicUrl;
+  return createSupabaseStorageClient()
+    .storage.from("category")
+    .getPublicUrl(path).data.publicUrl;
 }
 
 export async function GET() {
@@ -186,7 +196,9 @@ export async function GET() {
 
         productEntry.variants.push({
           ...variant,
-          publicImages: variant.images.map((imagePath) => toProductPublicUrl(imagePath)),
+          publicImages: variant.images.map((imagePath) =>
+            toProductPublicUrl(imagePath),
+          ),
         });
       }
     }
@@ -207,11 +219,27 @@ export async function GET() {
       {
         message: "Products fetched successfully",
         lowestInStock,
-        stats:{
-            totalInStock: Array.from(productMap.values()).flatMap((product) => product.variants).reduce((sum, variant) => sum + variant.stockQuantity, 0),
-            averagePrice: Array.from(productMap.values()).flatMap((product) => product.variants).reduce((sum, variant) => sum + parseFloat(variant.price), 0) / Array.from(productMap.values()).flatMap((product) => product.variants).length,
-            totalOutOfStock: Array.from(productMap.values()).flatMap((product) => product.variants).filter((variant) => variant.stockQuantity === 0).length,
-            lastUpdated: new Date(Math.max(...Array.from(productMap.values()).flatMap((product) => product.variants).map((variant) => variant.updatedAt.getTime()))).toISOString(),
+        stats: {
+          totalInStock: Array.from(productMap.values())
+            .flatMap((product) => product.variants)
+            .reduce((sum, variant) => sum + variant.stockQuantity, 0),
+          averagePrice:
+            Array.from(productMap.values())
+              .flatMap((product) => product.variants)
+              .reduce((sum, variant) => sum + parseFloat(variant.price), 0) /
+            Array.from(productMap.values()).flatMap(
+              (product) => product.variants,
+            ).length,
+          totalOutOfStock: Array.from(productMap.values())
+            .flatMap((product) => product.variants)
+            .filter((variant) => variant.stockQuantity === 0).length,
+          lastUpdated: new Date(
+            Math.max(
+              ...Array.from(productMap.values())
+                .flatMap((product) => product.variants)
+                .map((variant) => variant.updatedAt.getTime()),
+            ),
+          ).toISOString(),
         },
         data: Array.from(productMap.values()),
       },
@@ -220,7 +248,8 @@ export async function GET() {
   } catch (error) {
     return Response.json(
       {
-        message: error instanceof Error ? error.message : "Failed to fetch products",
+        message:
+          error instanceof Error ? error.message : "Failed to fetch products",
       },
       { status: 500 },
     );
@@ -232,7 +261,10 @@ export async function POST(request: Request) {
   const payloadRaw = formData.get("payload");
 
   if (typeof payloadRaw !== "string") {
-    return Response.json({ message: "Payload must be a string" }, { status: 400 });
+    return Response.json(
+      { message: "Payload must be a string" },
+      { status: 400 },
+    );
   }
 
   let payloadJson: unknown;
@@ -240,7 +272,10 @@ export async function POST(request: Request) {
   try {
     payloadJson = JSON.parse(payloadRaw) as unknown;
   } catch {
-    return Response.json({ message: "Payload must be valid JSON" }, { status: 400 });
+    return Response.json(
+      { message: "Payload must be valid JSON" },
+      { status: 400 },
+    );
   }
 
   const parsedPayload = productCreatePayloadSchema.safeParse(payloadJson);
@@ -256,38 +291,61 @@ export async function POST(request: Request) {
   }
 
   const payload = parsedPayload.data;
-  const baseFiles = getFilesFromFormData(formData.getAll("baseImages"), "baseImages");
+  const baseFiles = getFilesFromFormData(
+    formData.getAll("baseImages"),
+    "baseImages",
+  );
 
   const expectedColorImages = (payload.color?.dataset ?? []).reduce(
-    (count: number, variant: ProductCreatePayload["color"]["dataset"][number]) =>
-      count + (variant.images?.length ?? 0),
+    (
+      count: number,
+      variant: ProductCreatePayload["color"]["dataset"][number],
+    ) => count + (variant.images?.length ?? 0),
     0,
   );
 
   const expectedCustomImages = (payload.custom?.dataset ?? []).reduce(
-    (groupCount: number, group: ProductCreatePayload["custom"]["dataset"][number]) =>
-      groupCount + group.options.reduce((count, variant) => count + (variant.images?.length ?? 0), 0),
+    (
+      groupCount: number,
+      group: ProductCreatePayload["custom"]["dataset"][number],
+    ) =>
+      groupCount +
+      group.options.reduce(
+        (count, variant) => count + (variant.images?.length ?? 0),
+        0,
+      ),
     0,
   );
 
-  const colorFiles = expectedColorImages > 0
-    ? getFilesFromFormData(formData.getAll("colorImages"), "colorImages")
-    : [];
+  const colorFiles =
+    expectedColorImages > 0
+      ? getFilesFromFormData(formData.getAll("colorImages"), "colorImages")
+      : [];
 
-  const customFiles = expectedCustomImages > 0
-    ? getFilesFromFormData(formData.getAll("customImages"), "customImages")
-    : [];
+  const customFiles =
+    expectedCustomImages > 0
+      ? getFilesFromFormData(formData.getAll("customImages"), "customImages")
+      : [];
 
   if (payload.base.images.length !== baseFiles.length) {
-    return Response.json({ message: "Base image count mismatch" }, { status: 400 });
+    return Response.json(
+      { message: "Base image count mismatch" },
+      { status: 400 },
+    );
   }
 
   if (expectedColorImages !== colorFiles.length) {
-    return Response.json({ message: "Color image count mismatch" }, { status: 400 });
+    return Response.json(
+      { message: "Color image count mismatch" },
+      { status: 400 },
+    );
   }
 
   if (expectedCustomImages !== customFiles.length) {
-    return Response.json({ message: "Custom image count mismatch" }, { status: 400 });
+    return Response.json(
+      { message: "Custom image count mismatch" },
+      { status: 400 },
+    );
   }
 
   const uploadedPaths: string[] = [];
@@ -296,7 +354,10 @@ export async function POST(request: Request) {
     const productId = crypto.randomUUID();
     const variantIds: string[] = [];
 
-    const baseImagePaths = await uploadFiles(baseFiles, `product/${productId}/base`);
+    const baseImagePaths = await uploadFiles(
+      baseFiles,
+      `product/${productId}/base`,
+    );
     uploadedPaths.push(...baseImagePaths);
 
     let colorCursor = 0;
@@ -308,7 +369,10 @@ export async function POST(request: Request) {
 
     if (colorDataset.length > 0) {
       for (const variant of colorDataset) {
-        const filesForVariant = colorFiles.slice(colorCursor, colorCursor + (variant.images?.length ?? 0));
+        const filesForVariant = colorFiles.slice(
+          colorCursor,
+          colorCursor + (variant.images?.length ?? 0),
+        );
 
         if (filesForVariant.length !== (variant.images?.length ?? 0)) {
           throw new Error("Color image count mismatch");
@@ -316,7 +380,10 @@ export async function POST(request: Request) {
 
         colorCursor += variant.images.length;
 
-        const imagePaths = await uploadFiles(filesForVariant, `product/${productId}/color/${variant.id}`);
+        const imagePaths = await uploadFiles(
+          filesForVariant,
+          `product/${productId}/color/${variant.id}`,
+        );
         uploadedPaths.push(...imagePaths);
 
         const rowId = crypto.randomUUID();
@@ -332,7 +399,9 @@ export async function POST(request: Request) {
           sku: variant.sku ?? null,
           price: String(variant.price),
           compareAtPrice:
-            variant.compareAtPrice != null ? String(variant.compareAtPrice) : null,
+            variant.compareAtPrice != null
+              ? String(variant.compareAtPrice)
+              : null,
           stockQuantity: variant.stockQuantity,
           weight: null,
           details: variant.details ?? null,
@@ -345,30 +414,34 @@ export async function POST(request: Request) {
 
     const sizeDataset = payload.size?.dataset ?? [];
     const sizeEnabled = payload.size?.enabled ?? false;
-    const sizeRows: ProductVariantInsert[] = sizeDataset.map((variant, index) => {
-      const rowId = crypto.randomUUID();
-      variantIds.push(rowId);
+    const sizeRows: ProductVariantInsert[] = sizeDataset.map(
+      (variant, index) => {
+        const rowId = crypto.randomUUID();
+        variantIds.push(rowId);
 
-      return {
-        id: rowId,
-        groupId: productId,
-        kind: "size",
-        enabled: sizeEnabled,
-        title: variant.sizeName,
-        optionName: null,
-        code: variant.sizeCode ?? null,
-        sku: variant.sku ?? null,
-        price: String(variant.price),
-        compareAtPrice:
-          variant.compareAtPrice != null ? String(variant.compareAtPrice) : null,
-        stockQuantity: variant.stockQuantity,
-        weight: variant.weight ?? null,
-        details: variant.details ?? null,
-        metadata: variant.metadataRows,
-        images: [],
-        position: colorRows.length + index + 1,
-      };
-    });
+        return {
+          id: rowId,
+          groupId: productId,
+          kind: "size",
+          enabled: sizeEnabled,
+          title: variant.sizeName,
+          optionName: null,
+          code: variant.sizeCode ?? null,
+          sku: variant.sku ?? null,
+          price: String(variant.price),
+          compareAtPrice:
+            variant.compareAtPrice != null
+              ? String(variant.compareAtPrice)
+              : null,
+          stockQuantity: variant.stockQuantity,
+          weight: variant.weight ?? null,
+          details: variant.details ?? null,
+          metadata: variant.metadataRows,
+          images: [],
+          position: colorRows.length + index + 1,
+        };
+      },
+    );
 
     const customDataset = payload.custom?.dataset ?? [];
     const customEnabled = payload.custom?.enabled ?? false;
@@ -411,13 +484,16 @@ export async function POST(request: Request) {
           sku: variant.sku ?? null,
           price: String(variant.price),
           compareAtPrice:
-            variant.compareAtPrice != null ? String(variant.compareAtPrice) : null,
+            variant.compareAtPrice != null
+              ? String(variant.compareAtPrice)
+              : null,
           stockQuantity: variant.stockQuantity,
           weight: variant.weight ?? null,
           details: variant.details ?? null,
           metadata: variant.metadataRows,
           images: imagePaths,
-          position: colorRows.length + sizeRows.length + groupIndex + optionIndex + 1,
+          position:
+            colorRows.length + sizeRows.length + groupIndex + optionIndex + 1,
         });
       }
     }
@@ -441,12 +517,14 @@ export async function POST(request: Request) {
         throw new Error("Failed to create product");
       }
 
-      await tx.insert(productVariant).values([
-        buildBaseVariant(payload, productId, baseRowId, baseImagePaths),
-        ...colorRows,
-        ...sizeRows,
-        ...customRows,
-      ]);
+      await tx
+        .insert(productVariant)
+        .values([
+          buildBaseVariant(payload, productId, baseRowId, baseImagePaths),
+          ...colorRows,
+          ...sizeRows,
+          ...customRows,
+        ]);
 
       return [productRow] as const;
     });
@@ -463,11 +541,10 @@ export async function POST(request: Request) {
 
     return Response.json(
       {
-        message: error instanceof Error ? error.message : "Failed to create product",
+        message:
+          error instanceof Error ? error.message : "Failed to create product",
       },
       { status: 500 },
     );
   }
 }
-
-

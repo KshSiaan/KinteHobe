@@ -51,10 +51,7 @@ export async function POST(request: Request) {
       })
       .returning();
 
-    return Response.json(
-      { ok: true, data: created },
-      { status: 201 },
-    );
+    return Response.json({ ok: true, data: created }, { status: 201 });
   }
 
   // Previously rejected → allow the user to request again
@@ -67,10 +64,7 @@ export async function POST(request: Request) {
       .where(eq(followRelation.id, existing.id))
       .returning();
 
-    return Response.json(
-      { ok: true, data: updated },
-      { status: 200 },
-    );
+    return Response.json({ ok: true, data: updated }, { status: 200 });
   }
 
   // Already waiting for approval

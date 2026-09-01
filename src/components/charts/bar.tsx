@@ -76,7 +76,7 @@ function AnimatedBar({
       () => {
         setIsAnimated(true);
       },
-      index * staggerDelay * 1000
+      index * staggerDelay * 1000,
     );
     return () => clearTimeout(timeout);
   }, [index, staggerDelay]);

@@ -1,20 +1,21 @@
-import { createAuthClient } from "better-auth/react"
+import { createAuthClient } from "better-auth/react";
 import { adminClient, inferAdditionalFields } from "better-auth/client/plugins";
 import type { auth } from "./auth";
 import { ac, admin, manager, user } from "./auth/permissions";
 export const authClient = createAuthClient({
-    /** The base URL of the server (optional if you're using the same domain) */
-    
-    baseURL: process.env.NEXT_PUBLIC_BETTER_AUTH_URL ||"https://kintehobe.vercel.app",
-    plugins:[
-        adminClient({
-            ac,
-            roles: {
-                user,
-                admin,
-                manager,
-            },
-        }),
-        inferAdditionalFields<typeof auth>(),
-    ]
-})
+  /** The base URL of the server (optional if you're using the same domain) */
+
+  baseURL:
+    process.env.NEXT_PUBLIC_BETTER_AUTH_URL || "https://kintehobe.vercel.app",
+  plugins: [
+    adminClient({
+      ac,
+      roles: {
+        user,
+        admin,
+        manager,
+      },
+    }),
+    inferAdditionalFields<typeof auth>(),
+  ],
+});

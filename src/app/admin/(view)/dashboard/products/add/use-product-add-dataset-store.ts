@@ -59,13 +59,14 @@ type ProductAddDatasetState = {
   setBaseValues: (output: ProductBaseOutput) => void;
   setColorValues: (output: ProductColorVariantsOutput) => void;
   setSizeValues: (output: ProductSizeVariantsOutput) => void;
-  setCustomValues: (customKey: string, output: ProductCustomVariantsOutput) => void;
+  setCustomValues: (
+    customKey: string,
+    output: ProductCustomVariantsOutput,
+  ) => void;
   setColorVariantActive: (active: boolean) => void;
   setSizeVariantActive: (active: boolean) => void;
   setCustomVariantList: (
-    next:
-      | string[]
-      | ((previous: string[]) => string[]),
+    next: string[] | ((previous: string[]) => string[]),
   ) => void;
   setShowVariant: (tab: string) => void;
   resetDataset: () => void;
@@ -138,22 +139,24 @@ export const useProductAddDatasetStore = create<ProductAddDatasetState>()(
       setCustomVariantList: (next) =>
         set((previous) => ({
           customVariantList:
-            typeof next === "function" ? next(previous.customVariantList) : next,
+            typeof next === "function"
+              ? next(previous.customVariantList)
+              : next,
         })),
       setShowVariant: (tab) => set({ showVariant: tab }),
-        resetDataset: () =>
-          set((previous) => ({
-            baseValues: createInitialBaseValues(),
-            baseInputValues: createInitialBaseValues().draftValues,
-            colorValues: createInitialColorValues(),
-            sizeValues: createInitialSizeValues(),
-            customValues: {},
-            colorVariantActive: false,
-            sizeVariantActive: false,
-            customVariantList: [],
-            showVariant: "base",
-            resetVersion: previous.resetVersion + 1,
-          })),
+      resetDataset: () =>
+        set((previous) => ({
+          baseValues: createInitialBaseValues(),
+          baseInputValues: createInitialBaseValues().draftValues,
+          colorValues: createInitialColorValues(),
+          sizeValues: createInitialSizeValues(),
+          customValues: {},
+          colorVariantActive: false,
+          sizeVariantActive: false,
+          customVariantList: [],
+          showVariant: "base",
+          resetVersion: previous.resetVersion + 1,
+        })),
     }),
     {
       name: "product-add-dataset-store",

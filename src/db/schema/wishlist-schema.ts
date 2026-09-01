@@ -1,10 +1,4 @@
-import {
-  pgTable,
-  text,
-  timestamp,
-  index,
-  unique,
-} from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, index, unique } from "drizzle-orm/pg-core";
 import { product, user } from "../schema";
 
 export const wishlist = pgTable(
@@ -30,9 +24,6 @@ export const wishlist = pgTable(
     index("wishlist_productId_idx").on(table.productId),
     index("wishlist_userId_idx").on(table.userId),
 
-    unique("wishlist_user_product_unique").on(
-      table.userId,
-      table.productId
-    ),
-  ]
+    unique("wishlist_user_product_unique").on(table.userId, table.productId),
+  ],
 );

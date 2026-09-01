@@ -1,7 +1,13 @@
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { stripe } from "@/lib/stripe";
-import { activity, followRelation, order, orderItem, transaction } from "@/db/schema";
+import {
+  activity,
+  followRelation,
+  order,
+  orderItem,
+  transaction,
+} from "@/db/schema";
 import { eq } from "drizzle-orm";
 import type { CartLineItem } from "@/hooks/use-cart-store";
 import type { ShippingForm } from "@/app/(view)/checkout/types";
@@ -22,21 +28,25 @@ const shippingSchema = z.object({
 const bodySchema = z.object({
   shipping: shippingSchema,
   type: z.enum(["stripe", "cash"]),
-  items: z.array(z.object({
-    productId: z.string(),
-    productSlug: z.string(),
-    productTitle: z.string(),
-    quantity: z.number().int().positive(),
-    unitPrice: z.number().positive(),
-    lineTotal: z.number().positive(),
+  items: z
+    .array(
+      z.object({
+        productId: z.string(),
+        productSlug: z.string(),
+        productTitle: z.string(),
+        quantity: z.number().int().positive(),
+        unitPrice: z.number().positive(),
+        lineTotal: z.number().positive(),
 
-    selection: z.object({
-      variantId: z.string(),
-      title: z.string().optional().nullable(),
-      sku: z.string().optional().nullable(),
-      images: z.array(z.string()).default([]),
-    }),
-  })).min(1),
+        selection: z.object({
+          variantId: z.string(),
+          title: z.string().optional().nullable(),
+          sku: z.string().optional().nullable(),
+          images: z.array(z.string()).default([]),
+        }),
+      }),
+    )
+    .min(1),
 });
 
 function toCents(dollars: number) {
@@ -46,7 +56,6 @@ function toCents(dollars: number) {
 export async function POST(request: Request) {
   const session = await auth.api.getSession({ headers: request.headers });
 
-
   if (!session?.session.token) {
     return Response.json({ message: "Unauthorized" }, { status: 401 });
   }
@@ -55,7 +64,10 @@ export async function POST(request: Request) {
   const parsed = bodySchema.safeParse(raw);
   if (!parsed.success) {
     return Response.json(
-      { message: "Invalid request", issues: z.flattenError(parsed.error).fieldErrors },
+      {
+        message: "Invalid request",
+        issues: z.flattenError(parsed.error).fieldErrors,
+      },
       { status: 400 },
     );
   }
@@ -119,20 +131,21 @@ export async function POST(request: Request) {
     metadata: { orderId },
   });
 
-  const lineItems: import("stripe").Stripe.Checkout.SessionCreateParams.LineItem[] = [
-    ...items.map((item) => ({
-      price_data: {
-        currency: "usd",
-        unit_amount: toCents(item.unitPrice),
-        product_data: {
-          name: item.productTitle,
-          description: item.selection.title ?? undefined,
-          images: item.selection.images?.slice(0, 1) ?? [],
+  const lineItems: import("stripe").Stripe.Checkout.SessionCreateParams.LineItem[] =
+    [
+      ...items.map((item) => ({
+        price_data: {
+          currency: "usd",
+          unit_amount: toCents(item.unitPrice),
+          product_data: {
+            name: item.productTitle,
+            description: item.selection.title ?? undefined,
+            images: item.selection.images?.slice(0, 1) ?? [],
+          },
         },
-      },
-      quantity: item.quantity,
-    })),
-  ];
+        quantity: item.quantity,
+      })),
+    ];
 
   const stripeSession = await stripe.checkout.sessions.create({
     mode: "payment",

@@ -7,7 +7,6 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { CheckIcon, XIcon } from "lucide-react";
 import Link from "next/link";
 
-
 type PendingRequest = {
   id: string;
   status: string;
@@ -33,7 +32,13 @@ export default function Requests() {
   });
 
   const respond = useMutation({
-    mutationFn: async ({ id, action }: { id: string; action: "accept" | "reject" }) => {
+    mutationFn: async ({
+      id,
+      action,
+    }: {
+      id: string;
+      action: "accept" | "reject";
+    }) => {
       const res = await fetch(`/api/follow/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
@@ -58,7 +63,9 @@ export default function Requests() {
   }
 
   if (!data?.data?.length) {
-    return <p className="text-muted-foreground text-sm mt-4">No pending requests.</p>;
+    return (
+      <p className="text-muted-foreground text-sm mt-4">No pending requests.</p>
+    );
   }
 
   return (
@@ -77,7 +84,9 @@ export default function Requests() {
                 <Link href={"#"} className="hover:underline">
                   <h2 className="font-semibold">{follower.name}</h2>
                 </Link>
-                <p className="text-xs text-muted-foreground">{follower.email}</p>
+                <p className="text-xs text-muted-foreground">
+                  {follower.email}
+                </p>
               </div>
             </div>
             <div className="flex gap-2">

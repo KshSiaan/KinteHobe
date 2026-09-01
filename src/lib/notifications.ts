@@ -33,15 +33,15 @@ export async function createNotification(input: CreateNotificationInput) {
   return created;
 }
 
-export async function markNotificationRead(notificationId: string, userId: string) {
+export async function markNotificationRead(
+  notificationId: string,
+  userId: string,
+) {
   const [updated] = await db
     .update(notification)
     .set({ isRead: true, readAt: new Date() })
     .where(
-      and(
-        eq(notification.id, notificationId),
-        eq(notification.userId, userId),
-      ),
+      and(eq(notification.id, notificationId), eq(notification.userId, userId)),
     )
     .returning();
   return updated;

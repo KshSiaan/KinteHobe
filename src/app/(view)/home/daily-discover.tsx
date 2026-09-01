@@ -143,7 +143,7 @@ export default function DailyDiscover() {
               : ""}
           </p>
         </CardFooter>
-        <CardFooter className="grid grid-cols-2 gap-2 w-full pb-4">
+        <CardFooter className="grid grid-cols-2 gap-2 w-full pb-4 -mt-6">
           <div className="font-semibold text-muted-foreground">
             {product.variants
               .filter((v) => v.kind === "size")

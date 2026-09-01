@@ -18,7 +18,7 @@ interface AttachmentItemProps {
 const AttachmentItem = memo(({ attachment, onRemove }: AttachmentItemProps) => {
   const handleRemove = useCallback(
     () => onRemove(attachment.id),
-    [onRemove, attachment.id]
+    [onRemove, attachment.id],
   );
   return (
     <Attachment data={attachment} onRemove={handleRemove}>
@@ -33,7 +33,7 @@ export const AttachmentsDisplay = () => {
   const attachments = usePromptInputAttachments();
   const handleRemove = useCallback(
     (id: string) => attachments.remove(id),
-    [attachments]
+    [attachments],
   );
 
   if (attachments.files.length === 0) return null;

@@ -2,7 +2,11 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useCartStore, formatMoney, type CartLineItem } from "@/hooks/use-cart-store";
+import {
+  useCartStore,
+  formatMoney,
+  type CartLineItem,
+} from "@/hooks/use-cart-store";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -30,7 +34,8 @@ function EmptyCart() {
       <div className="text-center space-y-2 max-w-xs">
         <h2 className="text-xl font-semibold">Your cart is empty</h2>
         <p className="text-sm text-muted-foreground">
-          Looks like you haven't added anything yet. Browse our products to get started.
+          Looks like you haven't added anything yet. Browse our products to get
+          started.
         </p>
       </div>
       <Button asChild size="lg" className="gap-2">
@@ -92,10 +97,14 @@ function CartItemRow({ item }: { item: CartLineItem }) {
               {item.productTitle}
             </Link>
             {item.selection.title && (
-              <p className="text-xs text-muted-foreground mt-0.5">{item.selection.title}</p>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                {item.selection.title}
+              </p>
             )}
             {item.selection.sku && (
-              <p className="text-xs text-muted-foreground">SKU: {item.selection.sku}</p>
+              <p className="text-xs text-muted-foreground">
+                SKU: {item.selection.sku}
+              </p>
             )}
           </div>
           <Button
@@ -139,7 +148,9 @@ function CartItemRow({ item }: { item: CartLineItem }) {
 
           {/* Price */}
           <div className="text-right">
-            <p className="text-sm font-semibold tabular-nums">{formatMoney(item.lineTotal)}</p>
+            <p className="text-sm font-semibold tabular-nums">
+              {formatMoney(item.lineTotal)}
+            </p>
             {hasDiscount && (
               <p className="text-xs text-muted-foreground line-through tabular-nums">
                 {formatMoney((item.compareAtPrice as number) * item.quantity)}
@@ -182,7 +193,9 @@ function OrderSummaryPanel() {
         {/* Line items breakdown */}
         <div className="space-y-2 text-sm">
           <div className="flex justify-between text-muted-foreground">
-            <span>Subtotal ({itemCount} item{itemCount !== 1 ? "s" : ""})</span>
+            <span>
+              Subtotal ({itemCount} item{itemCount !== 1 ? "s" : ""})
+            </span>
             <span className="tabular-nums">{formatMoney(subtotal)}</span>
           </div>
           {hasSavings && (
@@ -191,12 +204,16 @@ function OrderSummaryPanel() {
                 <TagIcon className="size-3" />
                 Savings
               </span>
-              <span className="tabular-nums font-medium">−{formatMoney(savings)}</span>
+              <span className="tabular-nums font-medium">
+                −{formatMoney(savings)}
+              </span>
             </div>
           )}
           <div className="flex justify-between text-muted-foreground">
             <span>Shipping</span>
-            <span className="text-green-600 dark:text-green-400 font-medium">Free</span>
+            <span className="text-green-600 dark:text-green-400 font-medium">
+              Free
+            </span>
           </div>
         </div>
 

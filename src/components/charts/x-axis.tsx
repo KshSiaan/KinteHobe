@@ -135,7 +135,7 @@ export function XAxis({ numTicks = 5, tickerHalfWidth = 50 }: XAxisProps) {
         />
       ))}
     </div>,
-    container
+    container,
   );
 }
 

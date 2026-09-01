@@ -535,15 +535,29 @@ export default function CustomVariants({
                           onClick={async () => {
                             setGeneratingId(variant.id);
                             try {
-                              const result = await generateDatasetFromImages(variant.images);
+                              const result = await generateDatasetFromImages(
+                                variant.images,
+                              );
                               if (result.metadataRows?.length) {
-                                setVariantField(variant.id, "metadataRows", result.metadataRows);
+                                setVariantField(
+                                  variant.id,
+                                  "metadataRows",
+                                  result.metadataRows,
+                                );
                               }
                               if (result.description) {
-                                setVariantField(variant.id, "details", result.description);
+                                setVariantField(
+                                  variant.id,
+                                  "details",
+                                  result.description,
+                                );
                               }
                               if (result.weight) {
-                                setVariantField(variant.id, "weight", result.weight);
+                                setVariantField(
+                                  variant.id,
+                                  "weight",
+                                  result.weight,
+                                );
                               }
                             } catch {
                               // silently fail

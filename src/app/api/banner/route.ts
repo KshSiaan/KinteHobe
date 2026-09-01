@@ -18,9 +18,8 @@ export async function GET() {
 
     const file = files[0];
 
-    const publicUrl = storage.storage
-      .from("banners")
-      .getPublicUrl("hero").data.publicUrl;
+    const publicUrl = storage.storage.from("banners").getPublicUrl("hero")
+      .data.publicUrl;
 
     // 🧠 use updated_at as version for cache busting
     const version = file.updated_at || file.created_at;

@@ -225,9 +225,14 @@ export default function Navbar() {
                 </Sheet>
               </div>
             )} */}
-            <Suspense fallback={<Skeleton className="size-8" />}>
-              <MobileSearch aiSearch={aiSearch} setSearchType={setSearchType} />
-            </Suspense>
+            {isMobile && (
+              <Suspense fallback={<Skeleton className="size-8" />}>
+                <MobileSearch
+                  aiSearch={aiSearch}
+                  setSearchType={setSearchType}
+                />
+              </Suspense>
+            )}
             <Suspense fallback={<Skeleton className="size-8" />}>
               <Cart />
             </Suspense>
@@ -255,7 +260,7 @@ export default function Navbar() {
                         {data.user.name.slice(0, 2).toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
-                    <span className="hidden sm:inline text-sm">
+                    <span className="hidden md:inline text-sm">
                       {data.user.name}
                     </span>
                   </Button>
@@ -311,18 +316,6 @@ export default function Navbar() {
                   <SheetTitle>Menu</SheetTitle>
                 </SheetHeader>
                 <div className="mt-4 flex flex-col gap-6">
-                  {/* <InputGroup className="w-full border border-muted-foreground/20 bg-background">
-                    <InputGroupAddon>
-                      <InputGroupButton>
-                        <SearchIcon />
-                      </InputGroupButton>
-                    </InputGroupAddon>
-                    <InputGroupInput
-                      className="text-sm"
-                      placeholder="Search…"
-                    />
-                  </InputGroup> */}
-
                   {!isPending && !data?.user && (
                     <div className="flex flex-col gap-2">
                       <Button variant={"outline"} asChild>

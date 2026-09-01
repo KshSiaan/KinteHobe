@@ -1,71 +1,74 @@
-"use client"
+"use client";
 
 export type CreateCategoryPayload = FormData;
 
 type CreateCategoryResponse = {
-    message?: string;
+  message?: string;
 };
 
 export async function createCategory(values: CreateCategoryPayload) {
-    const response = await fetch("/api/admin/category", {
-        method: "POST",
-        body: values,
-    });
+  const response = await fetch("/api/admin/category", {
+    method: "POST",
+    body: values,
+  });
 
-    const contentType = response.headers.get("content-type") ?? "";
-    const isJson = contentType.includes("application/json");
+  const contentType = response.headers.get("content-type") ?? "";
+  const isJson = contentType.includes("application/json");
 
-    if (!response.ok) {
-        if (isJson) {
-            const data = (await response.json()) as { message?: string };
-            throw new Error(data.message ?? "Failed to create category");
-        }
-
-        const text = await response.text();
-        throw new Error(text || "Failed to create category");
+  if (!response.ok) {
+    if (isJson) {
+      const data = (await response.json()) as { message?: string };
+      throw new Error(data.message ?? "Failed to create category");
     }
 
-    if (!isJson) {
-        return { message: await response.text() } satisfies CreateCategoryResponse;
-    }
+    const text = await response.text();
+    throw new Error(text || "Failed to create category");
+  }
 
-    return (await response.json()) as CreateCategoryResponse;
+  if (!isJson) {
+    return { message: await response.text() } satisfies CreateCategoryResponse;
+  }
+
+  return (await response.json()) as CreateCategoryResponse;
 }
 
 export type UpdateCategoryPayload = FormData;
 
 type UpdateCategoryResponse = {
-    message?: string;
+  message?: string;
 };
 
-export async function updateCategory(categoryId: string, values: UpdateCategoryPayload) {
-    const response = await fetch(`/api/admin/category/${categoryId}`, {
-        method: "PUT",
-        body: values,
-    });
+export async function updateCategory(
+  categoryId: string,
+  values: UpdateCategoryPayload,
+) {
+  const response = await fetch(`/api/admin/category/${categoryId}`, {
+    method: "PUT",
+    body: values,
+  });
 
-    const contentType = response.headers.get("content-type") ?? "";
-    const isJson = contentType.includes("application/json");
+  const contentType = response.headers.get("content-type") ?? "";
+  const isJson = contentType.includes("application/json");
 
-    if (!response.ok) {
-        if (isJson) {
-            const data = (await response.json()) as { message?: string };
-            throw new Error(data.message ?? "Failed to update category");
-        }
-
-        const text = await response.text();
-        throw new Error(text || "Failed to update category");
+  if (!response.ok) {
+    if (isJson) {
+      const data = (await response.json()) as { message?: string };
+      throw new Error(data.message ?? "Failed to update category");
     }
 
-    if (!isJson) {
-        return { message: await response.text() } satisfies UpdateCategoryResponse;
-    }
+    const text = await response.text();
+    throw new Error(text || "Failed to update category");
+  }
 
-    return (await response.json()) as UpdateCategoryResponse;
+  if (!isJson) {
+    return { message: await response.text() } satisfies UpdateCategoryResponse;
+  }
+
+  return (await response.json()) as UpdateCategoryResponse;
 }
 
 export type DeleteCategoryPayload = {
-    id: string;
+  id: string;
 };
 
 // export async function deleteCategory({ id }: DeleteCategoryPayload) {

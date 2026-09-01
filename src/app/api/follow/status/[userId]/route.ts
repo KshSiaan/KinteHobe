@@ -1,4 +1,3 @@
-
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { followRelation } from "@/db/schema";
@@ -68,4 +67,3 @@ export async function GET(
     },
   });
 }
-

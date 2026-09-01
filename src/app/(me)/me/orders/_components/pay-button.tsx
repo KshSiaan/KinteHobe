@@ -32,12 +32,7 @@ export function PayButton({ orderId }: { orderId: string }) {
   };
 
   return (
-    <Button
-      size="sm"
-      onClick={handlePay}
-      disabled={loading}
-      className="gap-2"
-    >
+    <Button size="sm" onClick={handlePay} disabled={loading} className="gap-2">
       <CreditCardIcon className="size-3.5" />
       {loading ? "Redirecting..." : "Complete Payment"}
     </Button>

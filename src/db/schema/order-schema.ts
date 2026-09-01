@@ -31,7 +31,7 @@ export const transactionStatusEnum = pgEnum("transaction_status", [
 export const paymentMethodEnum = pgEnum("payment_method", [
   "stripe",
   "cash_on_delivery",
-  "online"
+  "online",
 ]);
 
 export const order = pgTable(
@@ -55,8 +55,8 @@ export const order = pgTable(
     shippingCents: integer("shipping_cents").notNull().default(0),
     totalCents: integer("total_cents").notNull(),
     paymentMethod: paymentMethodEnum("payment_method")
-    .notNull()
-    .default("stripe"),
+      .notNull()
+      .default("stripe"),
     stripeSessionId: text("stripe_session_id").unique(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at")

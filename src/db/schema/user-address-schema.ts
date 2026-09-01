@@ -1,10 +1,4 @@
-import {
-  pgTable,
-  text,
-  timestamp,
-  index,
-  boolean,
-} from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, index, boolean } from "drizzle-orm/pg-core";
 import { user } from "../schema";
 
 export const userAddresses = pgTable(
@@ -28,8 +22,5 @@ export const userAddresses = pgTable(
     is_default: boolean("is_default").default(false).notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
-  (table) => [
-    index("user_addresses_userId_idx").on(table.userId),
-  ]
+  (table) => [index("user_addresses_userId_idx").on(table.userId)],
 );
-

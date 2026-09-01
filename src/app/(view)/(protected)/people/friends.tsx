@@ -7,7 +7,6 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { UserMinusIcon } from "lucide-react";
 import Link from "next/link";
 
-
 type Friend = {
   requestId: string;
   person: {
@@ -38,9 +37,14 @@ export default function Friends() {
     onSuccess: (_, requestId) => {
       queryClient.invalidateQueries({ queryKey: ["friends"] });
       // also bust the status cache for that person
-      const friends = queryClient.getQueryData<{ ok: boolean; data: Friend[] }>(["friends"]);
+      const friends = queryClient.getQueryData<{ ok: boolean; data: Friend[] }>(
+        ["friends"],
+      );
       const target = friends?.data?.find((f) => f.requestId === requestId);
-      if (target) queryClient.invalidateQueries({ queryKey: ["follow-status", target.person.id] });
+      if (target)
+        queryClient.invalidateQueries({
+          queryKey: ["follow-status", target.person.id],
+        });
     },
   });
 
@@ -55,7 +59,11 @@ export default function Friends() {
   }
 
   if (!data?.data?.length) {
-    return <p className="text-muted-foreground text-sm mt-4">Not following anyone yet.</p>;
+    return (
+      <p className="text-muted-foreground text-sm mt-4">
+        Not following anyone yet.
+      </p>
+    );
   }
 
   return (

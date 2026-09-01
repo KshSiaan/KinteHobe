@@ -1,17 +1,17 @@
-import { debounce } from 'es-toolkit'
-import { useMemo } from 'react'
-import { useLatest } from '@/hooks/use-latest'
-import { useUnmount } from '@/hooks/use-unmount'
-import type { DebounceOptions } from 'es-toolkit'
+import { debounce } from "es-toolkit";
+import { useMemo } from "react";
+import { useLatest } from "@/hooks/use-latest";
+import { useUnmount } from "@/hooks/use-unmount";
+import type { DebounceOptions } from "es-toolkit";
 
-export type { DebounceOptions }
+export type { DebounceOptions };
 
 export function useDebounceFn<Fn extends (...args: any[]) => any>(
   fn: Fn,
   debounceMs?: number,
   options?: DebounceOptions,
 ) {
-  const fnRef = useLatest(fn)
+  const fnRef = useLatest(fn);
 
   const debouncedFn = useMemo(
     () =>
@@ -21,13 +21,13 @@ export function useDebounceFn<Fn extends (...args: any[]) => any>(
         options,
       ),
     [],
-  )
+  );
 
-  useUnmount(() => debouncedFn.cancel())
+  useUnmount(() => debouncedFn.cancel());
 
   return {
     run: debouncedFn,
     cancel: debouncedFn.cancel,
     flush: debouncedFn.flush,
-  }
+  };
 }

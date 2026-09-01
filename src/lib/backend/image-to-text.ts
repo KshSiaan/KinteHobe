@@ -5,24 +5,40 @@ import z from "zod";
 const productSchema = z.object({
   title: z.string().describe("The title of the product"),
   description: z.string().describe("The description of the product"),
-  weight: z.string().describe("The weight of the product guessed by the image. must be a number type in grams").optional(),
-  metadataRows: z.array(z.object({
-    id: z.string().describe("A random UUID string"),
-    name: z.string().describe("Attribute name, e.g. Material, Color, Care instructions"),
-    description: z.string().describe("Attribute value, e.g. 100% Cotton, Navy Blue, Machine wash cold"),
-  })).describe("In-depth product attributes as name/value pairs"),
+  weight: z
+    .string()
+    .describe(
+      "The weight of the product guessed by the image. must be a number type in grams",
+    )
+    .optional(),
+  metadataRows: z
+    .array(
+      z.object({
+        id: z.string().describe("A random UUID string"),
+        name: z
+          .string()
+          .describe("Attribute name, e.g. Material, Color, Care instructions"),
+        description: z
+          .string()
+          .describe(
+            "Attribute value, e.g. 100% Cotton, Navy Blue, Machine wash cold",
+          ),
+      }),
+    )
+    .describe("In-depth product attributes as name/value pairs"),
 });
 
 export async function ImageToText({ imageData }: { imageData: ArrayBuffer }) {
   const result = await generateText({
     model: openrouter("nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free"),
-    system: "You are a product catalog assistant. Analyze the product image and return structured e-commerce product data. Be specific and accurate.",
+    system:
+      "You are a product catalog assistant. Analyze the product image and return structured e-commerce product data. Be specific and accurate.",
     messages: [
       {
         role: "user",
         content: [
           {
-            type:"image",
+            type: "image",
             image: imageData,
           },
           {

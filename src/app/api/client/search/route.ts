@@ -6,8 +6,7 @@ import { getTableColumns, sql } from "drizzle-orm";
 
 function toProductPublicUrl(path: string) {
   return createSupabaseStorageClient()
-    .storage
-    .from("product")
+    .storage.from("product")
     .getPublicUrl(path).data.publicUrl;
 }
 

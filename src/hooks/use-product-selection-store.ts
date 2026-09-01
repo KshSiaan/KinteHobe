@@ -12,10 +12,12 @@ type ProductSelectionState = {
   resetSelection: () => void;
 };
 
-export const useProductSelectionStore = create<ProductSelectionState>((set) => ({
-  productId: null,
-  selectedVariantId: null,
-  setSelection: ({ productId, selectedVariantId }) =>
-    set({ productId, selectedVariantId }),
-  resetSelection: () => set({ productId: null, selectedVariantId: null }),
-}));
+export const useProductSelectionStore = create<ProductSelectionState>(
+  (set) => ({
+    productId: null,
+    selectedVariantId: null,
+    setSelection: ({ productId, selectedVariantId }) =>
+      set({ productId, selectedVariantId }),
+    resetSelection: () => set({ productId: null, selectedVariantId: null }),
+  }),
+);

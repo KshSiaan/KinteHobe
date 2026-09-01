@@ -4,11 +4,11 @@ import { redirect } from "next/navigation";
 import SupportClient from "./support-client";
 
 export default async function Page() {
-	const data = await auth.api.getSession({ headers: await headers() });
+  const data = await auth.api.getSession({ headers: await headers() });
 
-	if (!data?.user) {
-		redirect("/");
-	}
+  if (!data?.user) {
+    redirect("/");
+  }
 
-	return <SupportClient />;
+  return <SupportClient />;
 }

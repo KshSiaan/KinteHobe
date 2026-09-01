@@ -28,13 +28,9 @@ export const followRelation = pgTable(
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
 
-    status: followStatusEnum("status")
-      .default("pending")
-      .notNull(),
+    status: followStatusEnum("status").default("pending").notNull(),
 
-    createdAt: timestamp("created_at")
-      .defaultNow()
-      .notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
 
     updatedAt: timestamp("updated_at")
       .defaultNow()
@@ -43,34 +39,24 @@ export const followRelation = pgTable(
   },
   (table) => [
     // One relationship per direction.
-    unique("follow_relation_unique").on(
-      table.followerId,
-      table.followingId,
-    ),
+    unique("follow_relation_unique").on(table.followerId, table.followingId),
 
-    index("follow_relation_follower_idx").on(
-      table.followerId,
-    ),
+    index("follow_relation_follower_idx").on(table.followerId),
 
-    index("follow_relation_following_idx").on(
-      table.followingId,
-    ),
+    index("follow_relation_following_idx").on(table.followingId),
   ],
 );
 
-export const followRelationRelations = relations(
-  followRelation,
-  ({ one }) => ({
-    follower: one(user, {
-      fields: [followRelation.followerId],
-      references: [user.id],
-      relationName: "followRelationFollower",
-    }),
-
-    following: one(user, {
-      fields: [followRelation.followingId],
-      references: [user.id],
-      relationName: "followRelationFollowing",
-    }),
+export const followRelationRelations = relations(followRelation, ({ one }) => ({
+  follower: one(user, {
+    fields: [followRelation.followerId],
+    references: [user.id],
+    relationName: "followRelationFollower",
   }),
-);
+
+  following: one(user, {
+    fields: [followRelation.followingId],
+    references: [user.id],
+    relationName: "followRelationFollowing",
+  }),
+}));

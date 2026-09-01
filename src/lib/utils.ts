@@ -10,18 +10,20 @@ interface ApiClientOptions {
   body?: unknown;
   token?: string;
   headers?: Record<string, string>;
-  content?: string
+  content?: string;
 }
 
 export async function howl<T>(
   endpoint: string,
-  { method = "GET", body, token, content, headers = {} }: ApiClientOptions = {}
+  { method = "GET", body, token, content, headers = {} }: ApiClientOptions = {},
 ): Promise<T> {
   const res = await fetch(endpoint, {
     method,
     headers: {
-      "Accept": "application/json",
-      ...(content ? { "Content-Type": content } : { "Content-Type": "application/json" }),
+      Accept: "application/json",
+      ...(content
+        ? { "Content-Type": content }
+        : { "Content-Type": "application/json" }),
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...headers,
     },
@@ -30,7 +32,7 @@ export async function howl<T>(
   if (!res.ok) {
     const errorData = await res.json().catch(() => ({}));
     console.log(errorData);
-    
+
     throw new Error((errorData as any).message || "API request failed");
   }
   return res.json() as Promise<T>;

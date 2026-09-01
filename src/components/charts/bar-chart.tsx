@@ -168,7 +168,7 @@ function ChartInner({
       }
       return String(value ?? "");
     },
-    [xDataKey]
+    [xDataKey],
   );
 
   // For compatibility with ChartContext, provide a Date-based xAccessor
@@ -180,7 +180,7 @@ function ChartInner({
       }
       return new Date();
     },
-    [xDataKey]
+    [xDataKey],
   );
 
   // Category scale (band) - for the categorical axis
@@ -277,7 +277,7 @@ function ChartInner({
   // Pre-compute labels for ticker animation
   const dateLabels = useMemo(
     () => data.map((d) => categoryAccessor(d)),
-    [data, categoryAccessor]
+    [data, categoryAccessor],
   );
 
   // Create a fake time scale for compatibility with ChartContext
@@ -426,7 +426,7 @@ function ChartInner({
       isHorizontal,
       stacked,
       stackGap,
-    ]
+    ],
   );
 
   const handleMouseLeave = useCallback(() => {

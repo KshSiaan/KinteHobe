@@ -4,38 +4,41 @@ import { admin as AdminPlugin } from "better-auth/plugins/admin";
 import { db } from "./db"; // your drizzle instance
 import { ac, admin, manager, user } from "./auth/permissions";
 // import { SendVerificationEmail } from "./mail/send-verification-email";
-import { captcha } from "better-auth/plugins"; 
+import { captcha } from "better-auth/plugins";
 export const auth = betterAuth({
-    database: drizzleAdapter(db, {
-        provider: "pg",
+  database: drizzleAdapter(db, {
+    provider: "pg",
+  }),
+  secret: process.env.BETTER_AUTH_SECRET,
+  baseURL:
+    process.env.NEXT_PUBLIC_BETTER_AUTH_URL || "https://kintehobe.vercel.app",
+  trustedOrigins: ["https://kintehobe.vercel.app", "http://localhost:3000"],
+  emailAndPassword: {
+    enabled: true,
+    requireEmailVerification: false,
+  },
+  // emailVerification:{
+  //     sendOnSignUp:true,
+  //     sendVerificationEmail:async ({user,url})=>{
+  //         await SendVerificationEmail({
+  //             user,url
+  //         });
+  //     }
+  // },
+  plugins: [
+    AdminPlugin({
+      ac,
+      defaultRole: "user",
+      roles: {
+        user,
+        admin,
+        manager,
+      },
     }),
-    secret: process.env.BETTER_AUTH_SECRET,
-    baseURL: process.env.NEXT_PUBLIC_BETTER_AUTH_URL || "https://kintehobe.vercel.app",
-    trustedOrigins: ["https://kintehobe.vercel.app","http://localhost:3000"],
-    emailAndPassword: {
-        enabled: true,
-        requireEmailVerification: false,
-    },
-    // emailVerification:{
-    //     sendOnSignUp:true,
-    //     sendVerificationEmail:async ({user,url})=>{
-    //         await SendVerificationEmail({
-    //             user,url
-    //         });
-    //     }
-    // },
-    plugins:[AdminPlugin({
-        ac,
-        defaultRole:"user",
-        roles:{
-            user,
-            admin,
-            manager
-        }
+    captcha({
+      provider: "hcaptcha",
+      siteKey: process.env.NEXT_PUBLIC_CAPTCHA_SITE_KEY!,
+      secretKey: process.env.CAPTCHA_SECRET_KEY!,
     }),
-    captcha({ 
-        provider: "hcaptcha",
-        siteKey: process.env.NEXT_PUBLIC_CAPTCHA_SITE_KEY!,
-        secretKey: process.env.CAPTCHA_SECRET_KEY!, 
-    }), ]
+  ],
 });

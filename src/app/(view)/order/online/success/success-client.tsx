@@ -58,7 +58,10 @@ export function SuccessClient({ order: o, items }: Props) {
           </CardHeader>
           <CardContent className="space-y-3">
             {items.map((item) => (
-              <div key={item.id} className="flex justify-between items-start gap-3">
+              <div
+                key={item.id}
+                className="flex justify-between items-start gap-3"
+              >
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium line-clamp-1">
                     {item.productTitle}

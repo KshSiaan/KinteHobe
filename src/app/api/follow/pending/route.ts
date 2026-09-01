@@ -34,10 +34,7 @@ export async function GET(request: Request) {
       },
     })
     .from(followRelation)
-    .innerJoin(
-      user,
-      eq(followRelation.followerId, user.id),
-    )
+    .innerJoin(user, eq(followRelation.followerId, user.id))
     .where(
       and(
         eq(followRelation.followingId, session.user.id),

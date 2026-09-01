@@ -62,7 +62,10 @@ export default async function Page({
               </div>
 
               <div className="flex-1 flex flex-col justify-between relative">
-                <Badge variant={"destructive"} className="top-3 right-3 absolute">
+                <Badge
+                  variant={"destructive"}
+                  className="top-3 right-3 absolute"
+                >
                   {user?.banned ? "Banned" : "Active"}
                 </Badge>
                 <div className="space-y-3">
@@ -84,10 +87,13 @@ export default async function Page({
                     <CalendarDaysIcon className="w-4 h-4" />
                     <span>
                       Member since{" "}
-                      {new Date(user?.createdAt || "").toLocaleDateString("en-US", {
-                        year: "numeric",
-                        month: "long",
-                      })}
+                      {new Date(user?.createdAt || "").toLocaleDateString(
+                        "en-US",
+                        {
+                          year: "numeric",
+                          month: "long",
+                        },
+                      )}
                     </span>
                   </div>
                 </div>
@@ -161,7 +167,10 @@ export default async function Page({
           </section>
           <section className="w-full mt-8 grid grid-cols-4 gap-8">
             {stats.map((stat) => (
-              <Card key={stat.title} className="border-0! ring-0 shadow-none bg-muted">
+              <Card
+                key={stat.title}
+                className="border-0! ring-0 shadow-none bg-muted"
+              >
                 <CardHeader>
                   <CardTitle className="text-center text-xl uppercase font-semibold text-muted-foreground">
                     {stat.title}

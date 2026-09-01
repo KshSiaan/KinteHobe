@@ -54,4 +54,6 @@ export const productColorVariantsSchema = z.object({
 export type ProductColorVariantFormInput = z.input<
   typeof productColorVariantSchema
 >;
-export type ProductColorVariantInput = z.infer<typeof productColorVariantSchema>;
+export type ProductColorVariantInput = z.infer<
+  typeof productColorVariantSchema
+>;

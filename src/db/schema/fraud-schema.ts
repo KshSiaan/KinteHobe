@@ -25,9 +25,7 @@ export const fraud = pgTable(
     transactionId: text("transaction_id")
       .notNull()
       .references(() => transaction.id, { onDelete: "cascade" }),
-    current_status: text("current_status")
-      .notNull()
-      .default("pending"),
+    current_status: text("current_status").notNull().default("pending"),
     resolvedBy: text("resolved_by").references(() => user.id, {
       onDelete: "set null",
     }),

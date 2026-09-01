@@ -176,7 +176,7 @@ export default function SearchInput() {
     },
   });
 
-  console.log("search data", data);
+  // console.log("search data", data);
 
   return (
     <div
@@ -266,7 +266,7 @@ export default function SearchInput() {
                   size="sm"
                   className="text-xs text-muted-foreground"
                 >
-                  <Link href="/search">Explore More</Link>
+                  <Link href="/products?preference=trending">Explore More</Link>
                 </Button>
               </div>
 
@@ -328,8 +328,10 @@ export default function SearchInput() {
                         ?.sort(() => Math.random() - 0.5)
                         .slice(0, 4)
                         .map((cat) => (
-                          <Button key={cat.id} variant="ghost">
-                            {cat.name}
+                          <Button key={cat.id} variant="ghost" asChild>
+                            <Link href={`/categories/${cat.slug}`}>
+                              {cat.name}
+                            </Link>
                           </Button>
                         ))}
                     </div>

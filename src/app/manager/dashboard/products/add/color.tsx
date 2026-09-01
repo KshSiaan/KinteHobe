@@ -518,12 +518,22 @@ export default function ColorVariants({
                           onClick={async () => {
                             setGeneratingId(variant.id);
                             try {
-                              const result = await generateDatasetFromImages(variant.images);
+                              const result = await generateDatasetFromImages(
+                                variant.images,
+                              );
                               if (result.metadataRows?.length) {
-                                setVariantField(variant.id, "metadataRows", result.metadataRows);
+                                setVariantField(
+                                  variant.id,
+                                  "metadataRows",
+                                  result.metadataRows,
+                                );
                               }
                               if (result.description) {
-                                setVariantField(variant.id, "details", result.description);
+                                setVariantField(
+                                  variant.id,
+                                  "details",
+                                  result.description,
+                                );
                               }
                             } catch {
                               // silently fail

@@ -5,7 +5,7 @@ import { desc, eq, inArray } from "drizzle-orm";
 
 export async function GET(
   _request: Request,
-  { params }: { params: Promise<{ slug: string }> }
+  { params }: { params: Promise<{ slug: string }> },
 ) {
   const { slug } = await params;
 
@@ -15,10 +15,7 @@ export async function GET(
     .where(eq(category.slug, slug));
 
   if (!existingCategory) {
-    return Response.json(
-      { message: "Category not found" },
-      { status: 404 }
-    );
+    return Response.json({ message: "Category not found" }, { status: 404 });
   }
 
   // ✅ STEP 1: limit products FIRST
@@ -82,7 +79,7 @@ export async function GET(
         entry.variants.push({
           ...v,
           publicImages: v.images.map((img) =>
-            getFullURL({ bucket: "product", path: img })
+            getFullURL({ bucket: "product", path: img }),
           ),
         });
       }
@@ -115,6 +112,6 @@ export async function GET(
         products: finalProducts,
       },
     },
-    { status: 200 }
+    { status: 200 },
   );
 }

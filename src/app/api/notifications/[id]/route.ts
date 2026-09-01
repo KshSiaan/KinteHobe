@@ -20,14 +20,14 @@ export async function PATCH(
     .select({ id: notification.id })
     .from(notification)
     .where(
-      and(
-        eq(notification.id, id),
-        eq(notification.userId, session.user.id),
-      ),
+      and(eq(notification.id, id), eq(notification.userId, session.user.id)),
     );
 
   if (!existing) {
-    return Response.json({ message: "Notification not found" }, { status: 404 });
+    return Response.json(
+      { message: "Notification not found" },
+      { status: 404 },
+    );
   }
 
   const updated = await markNotificationRead(id, session.user.id);

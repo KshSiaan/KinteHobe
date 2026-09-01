@@ -60,7 +60,9 @@ export async function GET(
           price_data: {
             currency: "usd",
             unit_amount: existing.totalCents,
-            product_data: { name: `Order #${existing.id.slice(0, 8).toUpperCase()}` },
+            product_data: {
+              name: `Order #${existing.id.slice(0, 8).toUpperCase()}`,
+            },
           },
           quantity: 1,
         },

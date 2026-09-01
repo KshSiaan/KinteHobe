@@ -18,7 +18,16 @@ type OrderStatus = (typeof VALID_STATUSES)[number];
 
 const STATUS_NOTIFICATION: Record<
   OrderStatus,
-  { title: string; body: (orderId: string) => string; type: "order_placed" | "order_status_changed" | "order_cancelled" | "order_refunded" | "order_delivered" }
+  {
+    title: string;
+    body: (orderId: string) => string;
+    type:
+      | "order_placed"
+      | "order_status_changed"
+      | "order_cancelled"
+      | "order_refunded"
+      | "order_delivered";
+  }
 > = {
   pending_payment: {
     type: "order_status_changed",

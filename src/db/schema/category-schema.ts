@@ -1,4 +1,10 @@
-import { pgTable, text, timestamp, boolean, integer} from "drizzle-orm/pg-core";
+import {
+  pgTable,
+  text,
+  timestamp,
+  boolean,
+  integer,
+} from "drizzle-orm/pg-core";
 import type { AnyPgColumn } from "drizzle-orm/pg-core";
 
 export const category = pgTable("category", {

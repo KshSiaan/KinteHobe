@@ -10,10 +10,7 @@ type Params = {
 // PATCH /api/follow/[id]
 // Accept or reject a follow request.
 // Only the person being followed can do this.
-export async function PATCH(
-  request: Request,
-  { params }: Params,
-) {
+export async function PATCH(request: Request, { params }: Params) {
   const session = await auth.api.getSession({
     headers: request.headers,
   });
@@ -130,10 +127,7 @@ export async function PATCH(
 
 // DELETE /api/follow/[id]
 // Unfollow — removes both directions.
-export async function DELETE(
-  request: Request,
-  { params }: Params,
-) {
+export async function DELETE(request: Request, { params }: Params) {
   const session = await auth.api.getSession({
     headers: request.headers,
   });
@@ -164,9 +158,7 @@ export async function DELETE(
   }
 
   // Remove my relationship
-  await db
-    .delete(followRelation)
-    .where(eq(followRelation.id, existing.id));
+  await db.delete(followRelation).where(eq(followRelation.id, existing.id));
 
   // Remove the reverse relationship
   await db

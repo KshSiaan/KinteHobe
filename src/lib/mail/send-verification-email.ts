@@ -1,6 +1,5 @@
 import { MailtrapClient } from "mailtrap";
 
-
 const TOKEN = process.env.MAILER_API_KEY!;
 
 const client = new MailtrapClient({
@@ -12,7 +11,11 @@ const sender = {
   name: "KinteHobe Team",
 };
 
-export async function SendVerificationEmail({user,url}:{user:{
+export async function SendVerificationEmail({
+  user,
+  url,
+}: {
+  user: {
     id: string;
     createdAt: Date;
     updatedAt: Date;
@@ -20,16 +23,19 @@ export async function SendVerificationEmail({user,url}:{user:{
     emailVerified: boolean;
     name: string;
     image?: string | null | undefined;
-},url:string}){
-
-    await client.send({
-        from: sender,
-        to: [{
-            email: user.email,
-             name: user.name,
-        }],
-        subject: "Verify your mail - KinteHobe",
-        html:`<!DOCTYPE html>
+  };
+  url: string;
+}) {
+  await client.send({
+    from: sender,
+    to: [
+      {
+        email: user.email,
+        name: user.name,
+      },
+    ],
+    subject: "Verify your mail - KinteHobe",
+    html: `<!DOCTYPE html>
         <html lang="en">
         <head>
         <meta charset="UTF-8" />
@@ -278,7 +284,6 @@ export async function SendVerificationEmail({user,url}:{user:{
             </div>
         </div>
         </body>
-        </html>`
-    });
-
+        </html>`,
+  });
 }

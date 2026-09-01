@@ -39,10 +39,7 @@ export async function GET(request: Request) {
     const start = new Date(Date.UTC(year, mon - 1, 1));
     const end = new Date(Date.UTC(year, mon, 1));
 
-    monthCondition = and(
-      gte(order.createdAt, start),
-      lt(order.createdAt, end),
-    );
+    monthCondition = and(gte(order.createdAt, start), lt(order.createdAt, end));
   }
 
   const conditions = [
@@ -89,9 +86,9 @@ export async function GET(request: Request) {
     .offset(offset);
 
   const totalResult = await db
-  .select({ count: db.$count(order) })
-  .from(order)
-  .where(and(...conditions));
+    .select({ count: db.$count(order) })
+    .from(order)
+    .where(and(...conditions));
 
   const total = totalResult?.[0]?.count ?? 0;
 
