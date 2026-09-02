@@ -7,13 +7,13 @@ export const productEmbed = pgTable(
     id: uuid("id").primaryKey().defaultRandom(),
     content: text("content").notNull(),
     embedding: vector("embedding", { dimensions: 1028 }).notNull(),
-    productId: uuid("product_id").references(() => product.id, {
+    productId: text("product_id").references(() => product.id, {
       onDelete: "cascade",
       onUpdate: "cascade",
     }),
   },
   (table) => [
-    index("embedding_vector_idx").using(
+    index("product_embed_embedding_idx").using(
       "hnsw",
       table.embedding.op("vector_cosine_ops"),
     ),
