@@ -1,5 +1,7 @@
 import { legalDocument, legalPageTypeEnum } from "@/db/schema";
+import { legalEmbed } from "@/db/schema/legal_embed-schema";
 import { auth } from "@/lib/auth";
+import { generateEmbedding } from "@/lib/backend/chunker";
 import { db } from "@/lib/db";
 import { getSupabaseStorageClient } from "@/lib/storage/supabase";
 import { eq } from "drizzle-orm";
@@ -94,6 +96,7 @@ export async function POST(request: Request) {
     const [doc] = await db
       .insert(legalDocument)
       .values({
+        id: crypto.randomUUID(),
         pageType,
         fileName: file.name,
         filePath: storagePath,
@@ -115,6 +118,19 @@ export async function POST(request: Request) {
         .set({ isActive: true })
         .where(eq(legalDocument.id, doc.id));
       doc.isActive = true;
+    }
+
+    try {
+      const { chunks, embeddings } = await generateEmbedding(file);
+      const records = chunks.map((chunk, index) => ({
+        id: crypto.randomUUID(),
+        content: chunk,
+        embedding: embeddings[index],
+        document: doc.id,
+      }));
+      await db.insert(legalEmbed).values(records);
+    } catch (e) {
+      console.error("Error during post-upload processing:", e);
     }
 
     return Response.json(

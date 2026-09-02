@@ -3,7 +3,7 @@
 import { useState, useRef } from "react";
 import { Upload, FileText, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { chunkDocument } from "@/lib/backend/chunker";
+// import { chunkDocument } from "@/lib/backend/chunker";
 
 export function PdfUpload() {
   const [file, setFile] = useState<File | null>(null);
@@ -66,9 +66,9 @@ export function PdfUpload() {
 
   const handleUpload = async () => {
     if (!file) return;
-    const chunked = await chunkDocument(file);
+    // const chunked = await chunkDocument(file);
 
-    console.log("Chunked Document:", chunked);
+    // console.log("Chunked Document:", chunked);
     // Add your upload logic here
   };
 
