@@ -120,14 +120,6 @@ export default function Page() {
     }
   }, []);
 
-  const handleReset = React.useCallback(() => {
-    setCustomVariantTitle("");
-    setProductSlug("");
-    setProductCategory("");
-    setProductStatus("active");
-    resetDataset();
-  }, [resetDataset]);
-
   const handleBaseChange = React.useCallback(
     (output: ProductBaseOutput) => {
       setBaseValues(output);
@@ -317,7 +309,7 @@ export default function Page() {
         title: "Product created",
         description: "Product has been submitted successfully.",
       });
-      handleReset();
+      window.location.href = "/admin/dashboard/products";
       router.refresh();
     },
     onError: (error) => {
@@ -692,7 +684,6 @@ export default function Page() {
                 <AlertDialogCancel>Cancel</AlertDialogCancel>
                 <AlertDialogAction
                   onClick={() => {
-                    handleReset();
                     sileo.success({
                       title: "Form reset",
                       description: "Product form has been reset successfully.",

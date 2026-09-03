@@ -1,4 +1,13 @@
-import { product, productVariant, category } from "../../../../db/schema";
+import {
+  generateEmbedding,
+  generateEmbeddingFromText,
+} from "@/lib/backend/chunker";
+import {
+  product,
+  productVariant,
+  category,
+  productEmbed,
+} from "../../../../db/schema";
 import { db } from "../../../../lib/db";
 import { getSupabaseStorageClient } from "../../../../lib/storage/supabase";
 import {
@@ -525,6 +534,41 @@ export async function POST(request: Request) {
           ...sizeRows,
           ...customRows,
         ]);
+
+      // Create a list of all the created variants
+      const varaiants = [
+        buildBaseVariant(payload, productId, baseRowId, baseImagePaths),
+        ...colorRows,
+        ...sizeRows,
+        ...customRows,
+      ];
+
+      for (const variant of varaiants) {
+        const { chunks, embeddings } =
+          await generateEmbeddingFromText(`Title: ${variant.title}: ${variant.code ?? "N/A"}
+
+          SKU: ${variant.sku ?? "N/A"}
+
+          Price: ${variant.price}
+
+          Compare At Price: ${variant.compareAtPrice ?? "N/A"}
+
+          Stock Quantity: ${variant.stockQuantity}
+
+          Weight: ${variant.weight ?? "N/A"}
+
+          Details: ${variant.details ?? "N/A"}`);
+
+        const records = chunks.map((chunk, index) => ({
+          id: crypto.randomUUID(),
+          content: chunk,
+          embedding: embeddings[index],
+          productId: productRow.id,
+          variantId: variant.id,
+        }));
+
+        await tx.insert(productEmbed).values(records);
+      }
 
       return [productRow] as const;
     });

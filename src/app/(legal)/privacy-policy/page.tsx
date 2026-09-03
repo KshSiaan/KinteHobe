@@ -9,6 +9,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const content = await getLegalContent(TYPE);
   const title = content?.title || META.label;
   const description = content?.metaDescription || META.defaultDescription;
+
   return {
     title,
     description,
@@ -27,14 +28,14 @@ export default async function PrivacyPolicyPage() {
   const content = await getLegalContent(TYPE);
 
   if (!content?.isPublished) return notFound();
-
+  const updatedAt = new Date(content.updatedAt);
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "WebPage",
     name: content.title,
     description: content.metaDescription || META.defaultDescription,
     url: `/${META.slug}`,
-    dateModified: content.updatedAt.toISOString(),
+    dateModified: updatedAt.toISOString(),
   };
 
   return (
@@ -51,11 +52,11 @@ export default async function PrivacyPolicyPage() {
               {content.title}
             </h1>
             <time
-              dateTime={content.updatedAt.toISOString()}
+              dateTime={updatedAt.toISOString()}
               className="mt-3 block text-sm text-muted-foreground"
             >
               Last updated:{" "}
-              {content.updatedAt.toLocaleDateString("en-US", {
+              {updatedAt.toLocaleDateString("en-US", {
                 year: "numeric",
                 month: "long",
                 day: "numeric",

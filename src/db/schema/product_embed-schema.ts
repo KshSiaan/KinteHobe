@@ -1,5 +1,5 @@
 import { index, pgTable, text, uuid, vector } from "drizzle-orm/pg-core";
-import { product } from "../schema";
+import { product, productVariant } from "../schema";
 
 export const productEmbed = pgTable(
   "product_embed",
@@ -7,6 +7,10 @@ export const productEmbed = pgTable(
     id: uuid("id").primaryKey().defaultRandom(),
     content: text("content").notNull(),
     embedding: vector("embedding", { dimensions: 1028 }).notNull(),
+    variantId: text("variant_id").references(() => productVariant.id, {
+      onDelete: "cascade",
+      onUpdate: "cascade",
+    }),
     productId: text("product_id").references(() => product.id, {
       onDelete: "cascade",
       onUpdate: "cascade",

@@ -17,6 +17,7 @@ Base URL of the platform is:
 ${process.env.NEXT_PUBLIC_API_URL}
 
  * If you are giving links or redirecting users, always provide full links to the pages, including the domain name. For example, if you are providing a link to the home page, provide it as ${process.env.NEXT_PUBLIC_API_URL}/home instead of just /home.
+ * When Providing any product, also must provide image with it in 512x512 resolution. If the product has multiple images, provide the first image in the list. 
 ---
 
 ## Primary Responsibilities
