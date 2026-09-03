@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import {
   Conversation,
   ConversationContent,
@@ -16,6 +16,7 @@ import { ChatHeader } from "./_components/chat-header";
 import { ChatEmptyState } from "./_components/empty-state";
 import { ChatMessageRow, BotTypingRow } from "./_components/chat-message";
 import { ChatInput } from "./_components/chat-input";
+import { useSearchParams } from "next/navigation";
 
 export default function Page() {
   //! derive type directly from useChat so ref stays in sync with SDK changes
@@ -52,6 +53,14 @@ export default function Page() {
     },
   });
 
+  const q = useSearchParams().get("q");
+
+  useEffect(() => {
+    if (q) {
+      sendMessage({ text: q });
+    }
+  }, [q]);
+
   // biome-ignore lint/suspicious/noExplicitAny:sdsd
   addToolOutputRef.current = addToolOutput as any;
 
@@ -62,7 +71,6 @@ export default function Page() {
   return (
     <main className="px-4 h-[86dvh] py-4 flex items-start gap-4 container mx-auto">
       <section className="w-1/2 h-full border rounded-lg hidden" />
-
       <div className="flex-1 h-full flex flex-col rounded-xl bg-background overflow-hidden">
         <ChatHeader status={status} />
 

@@ -18,10 +18,15 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { CreateResponseType } from "@/lib/backend/message";
 import { Spinner } from "@/components/kibo-ui/spinner";
-export default function SearchInput() {
+export default function SearchInput({
+  value,
+  onChange,
+}: {
+  value: string;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+}) {
   const [open, setOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
-  const debouncedSearchQuery = useDebounce(searchQuery, 300);
+  const debouncedSearchQuery = useDebounce(value, 300);
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -210,10 +215,10 @@ export default function SearchInput() {
         </InputGroupAddon>
 
         <InputGroupInput
-          placeholder="What are you looking for? Ask AI"
+          placeholder="What are you looking for?"
           className="text-sm"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
+          value={value}
+          onChange={onChange}
           onFocus={() => setOpen(true)}
         />
       </InputGroup>

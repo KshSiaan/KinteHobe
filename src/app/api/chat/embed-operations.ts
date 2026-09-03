@@ -30,7 +30,7 @@ export async function searchSimilarProducts(
 
 export async function searchLegalDocument(query: string) {
   const embedding = await generateQueryEmbedding(query);
-  console.log("Generated embedding for query:", embedding);
+
   const similarity = sql<number>`
     1 - (${cosineDistance(legalEmbed.embedding, embedding)})
   `;
@@ -42,9 +42,10 @@ export async function searchLegalDocument(query: string) {
       similarity,
     })
     .from(legalEmbed)
-    .where(gt(similarity, 0.5))
     .orderBy(desc(similarity))
     .limit(5);
+
   console.log("Similar legal documents found:", similarDocs);
+
   return similarDocs;
 }

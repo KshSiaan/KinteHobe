@@ -22,6 +22,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import {
+  BotIcon,
   CircleQuestionMarkIcon,
   DoorOpenIcon,
   EditIcon,
@@ -72,9 +73,11 @@ import { useQuery } from "@tanstack/react-query";
 import PromotionBanner from "../extra/promotion-banner";
 import { useIsMobile } from "@/hooks/use-mobile";
 import MobileSearch from "./mobile-search";
+import { AnimatePresence, motion } from "motion/react";
 
 export default function Navbar() {
   const { isPending, data } = authClient.useSession();
+  const [searchQuery, setSearchQuery] = React.useState<string>("");
   const [aiSearch, setSearchType] = React.useState<boolean>(false);
   const path = usePathname();
   const router = useRouter();
@@ -143,15 +146,6 @@ export default function Navbar() {
     }
   };
 
-  //   {currentPromotion && (
-  //   <PromotionBanner
-  //     selectedAppearance={currentPromotion?.appearance}
-  //     promotionTitle={currentPromotion?.promotionTitle}
-  //     promotionUrl={currentPromotion?.promotionUrl}
-  //     selectedVariant={currentPromotion?.variant}
-  //   />
-  // )}
-
   return (
     <>
       <div
@@ -176,16 +170,97 @@ export default function Navbar() {
                 className="size-10"
               />
             </Link>
+
             {!isMobile && (
               <>
-                <SearchInput />
-                <div className="hidden md:flex items-center gap-2 h-8 border px-2 rounded-full ">
+                {aiSearch ? (
+                  <div className="w-full md:w-[30dvw] flex items-center gap-2">
+                    <motion.div layout className="min-w-0 flex-1">
+                      <InputGroup
+                        className="
+                          bg-background
+                          border-border
+                          border
+                          pr-0!
+                        "
+                      >
+                        <InputGroupAddon>
+                          <InputGroupButton>
+                            <SearchIcon className="h-4 w-4 transition-colors" />
+                          </InputGroupButton>
+                        </InputGroupAddon>
+
+                        <InputGroupInput
+                          placeholder="What are you looking for? Ask AI"
+                          className="text-sm"
+                          onKeyDown={(e) => {
+                            if (e.code === "Enter") {
+                              router.push(
+                                `/khuki?q=${encodeURIComponent(searchQuery)}`,
+                              );
+                            }
+                          }}
+                          value={searchQuery}
+                          onChange={(e) => setSearchQuery(e.target.value)}
+                        />
+                      </InputGroup>
+                    </motion.div>
+
+                    <AnimatePresence initial={false}>
+                      {searchQuery && (
+                        <motion.div
+                          initial={{
+                            opacity: 0,
+                            x: 8,
+                            scale: 0.95,
+                          }}
+                          animate={{
+                            opacity: 1,
+                            x: 0,
+                            scale: 1,
+                          }}
+                          exit={{
+                            opacity: 0,
+                            x: 8,
+                            scale: 0.95,
+                          }}
+                          transition={{
+                            duration: 0.2,
+                            ease: "easeOut",
+                          }}
+                          className="shrink-0"
+                        >
+                          <Button
+                            variant="outline"
+                            onClick={() =>
+                              router.push(
+                                `/khuki?q=${encodeURIComponent(searchQuery)}`,
+                              )
+                            }
+                            className="whitespace-nowrap"
+                          >
+                            <BotIcon />
+                            Ask AI
+                          </Button>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                ) : (
+                  <SearchInput
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
+                )}
+
+                <div className="hidden md:flex items-center gap-2 h-8 border px-2 rounded-full">
                   <Switch
                     size="sm"
                     id="ai-search"
                     checked={aiSearch}
                     onCheckedChange={setSearchType}
                   />
+
                   <Label
                     htmlFor="ai-search"
                     className="text-nowrap text-sm font-semibold text-muted-foreground"
