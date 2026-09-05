@@ -10,7 +10,7 @@ import {
 } from "drizzle-orm";
 
 async function logToDatabase(data) {
-  if (!data?.q || data?.type) {
+  if (!data?.q || !data?.type) {
     console.error("[Search Worker] Missing query");
     return;
   }

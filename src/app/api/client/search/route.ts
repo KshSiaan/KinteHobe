@@ -17,6 +17,7 @@ export async function GET(request: NextRequest) {
   const q = searchParams.get("q");
 
   const headers = Object.fromEntries(request.headers.entries());
+
   if (!q?.trim()) {
     return new Response("Missing search query", { status: 400 });
   }

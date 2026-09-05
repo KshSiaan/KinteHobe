@@ -23,6 +23,7 @@ export async function GET(req: Request) {
   const limit = Math.min(
     Math.max(Number.isFinite(rawLimit) ? Math.floor(rawLimit) : 60, 1),
     100,
+    w,
   );
 
   if (preference === "most_favorites") {

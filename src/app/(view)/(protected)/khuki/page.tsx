@@ -55,11 +55,28 @@ export default function Page() {
 
   const q = useSearchParams().get("q");
 
+  //record search query to database via worker thread if q is present
+  async function recordSearchQuery(query: string) {
+    await fetch(`/api/client/record/ai`, {
+      method: "POST",
+      body: JSON.stringify({ q: query }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+  }
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
+  const recordedQueries = useRef(new Set<string>());
+
   // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   useEffect(() => {
-    if (q) {
-      sendMessage({ text: q });
-    }
+    if (!q || recordedQueries.current.has(q)) return;
+
+    recordedQueries.current.add(q);
+
+    sendMessage({ text: q });
+    recordSearchQuery(q);
   }, [q]);
 
   // biome-ignore lint/suspicious/noExplicitAny:sdsd
