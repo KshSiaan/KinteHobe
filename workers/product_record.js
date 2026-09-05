@@ -21,6 +21,9 @@ async function logToDatabase(data) {
       userId = session?.user?.id ?? null;
     }
 
+    console.log(`[Product Visit Worker] Logging product visit for productId: ${data.productId}, userId: ${userId}`);
+    console.log(`[Product Visit Worker] Headers: ${JSON.stringify(data.headers)}`);
+
     // --------------------------------------------------
     // 1. INSERT NEW SEARCH
     // --------------------------------------------------

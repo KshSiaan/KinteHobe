@@ -13,17 +13,18 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
-import { CheckIcon, TruckIcon } from "lucide-react";
 import Controller from "./controller";
-import { notFound } from "next/navigation";
 import Loading from "@/app/loading";
+import { headers } from "next/headers";
 
 async function getProduct(slug: string) {
+  const headerzz = await headers();
   try {
     const res = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/api/product/${slug}`,
       {
         next: { revalidate: 300 },
+        headers: headerzz,
       },
     );
 

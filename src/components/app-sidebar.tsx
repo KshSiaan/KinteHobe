@@ -109,6 +109,10 @@ const data = {
           title: "Search History",
           url: "/search-history",
         },
+        {
+          title: "Product Visits",
+          url: "/product-visit",
+        },
       ],
     },
     {

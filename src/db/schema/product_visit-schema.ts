@@ -9,11 +9,9 @@ export const productVisit = pgTable(
     productId: text("product_id").references((): AnyPgColumn => product.id, {
       onDelete: "cascade",
     }),
-    visitorId: text("visitor_id")
-      .notNull()
-      .references((): AnyPgColumn => user.id, {
-        onDelete: "cascade",
-      }),
+    visitorId: text("visitor_id").references((): AnyPgColumn => user.id, {
+      onDelete: "cascade",
+    }),
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
   (table) => [

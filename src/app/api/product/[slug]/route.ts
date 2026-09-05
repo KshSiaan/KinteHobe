@@ -3,6 +3,7 @@ import { CreateResponse } from "@/lib/backend/message";
 import { db } from "@/lib/db";
 import { createSupabaseStorageClient } from "@/lib/storage/supabase";
 import { asc, eq } from "drizzle-orm";
+import { NextRequest } from "next/server";
 import path from "node:path";
 import { Worker } from "node:worker_threads";
 
@@ -20,7 +21,7 @@ function toCategoryPublicUrl(path: string | null | undefined) {
 }
 
 export async function GET(
-  _request: Request,
+  _request: NextRequest,
   { params }: { params: Promise<{ slug: string }> },
 ) {
   const slug = (await params)?.slug;
@@ -47,6 +48,7 @@ export async function GET(
 
   try {
     const headers = Object.fromEntries(_request.headers.entries());
+    console.log(`[Product Visit] Headers: ${JSON.stringify(headers)}`);
 
     const workerPath = path.join(process.cwd(), "workers", "product_record.js");
     const worker = new Worker(workerPath);
