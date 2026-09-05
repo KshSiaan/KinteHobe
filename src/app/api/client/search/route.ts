@@ -27,6 +27,7 @@ export async function GET(request: NextRequest) {
     worker.postMessage({
       q,
       headers,
+      type: "normal",
     });
   } catch (error) {
     console.error("Error creating worker thread:", error);
