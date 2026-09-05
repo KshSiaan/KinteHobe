@@ -255,6 +255,21 @@ export default function Product({
                 Available Sizes
               </div>
               <div className="flex flex-wrap gap-2">
+                <Button
+                  type="button"
+                  variant={
+                    activeVariant?.kind !== "size" ? "default" : "outline"
+                  }
+                  className="px-3 py-1.5"
+                  onClick={() => {
+                    setSelection({
+                      productId: data.product.id,
+                      selectedVariantId: base?.id || "",
+                    });
+                  }}
+                >
+                  Base
+                </Button>
                 {sizes.map((size) => (
                   <Button
                     key={size.id}
@@ -270,7 +285,7 @@ export default function Product({
                       });
                     }}
                   >
-                    {size.title || size.weight || "Unknown Size"}
+                    {size.weight || "Unknown Size"}
                   </Button>
                 ))}
               </div>
