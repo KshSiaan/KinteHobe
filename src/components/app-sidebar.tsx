@@ -101,12 +101,12 @@ const data = {
       ],
     },
     {
-      title: "Marketing & Observation",
+      title: "Marketing & Monitor",
       url: "#",
       icon: <PieChartIcon />,
       items: [
         {
-          title: "Platform Search History",
+          title: "Search History",
           url: "/search-history",
         },
       ],

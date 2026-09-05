@@ -1,8 +1,8 @@
-import { searchHistory } from "@/db/schema";
+import { searchHistory, user } from "@/db/schema";
 import { auth } from "@/lib/auth";
 import { CreateResponse } from "@/lib/backend/message";
 import { db } from "@/lib/db";
-
+import { eq, desc } from "drizzle-orm";
 export async function GET(req: Request) {
   const session = await auth.api.getSession(req);
   if (!session) {
@@ -16,7 +16,8 @@ export async function GET(req: Request) {
     const res = await db
       .select()
       .from(searchHistory)
-      .orderBy(searchHistory.createdAt);
+      .leftJoin(user, eq(searchHistory.authorId, user.id))
+      .orderBy(desc(searchHistory.createdAt));
 
     return CreateResponse({
       message: "Search history fetched successfully",

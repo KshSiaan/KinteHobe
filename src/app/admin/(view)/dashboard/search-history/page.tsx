@@ -1,14 +1,48 @@
 "use client";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
 
-import { Table, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { howl } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
+import Link from "next/link";
 
 export default function Page() {
   const { data, isPending } = useQuery({
     queryKey: ["search-history"],
-    queryFn: async () => {
+    queryFn: async (): Promise<{
+      message: string;
+      ok: boolean;
+      data: Array<{
+        search_history: {
+          id: string;
+          query: string;
+          searchType?: string;
+          authorId?: string;
+          createdAt: string;
+        };
+        user?: {
+          id: string;
+          name: string;
+          email: string;
+          emailVerified: boolean;
+          image: string;
+          createdAt: string;
+          updatedAt: string;
+          role: string;
+          banned: boolean;
+          banReason: any;
+          banExpires: any;
+        };
+      }>;
+    }> => {
       return await howl("/api/admin/search-history");
     },
     refetchInterval: 1000 * 60 * 0.33, // Refetch every 20 seconds
@@ -28,74 +62,50 @@ export default function Page() {
               <TableRow>
                 <TableHead>Query</TableHead>
                 <TableHead>User</TableHead>
+                <TableHead>Search Type</TableHead>
                 <TableHead>Search time</TableHead>
-                <TableHead>Action</TableHead>
               </TableRow>
             </TableHeader>
+            <TableBody>
+              {data?.data.map((history) => (
+                <TableRow key={history.search_history.id}>
+                  <TableCell>{history.search_history.query}</TableCell>
+                  <TableCell>
+                    {history.user ? (
+                      <Link
+                        href={`/admin/users/${history.user.id}`}
+                        className="text-primary underline"
+                      >
+                        <div className="flex items-center gap-2">
+                          <Avatar>
+                            <AvatarImage
+                              src={history.user.image}
+                              alt={history.user.name}
+                            />
+                            <AvatarFallback>
+                              {history.user.name?.charAt(0) || "U"}
+                            </AvatarFallback>
+                          </Avatar>
+                          <span>{history.user.name || "Unknown"}</span>
+                        </div>
+                      </Link>
+                    ) : (
+                      <span className="text-muted-foreground">N/A</span>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    {history.search_history.searchType || "N/A"}
+                  </TableCell>
+                  <TableCell>
+                    {new Date(
+                      history.search_history.createdAt,
+                    ).toLocaleString()}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
           </Table>
         </CardContent>
-        {/* <CardFooter className="flex items-center justify-between gap-3">
-          <p className="text-sm text-muted-foreground">
-            Showing {startItem}-{endItem} of {totalUsers}
-          </p>
-
-          <Pagination className="mx-0 w-auto justify-end">
-            <PaginationContent>
-              <PaginationItem>
-                <PaginationPrevious
-                  href="#"
-                  onClick={(event) => {
-                    event.preventDefault();
-                    if (currentPage > 1) {
-                      setCurrentPage((prev) => prev - 1);
-                    }
-                  }}
-                />
-              </PaginationItem>
-
-              {pageLinks.map((page, index) => {
-                const previousPage = pageLinks[index - 1];
-                const showEllipsis =
-                  typeof previousPage === "number" && page - previousPage > 1;
-
-                return (
-                  <div key={`page-${page}`} className="flex items-center">
-                    {showEllipsis ? (
-                      <PaginationItem>
-                        <PaginationEllipsis />
-                      </PaginationItem>
-                    ) : null}
-
-                    <PaginationItem>
-                      <PaginationLink
-                        href="#"
-                        isActive={currentPage === page}
-                        onClick={(event) => {
-                          event.preventDefault();
-                          setCurrentPage(page);
-                        }}
-                      >
-                        {page}
-                      </PaginationLink>
-                    </PaginationItem>
-                  </div>
-                );
-              })}
-
-              <PaginationItem>
-                <PaginationNext
-                  href="#"
-                  onClick={(event) => {
-                    event.preventDefault();
-                    if (currentPage < totalPages) {
-                      setCurrentPage((prev) => prev + 1);
-                    }
-                  }}
-                />
-              </PaginationItem>
-            </PaginationContent>
-          </Pagination>
-        </CardFooter> */}
       </Card>
     </div>
   );

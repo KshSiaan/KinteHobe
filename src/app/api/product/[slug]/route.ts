@@ -3,6 +3,8 @@ import { CreateResponse } from "@/lib/backend/message";
 import { db } from "@/lib/db";
 import { createSupabaseStorageClient } from "@/lib/storage/supabase";
 import { asc, eq } from "drizzle-orm";
+import path from "node:path";
+import { Worker } from "node:worker_threads";
 
 function toProductPublicUrl(path: string) {
   return createSupabaseStorageClient()
@@ -41,6 +43,20 @@ export async function GET(
       },
       { status: 404 },
     );
+  }
+
+  try {
+    const headers = Object.fromEntries(_request.headers.entries());
+
+    const workerPath = path.join(process.cwd(), "workers", "product_record.js");
+    const worker = new Worker(workerPath);
+    worker.postMessage({
+      productId: existingProduct[0].product.id,
+      headers,
+    });
+  } catch (error) {
+    console.error("Error parsing request body:", error);
+    return new Response("Invalid request body", { status: 400 });
   }
 
   const firstRow = existingProduct[0];

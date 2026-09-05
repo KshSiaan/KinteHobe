@@ -30,6 +30,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Textarea } from "@/components/ui/textarea";
+import { EyeIcon } from "@animateicons/react/lucide";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { PlusIcon } from "lucide-react";
 import { useState } from "react";
@@ -158,6 +159,7 @@ export default function SupportClient() {
                 <TableHead>Subject</TableHead>
                 <TableHead>Date</TableHead>
                 <TableHead>Preview</TableHead>
+                <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -180,6 +182,23 @@ export default function SupportClient() {
                       </TableCell>
                       <TableCell className="text-sm text-muted-foreground max-w-64 truncate">
                         {m.message}
+                      </TableCell>
+                      <TableCell className="text-sm text-muted-foreground">
+                        <Dialog>
+                          <DialogTrigger asChild>
+                            <Button variant="outline" size="icon">
+                              <EyeIcon />
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent>
+                            <DialogHeader>
+                              <DialogTitle>Subject: {m.subject}</DialogTitle>
+                            </DialogHeader>
+                            <div className="">
+                              <DialogDescription>{m.message}</DialogDescription>
+                            </div>
+                          </DialogContent>
+                        </Dialog>
                       </TableCell>
                     </TableRow>
                   ))}

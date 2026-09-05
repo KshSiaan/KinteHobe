@@ -13,6 +13,11 @@ export const auth = betterAuth({
   baseURL:
     process.env.NEXT_PUBLIC_BETTER_AUTH_URL || "https://kintehobe.vercel.app",
   trustedOrigins: ["https://kintehobe.vercel.app", "http://localhost:3000"],
+  user: {
+    deleteUser: {
+      enabled: true,
+    },
+  },
   emailAndPassword: {
     enabled: true,
     requireEmailVerification: false,
