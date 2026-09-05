@@ -55,6 +55,7 @@ export default function Page() {
 
   const q = useSearchParams().get("q");
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   useEffect(() => {
     if (q) {
       sendMessage({ text: q });

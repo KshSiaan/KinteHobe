@@ -101,6 +101,17 @@ const data = {
       ],
     },
     {
+      title: "Marketing & Observation",
+      url: "#",
+      icon: <PieChartIcon />,
+      items: [
+        {
+          title: "Platform Search History",
+          url: "/search-history",
+        },
+      ],
+    },
+    {
       title: "Others",
       url: "#",
       icon: <Ellipsis />,
@@ -139,11 +150,6 @@ const data = {
     },
   ],
   projects: [
-    {
-      name: "Sales & Marketing",
-      url: "/sales-marketing",
-      icon: <PieChartIcon />,
-    },
     {
       name: "Manager Feedbacks",
       url: "/admin/manager-feedbacks",

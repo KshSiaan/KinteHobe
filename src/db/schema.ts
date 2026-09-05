@@ -18,3 +18,4 @@ export * from "./schema/fraud-schema";
 export * from "./schema/activity-schema";
 export * from "./schema/activity_read-schema";
 export * from "./schema/promotion-schema";
+export * from "./schema/search_history-schema";

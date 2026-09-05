@@ -3,19 +3,33 @@ import { CreateResponse } from "@/lib/backend/message";
 import { db } from "@/lib/db";
 import { createSupabaseStorageClient } from "@/lib/storage/supabase";
 import { getTableColumns, sql } from "drizzle-orm";
-
+import { NextRequest } from "next/server";
+import path from "node:path";
+import { Worker } from "node:worker_threads";
 function toProductPublicUrl(path: string) {
   return createSupabaseStorageClient()
     .storage.from("product")
     .getPublicUrl(path).data.publicUrl;
 }
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const q = searchParams.get("q");
 
+  const headers = Object.fromEntries(request.headers.entries());
   if (!q?.trim()) {
     return new Response("Missing search query", { status: 400 });
+  }
+
+  try {
+    const workerPath = path.join(process.cwd(), "workers", "search-worker.js");
+    const worker = new Worker(workerPath);
+    worker.postMessage({
+      q,
+      headers,
+    });
+  } catch (error) {
+    console.error("Error creating worker thread:", error);
   }
 
   const searchQuery = q
