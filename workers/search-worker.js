@@ -14,11 +14,6 @@ async function logToDatabase(data) {
     const session = await auth.api.getSession({
       headers: data.headers,
     });
-    if (session?.user?.id) {
-      console.log("User ID from session:", session?.user?.id);
-    } else {
-      console.log("No user ID found in session.");
-    }
     userId = session?.user?.id || null;
   }
   try {
