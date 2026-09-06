@@ -49,6 +49,7 @@ export async function GET(request: NextRequest) {
           to_tsquery('english', ${searchQuery})
         )
       `.as("rank"),
+      // slug: ,
     })
     .from(productVariant)
     .where(

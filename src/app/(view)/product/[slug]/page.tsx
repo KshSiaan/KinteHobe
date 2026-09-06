@@ -23,6 +23,7 @@ import Loading from "@/app/loading";
 import { headers } from "next/headers";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import Related from "./related";
 
 async function getProduct(slug: string) {
   const headerzz = await headers();
@@ -193,45 +194,15 @@ export default async function Page({
         </Suspense>
       </div>
       <Separator className="my-4" />
-      <div className="w-full">
-        <h3 className="text-lg">Related Products</h3>
-        <Carousel className="grid mt-4">
-          <CarouselContent className="py-2">
-            <CarouselItem className="basis-1/5">
-              <Card></Card>
-            </CarouselItem>
-            <CarouselItem className="basis-1/5">
-              <Card></Card>
-            </CarouselItem>
-            <CarouselItem className="basis-1/5">
-              <Card></Card>
-            </CarouselItem>
-            <CarouselItem className="basis-1/5">
-              <Card></Card>
-            </CarouselItem>
-            <CarouselItem className="basis-1/5">
-              <Card></Card>
-            </CarouselItem>
-            <CarouselItem className="basis-1/5">
-              <Card></Card>
-            </CarouselItem>
-            <CarouselItem className="basis-1/5">
-              <Card></Card>
-            </CarouselItem>
-            <CarouselItem className="basis-1/5">
-              <Card></Card>
-            </CarouselItem>
-          </CarouselContent>
-          <div className="flex justify-center mt-4 h-12 w-full">
-            <div className="relative">
-              <CarouselPrevious />
-            </div>
-            <div className="relative">
-              <CarouselNext />
-            </div>
+      <Suspense
+        fallback={
+          <div className="h-full! w-full flex justify-center items-center">
+            <Loading />
           </div>
-        </Carousel>
-      </div>
+        }
+      >
+        <Related slug={slug} />
+      </Suspense>
       <Card className="group relative overflow-hidden border bg-muted/30 shadow-none mt-24">
         <CardContent className="flex flex-col gap-6 p-6 sm:flex-row sm:items-center sm:p-8">
           <div className="relative h-28 w-28 shrink-0 overflow-hidden rounded-2xl border bg-background shadow-sm sm:h-32 sm:w-32">

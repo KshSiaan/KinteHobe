@@ -120,6 +120,15 @@ export default function Page() {
     }
   }, []);
 
+  const handleReset = React.useCallback(() => {
+    setCustomVariantTitle("");
+    setProductSlug("");
+    setProductCategory("");
+    setProductStatus("active");
+    resetDataset();
+    window.location.reload();
+  }, [resetDataset]);
+
   const handleBaseChange = React.useCallback(
     (output: ProductBaseOutput) => {
       setBaseValues(output);
@@ -510,7 +519,7 @@ export default function Page() {
 
                 {customVariantList.map((_, index) => (
                   <TabsTrigger
-                    // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
+                    // biome-ignore lint/suspicious/noArrayIndexKey: custom variant positions are stable
                     key={index}
                     className="data-active:bg-primary data-active:text-primary-foreground"
                     value={`custom-${index}`}
@@ -684,6 +693,7 @@ export default function Page() {
                 <AlertDialogCancel>Cancel</AlertDialogCancel>
                 <AlertDialogAction
                   onClick={() => {
+                    handleReset();
                     sileo.success({
                       title: "Form reset",
                       description: "Product form has been reset successfully.",
