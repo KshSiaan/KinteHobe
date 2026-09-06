@@ -20,10 +20,7 @@ export async function GET(req: Request) {
   // ["best_selling", "most_favorites", "trending"];
 
   const rawLimit = Number(url.searchParams.get("limit") ?? 60);
-  const limit = Math.min(
-    Math.max(Number.isFinite(rawLimit) ? Math.floor(rawLimit) : 60, 1),
-    100,
-  );
+  const limit = Math.min(Math.max(rawLimit, 1), 100); // Ensure limit is between 1 and 100
 
   if (preference === "most_favorites") {
     const favourites = await favouriteProducts(limit);

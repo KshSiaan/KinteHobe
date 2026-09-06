@@ -1,4 +1,9 @@
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+} from "@/components/ui/card";
 import { CreateResponseType } from "@/lib/backend/message";
 import { Metadata } from "next";
 import Image from "next/image";
@@ -16,6 +21,8 @@ import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import Controller from "./controller";
 import Loading from "@/app/loading";
 import { headers } from "next/headers";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 async function getProduct(slug: string) {
   const headerzz = await headers();
@@ -161,17 +168,8 @@ export default async function Page({
     };
   }> = await getProduct(slug);
 
-  if (!data) {
-    return (
-      <>
-        <pre className="bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900 text-amber-400 rounded-xl p-6 shadow-lg overflow-x-auto text-sm leading-relaxed border border-zinc-700">
-          <code className="whitespace-pre-wrap">
-            {JSON.stringify(data, null, 2)}
-          </code>
-        </pre>
-      </>
-    );
-  }
+  if (!data) return { title: "Product" };
+
   return (
     <main className="p-4">
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 min-h-screen">
@@ -223,9 +221,6 @@ export default async function Page({
             <CarouselItem className="basis-1/5">
               <Card></Card>
             </CarouselItem>
-            <CarouselItem className="basis-1/5">
-              <Card></Card>
-            </CarouselItem>
           </CarouselContent>
           <div className="flex justify-center mt-4 h-12 w-full">
             <div className="relative">
@@ -237,14 +232,44 @@ export default async function Page({
           </div>
         </Carousel>
       </div>
-      <Card className="mt-4">
-        <CardContent className="flex justify-between items-center">
-          <Avatar className="size-12">
-            <AvatarImage
-              className="rounded-none"
+      <Card className="group relative overflow-hidden border bg-muted/30 shadow-none mt-24">
+        <CardContent className="flex flex-col gap-6 p-6 sm:flex-row sm:items-center sm:p-8">
+          <div className="relative h-28 w-28 shrink-0 overflow-hidden rounded-2xl border bg-background shadow-sm sm:h-32 sm:w-32">
+            <Image
               src={data?.data?.category?.image}
+              alt={data?.data?.category?.name || "Category Image"}
+              fill
+              className="object-cover transition-transform duration-300 group-hover:scale-105"
             />
-          </Avatar>
+          </div>
+
+          <div className="flex min-w-0 flex-1 flex-col gap-3">
+            <div>
+              <p className="mb-1 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                Explore the category
+              </p>
+
+              <h2 className="text-xl font-semibold tracking-tight sm:text-2xl">
+                {data?.data?.category?.name || "Unknown Category"}
+              </h2>
+            </div>
+
+            <CardDescription className="max-w-2xl text-sm leading-6">
+              {data?.data?.category?.description ||
+                "Discover more products from this category."}
+            </CardDescription>
+
+            <div>
+              <Button variant="outline" className="mt-1" asChild>
+                <Link href={`/categories/${data?.data?.category?.slug}`}>
+                  See more products
+                  <span className="ml-1 transition-transform group-hover:translate-x-0.5">
+                    →
+                  </span>
+                </Link>
+              </Button>
+            </div>
+          </div>
         </CardContent>
       </Card>
     </main>

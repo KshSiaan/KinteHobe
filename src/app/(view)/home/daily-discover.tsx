@@ -16,7 +16,7 @@ import Link from "next/link";
 
 export default function DailyDiscover() {
   const { data, isPending } = useQuery({
-    queryKey: ["dailyDiscover"],
+    queryKey: ["dailyDiscovers"],
     queryFn: async (): Promise<
       CreateResponseType<{
         data: {

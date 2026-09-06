@@ -9,6 +9,7 @@ async function logToDatabase(data) {
     console.error("[Product Visit Worker] Missing product ID");
     return;
   }
+  
 
   try {
     let userId = null;
@@ -19,6 +20,8 @@ async function logToDatabase(data) {
         headers: new Headers(data.headers),
       });
       userId = session?.user?.id ?? null;
+    }else{
+      return;
     }
 
     console.log(`[Product Visit Worker] Logging product visit for productId: ${data.productId}, userId: ${userId}`);

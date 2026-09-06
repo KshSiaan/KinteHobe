@@ -15,20 +15,19 @@ import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 
 export default function Page() {
-  const { data, isPending } = useQuery({
-    queryKey: ["search-history"],
+  const { data } = useQuery({
+    queryKey: ["product_visit-history"],
     queryFn: async (): Promise<{
       message: string;
       ok: boolean;
       data: Array<{
-        search_history: {
+        product_visit: {
           id: string;
-          query: string;
-          searchType?: string;
-          authorId?: string;
+          productId: string;
+          visitorId: string;
           createdAt: string;
         };
-        user?: {
+        user: {
           id: string;
           name: string;
           email: string;
@@ -41,6 +40,31 @@ export default function Page() {
           banReason: any;
           banExpires: any;
         };
+        product_variant: {
+          id: string;
+          groupId: string;
+          code: any;
+          sku: string;
+          price: string;
+          compareAtPrice: string;
+          stockQuantity: number;
+          weight: string;
+          details: string;
+          metadata: Array<{
+            id: string;
+            name: string;
+            description: string;
+          }>;
+          position: number;
+          kind: string;
+          enabled: boolean;
+          title: string;
+          optionName: any;
+          images: Array<string>;
+          createdAt: string;
+          bodySearch: string;
+          updatedAt: string;
+        };
       }>;
     }> => {
       return await howl("/api/admin/product-visit");
@@ -49,11 +73,56 @@ export default function Page() {
   });
 
   return (
-    <pre className="bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900 text-amber-400 rounded-xl p-6 shadow-lg overflow-x-auto text-sm leading-relaxed border border-zinc-700">
-      <code className="whitespace-pre-wrap">
-        {JSON.stringify(data, null, 2)}
-      </code>
-    </pre>
+    <div className="p-3 sm:p-6 gap-6 flex flex-col flex-1 h-full w-full">
+      <div className="flex flex-col gap-4">
+        <h1 className="text-xl sm:text-2xl font-bold">
+          Last 250 Product Visits
+        </h1>
+      </div>
+      <Table className="min-w-150">
+        <TableHeader>
+          <TableRow>
+            <TableHead>Product</TableHead>
+            <TableHead>User</TableHead>
+
+            <TableHead>Visit Time</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {data?.data?.map((history) => (
+            <TableRow key={history.product_visit.id}>
+              <TableCell>{history.product_variant.title}</TableCell>
+              <TableCell>
+                {history.user ? (
+                  <Link
+                    href={`/admin/users/${history.user.id}`}
+                    className="text-primary underline"
+                  >
+                    <div className="flex items-center gap-2">
+                      <Avatar>
+                        <AvatarImage
+                          src={history.user.image}
+                          alt={history.user.name}
+                        />
+                        <AvatarFallback>
+                          {history.user.name?.charAt(0) || "U"}
+                        </AvatarFallback>
+                      </Avatar>
+                      <span>{history.user.name || "Unknown"}</span>
+                    </div>
+                  </Link>
+                ) : (
+                  <span className="text-muted-foreground">N/A</span>
+                )}
+              </TableCell>
+              <TableCell>
+                {new Date(history.product_visit.createdAt).toLocaleString()}
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </div>
   );
 
   // return (

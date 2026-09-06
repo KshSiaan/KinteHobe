@@ -1,13 +1,14 @@
-import { productVisit, user } from "@/db/schema";
+import { productVariant, productVisit, user } from "@/db/schema";
 import { auth } from "@/lib/auth";
 import { CreateResponse } from "@/lib/backend/message";
 import { db } from "@/lib/db";
-import { eq, desc } from "drizzle-orm";
+import { eq, desc, and } from "drizzle-orm";
 export async function GET(req: Request) {
   const session = await auth.api.getSession(req);
   if (!session) {
     return new Response("Unauthorized", { status: 401 });
   }
+
   if (!session.user.role || session.user.role !== "admin") {
     return new Response("Forbidden", { status: 403 });
   }
@@ -17,6 +18,13 @@ export async function GET(req: Request) {
       .select()
       .from(productVisit)
       .leftJoin(user, eq(productVisit.visitorId, user.id))
+      .innerJoin(
+        productVariant,
+        and(
+          eq(productVisit.productId, productVariant.groupId),
+          eq(productVariant.kind, "base"),
+        ),
+      )
       .orderBy(desc(productVisit.createdAt));
 
     return CreateResponse({

@@ -278,20 +278,20 @@ export default function SearchInput({
               <div className="space-y-2">
                 {isEnabled &&
                   data?.data.map((item, i) => (
-                    <motion.button
-                      key={item.id}
-                      initial={{
-                        opacity: 0,
-                        x: -10,
-                      }}
-                      animate={{
-                        opacity: 1,
-                        x: 0,
-                      }}
-                      transition={{
-                        delay: i * 0.05,
-                      }}
-                      className="
+                    <Link href={`/product/${item.code}`} key={item.id}>
+                      <motion.button
+                        initial={{
+                          opacity: 0,
+                          x: -10,
+                        }}
+                        animate={{
+                          opacity: 1,
+                          x: 0,
+                        }}
+                        transition={{
+                          delay: i * 0.05,
+                        }}
+                        className="
                       flex
                       w-full
                       items-center
@@ -304,25 +304,26 @@ export default function SearchInput({
                       transition-colors
                       hover:bg-accent
                     "
-                    >
-                      {item.publicImages?.[0] && (
-                        <Image
-                          src={
-                            item?.publicImages[0] || "/images/placeholder.png"
-                          }
-                          alt={item.title}
-                          className="size-12 rounded-md object-cover"
-                          height={48}
-                          width={48}
-                        />
-                      )}
-                      <div className="">
-                        <h4>{item.title}</h4>
-                        <p className="text-xs text-muted-foreground line-clamp-1">
-                          {item.details}
-                        </p>
-                      </div>
-                    </motion.button>
+                      >
+                        {item.publicImages?.[0] && (
+                          <Image
+                            src={
+                              item?.publicImages[0] || "/images/placeholder.png"
+                            }
+                            alt={item.title}
+                            className="size-12 rounded-md object-cover"
+                            height={48}
+                            width={48}
+                          />
+                        )}
+                        <div className="">
+                          <h4>{item.title}</h4>
+                          <p className="text-xs text-muted-foreground line-clamp-1">
+                            {item.details}
+                          </p>
+                        </div>
+                      </motion.button>
+                    </Link>
                   ))}
 
                 {data?.data?.length === 0 && <div>No results found</div>}

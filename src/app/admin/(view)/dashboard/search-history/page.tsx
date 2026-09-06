@@ -1,5 +1,6 @@
 "use client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 
 import {
@@ -15,7 +16,7 @@ import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 
 export default function Page() {
-  const { data, isPending } = useQuery({
+  const { data, isPending, isError, error } = useQuery({
     queryKey: ["search-history"],
     queryFn: async (): Promise<{
       message: string;
@@ -47,6 +48,7 @@ export default function Page() {
     },
     refetchInterval: 1000 * 60 * 0.33, // Refetch every 20 seconds
   });
+
   return (
     <div className="p-3 sm:p-6 gap-6 flex flex-col flex-1 h-full w-full">
       <div className="flex flex-col gap-4">
@@ -67,9 +69,9 @@ export default function Page() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {data?.data.map((history) => (
-                <TableRow key={history.search_history.id}>
-                  <TableCell>{history.search_history.query}</TableCell>
+              {data?.data?.map((history) => (
+                <TableRow key={history?.search_history?.id}>
+                  <TableCell>{history?.search_history?.query}</TableCell>
                   <TableCell>
                     {history.user ? (
                       <Link
@@ -94,11 +96,23 @@ export default function Page() {
                     )}
                   </TableCell>
                   <TableCell>
-                    {history.search_history.searchType || "N/A"}
+                    {history?.search_history?.searchType === "ai" ? (
+                      <Badge variant="info">
+                        {history?.search_history?.searchType || "N/A"}
+                      </Badge>
+                    ) : history?.search_history?.searchType === "normal" ? (
+                      <Badge variant="secondary">
+                        {history?.search_history?.searchType || "N/A"}
+                      </Badge>
+                    ) : (
+                      <Badge variant="ghost">
+                        {history?.search_history?.searchType || "N/A"}
+                      </Badge>
+                    )}
                   </TableCell>
                   <TableCell>
                     {new Date(
-                      history.search_history.createdAt,
+                      history?.search_history?.createdAt,
                     ).toLocaleString()}
                   </TableCell>
                 </TableRow>
