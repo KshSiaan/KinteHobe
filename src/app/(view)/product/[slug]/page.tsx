@@ -21,6 +21,7 @@ import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import Controller from "./controller";
 import Loading from "@/app/loading";
 import { headers } from "next/headers";
+import { notFound } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import Related from "./related";
@@ -169,7 +170,7 @@ export default async function Page({
     };
   }> = await getProduct(slug);
 
-  if (!data) return { title: "Product" };
+  if (!data) notFound();
 
   return (
     <main className="p-4">
