@@ -1,5 +1,4 @@
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
   TableBody,
@@ -9,8 +8,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Eye, PlusIcon, Trash2Icon } from "lucide-react";
-import React, { Suspense } from "react";
+import { Eye, PlusIcon } from "lucide-react";
+import { Suspense } from "react";
 import Add from "./add";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import View from "./view";
@@ -21,6 +20,8 @@ import Edit from "./edit";
 import { category } from "@/db/schema";
 import { db } from "@/lib/db";
 import { createSupabaseStorageClient } from "@/lib/storage/supabase";
+
+export const dynamic = "force-dynamic";
 
 export default async function Page() {
   const categories = await db.select().from(category);

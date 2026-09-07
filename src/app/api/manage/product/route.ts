@@ -1,7 +1,4 @@
-import {
-  generateEmbedding,
-  generateEmbeddingFromText,
-} from "@/lib/backend/chunker";
+import { generateEmbeddingFromText } from "@/lib/backend/chunker";
 import {
   product,
   productVariant,
@@ -165,27 +162,37 @@ export async function GET() {
       const currentProduct = row.product;
       const currentCategory = row.category;
 
-      if (!currentCategory) {
-        continue;
-      }
-
       if (!productMap.has(currentProduct.id)) {
         productMap.set(currentProduct.id, {
           id: currentProduct.id,
           slug: currentProduct.slug,
-          category: {
-            id: currentCategory.id,
-            name: currentCategory.name,
-            slug: currentCategory.slug,
-            description: currentCategory.description,
-            image: toCategoryPublicUrl(currentCategory.image),
-            banner: toCategoryPublicUrl(currentCategory.banner),
-            isActive: currentCategory.isActive,
-            metaTitle: currentCategory.metaTitle,
-            metaDescription: currentCategory.metaDescription,
-            createdAt: currentCategory.createdAt,
-            updatedAt: currentCategory.updatedAt,
-          },
+          category: currentCategory
+            ? {
+                id: currentCategory.id,
+                name: currentCategory.name,
+                slug: currentCategory.slug,
+                description: currentCategory.description,
+                image: toCategoryPublicUrl(currentCategory.image),
+                banner: toCategoryPublicUrl(currentCategory.banner),
+                isActive: currentCategory.isActive,
+                metaTitle: currentCategory.metaTitle,
+                metaDescription: currentCategory.metaDescription,
+                createdAt: currentCategory.createdAt,
+                updatedAt: currentCategory.updatedAt,
+              }
+            : {
+                id: currentProduct.categoryId,
+                name: "Uncategorized",
+                slug: "uncategorized",
+                description: null,
+                image: null,
+                banner: null,
+                isActive: false,
+                metaTitle: null,
+                metaDescription: null,
+                createdAt: currentProduct.createdAt,
+                updatedAt: currentProduct.updatedAt,
+              },
           categoryId: currentProduct.categoryId,
           status: currentProduct.status,
           variantIds: currentProduct.variantIds,
@@ -212,8 +219,10 @@ export async function GET() {
       }
     }
     //instead of giving full product dataset, give only title,image,price and id
-    const lowestInStock = Array.from(productMap.values())
-      .flatMap((product) => product.variants)
+    const variants = Array.from(productMap.values()).flatMap(
+      (product) => product.variants,
+    );
+    const lowestInStock = variants
       .filter((variant) => variant.kind === "base")
       .sort((a, b) => a.stockQuantity - b.stockQuantity)
       .slice(0, 3)
@@ -229,26 +238,26 @@ export async function GET() {
         message: "Products fetched successfully",
         lowestInStock,
         stats: {
-          totalInStock: Array.from(productMap.values())
-            .flatMap((product) => product.variants)
-            .reduce((sum, variant) => sum + variant.stockQuantity, 0),
-          averagePrice:
-            Array.from(productMap.values())
-              .flatMap((product) => product.variants)
-              .reduce((sum, variant) => sum + parseFloat(variant.price), 0) /
-            Array.from(productMap.values()).flatMap(
-              (product) => product.variants,
-            ).length,
-          totalOutOfStock: Array.from(productMap.values())
-            .flatMap((product) => product.variants)
-            .filter((variant) => variant.stockQuantity === 0).length,
-          lastUpdated: new Date(
-            Math.max(
-              ...Array.from(productMap.values())
-                .flatMap((product) => product.variants)
-                .map((variant) => variant.updatedAt.getTime()),
-            ),
-          ).toISOString(),
+          totalInStock: variants.reduce(
+            (sum, variant) => sum + variant.stockQuantity,
+            0,
+          ),
+          averagePrice: variants.length
+            ? variants.reduce(
+                (sum, variant) => sum + parseFloat(variant.price),
+                0,
+              ) / variants.length
+            : 0,
+          totalOutOfStock: variants.filter(
+            (variant) => variant.stockQuantity === 0,
+          ).length,
+          lastUpdated: variants.length
+            ? new Date(
+                Math.max(
+                  ...variants.map((variant) => variant.updatedAt.getTime()),
+                ),
+              ).toISOString()
+            : null,
         },
         data: Array.from(productMap.values()),
       },
