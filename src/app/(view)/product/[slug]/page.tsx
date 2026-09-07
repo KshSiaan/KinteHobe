@@ -4,29 +4,76 @@ import {
   CardDescription,
   CardHeader,
 } from "@/components/ui/card";
-import { CreateResponseType } from "@/lib/backend/message";
-import { Metadata } from "next";
+import type { CreateResponseType } from "@/lib/backend/message";
+import type { Metadata } from "next";
 import Image from "next/image";
-import React, { Suspense } from "react";
+import { Suspense } from "react";
 import Product from "./product";
 import { Separator } from "@/components/ui/separator";
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from "@/components/ui/carousel";
-import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import Controller from "./controller";
 import Loading from "@/app/loading";
 import { headers } from "next/headers";
-import { notFound } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import Related from "./related";
 
-async function getProduct(slug: string) {
+type ProductResponse = CreateResponseType<{
+  data: {
+    product: {
+      id: string;
+      slug: string;
+      categoryId: string;
+      status: string;
+      variantIds: Array<string>;
+      createdAt: string;
+      updatedAt: string;
+    };
+    category: {
+      id: string;
+      parentId: string | null;
+      name: string;
+      slug: string;
+      description: string;
+      image: string;
+      banner: string;
+      isActive: boolean;
+      metaTitle: string;
+      metaDescription: string;
+      createdAt: string;
+      updatedAt: string;
+    };
+    variants: Array<{
+      id: string;
+      groupId: string;
+      code?: string;
+      sku: string;
+      price: string;
+      compareAtPrice: string;
+      stockQuantity: number;
+      weight?: string;
+      details: string;
+      metadata: Array<{
+        id: string;
+        name: string;
+        description: string;
+      }>;
+      position: number;
+      kind: string;
+      enabled: boolean;
+      title: string;
+      optionName: string | null;
+      images: Array<string>;
+      createdAt: string;
+      updatedAt: string;
+    }>;
+  };
+}>;
+
+type ProductLoadResult =
+  | { data: ProductResponse; error: null }
+  | { data: null; error: string };
+
+async function getProduct(slug: string): Promise<ProductLoadResult> {
   const headerzz = await headers();
   try {
     const res = await fetch(
@@ -37,10 +84,34 @@ async function getProduct(slug: string) {
       },
     );
 
-    if (!res.ok) return null;
-    return res.json();
-  } catch {
-    return null;
+    const body = (await res.json().catch(() => null)) as
+      | (ProductResponse & { message?: string })
+      | { message?: string }
+      | null;
+
+    if (!res.ok) {
+      return {
+        data: null,
+        error:
+          body && "message" in body && body.message
+            ? body.message
+            : `Product request failed with status ${res.status}`,
+      };
+    }
+
+    if (!body || !("data" in body) || !body.data) {
+      return {
+        data: null,
+        error: "The product response was empty or invalid.",
+      };
+    }
+
+    return { data: body, error: null };
+  } catch (error) {
+    return {
+      data: null,
+      error: error instanceof Error ? error.message : "Failed to load product",
+    };
   }
 }
 
@@ -50,59 +121,11 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const data: CreateResponseType<{
-    data: {
-      product: {
-        id: string;
-        slug: string;
-        categoryId: string;
-        status: string;
-        variantIds: Array<string>;
-        createdAt: string;
-        updatedAt: string;
-      };
-      category: {
-        id: string;
-        parentId: any;
-        name: string;
-        slug: string;
-        description: string;
-        image: string;
-        banner: string;
-        isActive: boolean;
-        metaTitle: string;
-        metaDescription: string;
-        createdAt: string;
-        updatedAt: string;
-      };
-      variants: Array<{
-        id: string;
-        groupId: string;
-        code?: string;
-        sku: string;
-        price: string;
-        compareAtPrice: string;
-        stockQuantity: number;
-        weight?: string;
-        details: string;
-        metadata: Array<{
-          id: string;
-          name: string;
-          description: string;
-        }>;
-        position: number;
-        kind: string;
-        enabled: boolean;
-        title: string;
-        optionName: any;
-        images: Array<string>;
-        createdAt: string;
-        updatedAt: string;
-      }>;
-    };
-  }> = await getProduct(slug);
+  const result = await getProduct(slug);
 
-  if (!data) return { title: "Product" };
+  if (result.error) return { title: "Product error" };
+
+  const data = result.data;
 
   const base = data?.data?.variants.find((variant) => variant.kind === "base");
 
@@ -118,59 +141,26 @@ export default async function Page({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const data: CreateResponseType<{
-    data: {
-      product: {
-        id: string;
-        slug: string;
-        categoryId: string;
-        status: string;
-        variantIds: Array<string>;
-        createdAt: string;
-        updatedAt: string;
-      };
-      category: {
-        id: string;
-        parentId: any;
-        name: string;
-        slug: string;
-        description: string;
-        image: string;
-        banner: string;
-        isActive: boolean;
-        metaTitle: string;
-        metaDescription: string;
-        createdAt: string;
-        updatedAt: string;
-      };
-      variants: Array<{
-        id: string;
-        groupId: string;
-        code?: string;
-        sku: string;
-        price: string;
-        compareAtPrice: string;
-        stockQuantity: number;
-        weight?: string;
-        details: string;
-        metadata: Array<{
-          id: string;
-          name: string;
-          description: string;
-        }>;
-        position: number;
-        kind: string;
-        enabled: boolean;
-        title: string;
-        optionName: any;
-        images: Array<string>;
-        createdAt: string;
-        updatedAt: string;
-      }>;
-    };
-  }> = await getProduct(slug);
+  const result = await getProduct(slug);
 
-  if (!data) notFound();
+  if (result.error || !result.data) {
+    return (
+      <main className="flex min-h-[50vh] items-center justify-center p-6">
+        <Card className="w-full max-w-xl border-destructive/40">
+          <CardHeader>
+            <CardDescription>Product request failed</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p className="break-words font-mono text-sm text-destructive">
+              {result.error}
+            </p>
+          </CardContent>
+        </Card>
+      </main>
+    );
+  }
+
+  const data = result.data;
 
   return (
     <main className="p-4">
@@ -208,7 +198,7 @@ export default async function Page({
         <CardContent className="flex flex-col gap-6 p-6 sm:flex-row sm:items-center sm:p-8">
           <div className="relative h-28 w-28 shrink-0 overflow-hidden rounded-2xl border bg-background shadow-sm sm:h-32 sm:w-32">
             <Image
-              src={data?.data?.category?.image}
+              src={data.data.category.image || "https://placehold.co/256"}
               alt={data?.data?.category?.name || "Category Image"}
               fill
               className="object-cover transition-transform duration-300 group-hover:scale-105"
