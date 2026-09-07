@@ -34,6 +34,7 @@ import { useQuery } from "@tanstack/react-query";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import Loading from "@/app/loading";
+import { Trash2Icon } from "@animateicons/react/lucide";
 
 export default function Page() {
   const { data, isPending } = useQuery({
@@ -275,11 +276,16 @@ export default function Page() {
                       {Number(base?.stockQuantity || 0).toFixed(0) || "N/A"}
                     </TableCell>
                     <TableCell className="space-x-4">
-                      <Button variant="outline" size="icon-lg">
-                        <EyeIcon />
+                      <Button variant="outline" size="icon-lg" asChild>
+                        <Link href={`/product/${product.slug}`}>
+                          <EyeIcon />
+                        </Link>
                       </Button>
                       <Button variant="outline" size="icon-lg">
                         <PencilLineIcon />
+                      </Button>
+                      <Button variant="outline" size="icon-lg">
+                        <Trash2Icon />
                       </Button>
                     </TableCell>
                   </TableRow>

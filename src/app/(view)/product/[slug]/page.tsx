@@ -74,13 +74,14 @@ type ProductLoadResult =
   | { data: null; error: string };
 
 async function getProduct(slug: string): Promise<ProductLoadResult> {
-  const headerzz = await headers();
   try {
+    const requestHeaders = await headers();
+    const cookie = requestHeaders.get("cookie");
     const res = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/api/product/${slug}`,
       {
         next: { revalidate: 300 },
-        headers: headerzz,
+        headers: cookie ? { cookie } : undefined,
       },
     );
 
