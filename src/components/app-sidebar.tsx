@@ -149,7 +149,7 @@ const data = {
     },
     {
       title: "Developer",
-      url: "/dev",
+      url: "/admin/dev",
       icon: <ComputerIcon />,
     },
   ],

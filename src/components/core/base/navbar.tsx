@@ -313,7 +313,7 @@ export default function Navbar() {
             </Suspense>
             {isPending ? (
               <div className="flex items-center gap-2">
-                <Spinner variant="infinite" />
+                <Spinner variant="ring" />
               </div>
             ) : data?.user ? (
               <DropdownMenu>

@@ -1,7 +1,7 @@
 import { ManagerSidebar } from "@/components/manager-sidebar";
 import { SiteHeader } from "@/components/site-header";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
-import { auth } from "@/lib/auth";
+import { getServerSession } from "@/lib/auth";
 import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 
@@ -14,9 +14,7 @@ export default async function Layout({
 }: {
   children: React.ReactNode;
 }) {
-  const data = await auth?.api?.getSession({
-    headers: await headers(),
-  });
+  const data = await getServerSession(await headers());
   if (data?.user?.role !== "manager") {
     return notFound();
   }

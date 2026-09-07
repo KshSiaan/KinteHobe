@@ -7,6 +7,9 @@ export const authClient = createAuthClient({
 
   baseURL:
     process.env.NEXT_PUBLIC_BETTER_AUTH_URL || "https://kintehobe.vercel.app",
+  fetchOptions: {
+    retry: 2,
+  },
   plugins: [
     adminClient({
       ac,

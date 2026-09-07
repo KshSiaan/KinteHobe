@@ -86,11 +86,11 @@ export default function DailyDiscover() {
     const base = product.variants.find((v) => v.kind === "base");
     const colors = product?.variants
       .filter((v) => v.kind === "color")
-      .map((v) => v.code)
-      .filter((value): value is string => Boolean(value));
+      .filter((v) => Boolean(v.code))
+      .map((v) => ({ id: v.id, value: v.code as string }));
     return (
       <Card
-        key={base?.id}
+        key={product.id}
         className="p-0! flex flex-col transition-transform relative rounded-none shadow-none border-dashed overflow-visible"
       >
         <CardHeader className="w-full aspect-video rounded-none relative">
@@ -153,11 +153,11 @@ export default function DailyDiscover() {
           <div className="flex items-center justify-end gap-2">
             {colors?.map((color) => (
               <Button
-                key={color}
+                key={color.id}
                 className={cn(
                   "rounded-full! size-6! p-0! hover:ring-4 ring-zinc-500/20",
                 )}
-                style={{ backgroundColor: color }}
+                style={{ backgroundColor: color.value }}
               ></Button>
             ))}
           </div>

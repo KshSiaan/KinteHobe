@@ -47,3 +47,11 @@ export const auth = betterAuth({
     }),
   ],
 });
+
+export async function getServerSession(requestHeaders: Headers) {
+  try {
+    return await auth.api.getSession({ headers: requestHeaders });
+  } catch {
+    return null;
+  }
+}

@@ -12,26 +12,29 @@ import { Badge } from "@/components/ui/badge";
 import { Eye, PlusIcon, Trash2Icon } from "lucide-react";
 import React, { Suspense } from "react";
 import Add from "./add";
-import { headers } from "next/headers";
-import { CategoryType } from "@/types/schemas";
-import { CreateResponseType } from "@/lib/backend/message";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import View from "./view";
 import Image from "next/image";
 
 import Delete from "./delete";
 import Edit from "./edit";
+import { category } from "@/db/schema";
+import { db } from "@/lib/db";
+import { createSupabaseStorageClient } from "@/lib/storage/supabase";
 
 export default async function Page() {
-  const response = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/category`,
-    {
-      method: "GET",
-      headers: await headers(),
-    },
-  );
-  const categories: CreateResponseType<{ data: CategoryType }> =
-    await response.json();
+  const categories = await db.select().from(category);
+  const storage = createSupabaseStorageClient();
+  const categoryRows = categories.map((item) => ({
+    ...item,
+    image: item.image
+      ? storage.storage.from("category").getPublicUrl(item.image).data.publicUrl
+      : null,
+    banner: item.banner
+      ? storage.storage.from("category").getPublicUrl(item.banner).data
+          .publicUrl
+      : null,
+  }));
   return (
     <div className="p-3 sm:p-6 flex flex-col flex-1 h-full w-full">
       <div className="flex flex-row justify-between items-center gap-4 mb-6">
@@ -60,7 +63,7 @@ export default async function Page() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {categories?.data?.map((category) => (
+            {categoryRows.map((category) => (
               <TableRow key={category.id}>
                 <TableCell className="font-mono text-sm">
                   {category.image ? (
