@@ -1,4 +1,3 @@
-import React from "react";
 import {
   Carousel,
   CarouselContent,
@@ -14,7 +13,6 @@ import {
 } from "@/components/ui/card";
 
 import { Badge } from "@/components/ui/badge";
-import product from "./product";
 import Image from "next/image";
 import Link from "next/link";
 export default async function Related({ slug }: { slug: string }) {
@@ -68,8 +66,7 @@ export default async function Related({ slug }: { slug: string }) {
                         className="absolute z-20 top-2 left-2 bg-background/40 text-primary backdrop-blur-sm border border-primary/20 py-3!"
                         variant={"outline"}
                       >
-                        {item.product.base &&
-                        item.product.base.compareAtPrice &&
+                        {item.product.base?.compareAtPrice &&
                         item.product.base.compareAtPrice !==
                           item.product.base.price
                           ? `${Math.round(
@@ -78,7 +75,7 @@ export default async function Related({ slug }: { slug: string }) {
                                 parseFloat(item.product.base.compareAtPrice)) *
                                 100,
                             )}%`
-                          : null}{" "}
+                          : null}
                         off
                       </Badge>
                     )}
@@ -93,6 +90,7 @@ export default async function Related({ slug }: { slug: string }) {
                       }
                       alt={item.product.slug}
                       fill
+                      sizes="(max-width: 768px) 80vw, 20vw"
                       className="object-cover"
                     />
                   </Link>
@@ -120,8 +118,7 @@ export default async function Related({ slug }: { slug: string }) {
                       : "Price not available"}
                   </p>
                   <p className="text-destructive opacity-70 line-through">
-                    {item.product.base &&
-                    item.product.base.compareAtPrice &&
+                    {item.product.base?.compareAtPrice &&
                     item.product.base.compareAtPrice !== item.product.base.price
                       ? `₹${item.product.base.compareAtPrice}`
                       : ""}

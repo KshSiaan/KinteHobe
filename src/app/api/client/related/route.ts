@@ -20,7 +20,7 @@ export async function GET(req: Request) {
       .from(product)
       .where(eq(product.slug, slug))
       .limit(1);
-  } catch (error) {
+  } catch (_error) {
     return new Response("Internal Server Error", { status: 500 });
   }
 
@@ -39,7 +39,7 @@ export async function GET(req: Request) {
         ),
       )
       .limit(1);
-  } catch (error) {
+  } catch (_error) {
     return new Response("Internal Server Error", { status: 500 });
   }
 
@@ -51,9 +51,14 @@ export async function GET(req: Request) {
     currentEmbed = await db
       .select()
       .from(productEmbed)
-      .where(eq(productEmbed.productId, productData[0].id))
+      .where(
+        and(
+          eq(productEmbed.productId, productData[0].id),
+          eq(productEmbed.variantId, base[0].id),
+        ),
+      )
       .limit(1);
-  } catch (error) {
+  } catch (_error) {
     return new Response("Internal Server Error", { status: 500 });
   }
 
@@ -98,27 +103,41 @@ export async function GET(req: Request) {
         and(
           eq(productVariant.groupId, product.id),
           eq(productVariant.kind, "base"),
+          eq(productVariant.id, productEmbed.variantId),
         ),
       )
       .where(ne(productEmbed.productId, productData[0].id))
       .orderBy(desc(similarity))
-      .limit(5);
+      .limit(100);
 
-    similarProducts = results.map((item) => ({
-      id: item.id,
-      productId: item.productId,
-      similarity: item.similarity,
-      product: {
-        id: item.product.id,
-        slug: item.product.slug,
-        categoryId: item.product.categoryId,
-        status: item.product.status,
-        base: {
-          ...item.base,
-          publicImages: item.base.image.map(toProductPublicUrl),
+    const uniqueProducts = new Map<string, (typeof results)[number]>();
+    for (const item of results) {
+      if (!item.productId) {
+        continue;
+      }
+
+      if (!uniqueProducts.has(item.productId)) {
+        uniqueProducts.set(item.productId, item);
+      }
+    }
+
+    similarProducts = Array.from(uniqueProducts.values())
+      .slice(0, 5)
+      .map((item) => ({
+        id: item.productId,
+        productId: item.productId,
+        similarity: item.similarity,
+        product: {
+          id: item.product.id,
+          slug: item.product.slug,
+          categoryId: item.product.categoryId,
+          status: item.product.status,
+          base: {
+            ...item.base,
+            publicImages: item.base.image.map(toProductPublicUrl),
+          },
         },
-      },
-    }));
+      }));
   } catch (error) {
     console.error(error);
     return new Response("Internal Server Error", { status: 500 });
