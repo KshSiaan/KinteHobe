@@ -1,4 +1,3 @@
-import { generateEmbeddingFromText } from "@/lib/backend/chunker";
 import {
   product,
   productVariant,
@@ -369,6 +368,7 @@ export async function POST(request: Request) {
   const uploadedPaths: string[] = [];
 
   try {
+    const { generateEmbeddingFromText } = await import("@/lib/backend/chunker");
     const productId = crypto.randomUUID();
     const variantIds: string[] = [];
 
