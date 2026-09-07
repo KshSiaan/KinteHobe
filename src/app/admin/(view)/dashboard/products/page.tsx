@@ -34,10 +34,11 @@ import { useQuery } from "@tanstack/react-query";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import Loading from "@/app/loading";
-import { Trash2Icon } from "@animateicons/react/lucide";
+
+import Delete from "./delete";
 
 export default function Page() {
-  const { data, isPending } = useQuery({
+  const { data, isPending, refetch } = useQuery({
     queryKey: ["products"],
     queryFn: async (): Promise<{
       message: string;
@@ -220,7 +221,6 @@ export default function Page() {
           </Select>
         </CardContent>
       </Card>
-
       <Card className="w-full">
         <CardContent className="overflow-x-auto">
           <Table className="min-w-150">
@@ -281,16 +281,12 @@ export default function Page() {
                           <EyeIcon />
                         </Link>
                       </Button>
-                      <Button variant="outline" size="icon-lg">
-                        <PencilLineIcon />
+                      <Button variant="outline" size="icon-lg" asChild>
+                        <Link href={`/admin/dashboard/products/${product.id}`}>
+                          <PencilLineIcon />
+                        </Link>
                       </Button>
-                      <Button
-                        variant="outline"
-                        size="icon-lg"
-                        className="text-destructive!"
-                      >
-                        <Trash2Icon />
-                      </Button>
+                      <Delete id={product?.id} refetch={refetch} />
                     </TableCell>
                   </TableRow>
                 );
