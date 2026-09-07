@@ -27,7 +27,7 @@ import {
   TableCell,
 } from "@/components/ui/table";
 import { EyeIcon, PencilLineIcon, PlusIcon, SearchIcon } from "lucide-react";
-import { products } from "./products-data";
+
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
@@ -284,7 +284,11 @@ export default function Page() {
                       <Button variant="outline" size="icon-lg">
                         <PencilLineIcon />
                       </Button>
-                      <Button variant="outline" size="icon-lg">
+                      <Button
+                        variant="outline"
+                        size="icon-lg"
+                        className="text-destructive!"
+                      >
                         <Trash2Icon />
                       </Button>
                     </TableCell>

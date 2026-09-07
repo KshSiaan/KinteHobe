@@ -368,7 +368,9 @@ export async function POST(request: Request) {
   const uploadedPaths: string[] = [];
 
   try {
-    const { generateEmbeddingFromText } = await import("@/lib/backend/chunker");
+    const { generateEmbeddingFromText } = await import(
+      "@/lib/backend/text-embedding"
+    );
     const productId = crypto.randomUUID();
     const variantIds: string[] = [];
 

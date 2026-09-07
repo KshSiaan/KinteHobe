@@ -1,8 +1,7 @@
 import { legalEmbed, productEmbed } from "@/db/schema";
-import { generateQueryEmbedding } from "@/lib/backend/chunker";
+import { generateQueryEmbedding } from "@/lib/backend/text-embedding";
 import { db } from "@/lib/db";
 import { cosineDistance, desc, gt, sql } from "drizzle-orm";
-import * as Sentry from "@sentry/nextjs";
 export async function searchSimilarProducts(
   query: string,
   limit: number = 5,
