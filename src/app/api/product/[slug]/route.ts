@@ -3,7 +3,7 @@ import { CreateResponse } from "@/lib/backend/message";
 import { db } from "@/lib/db";
 import { createSupabaseStorageClient } from "@/lib/storage/supabase";
 import { asc, eq } from "drizzle-orm";
-import { NextRequest } from "next/server";
+import type { NextRequest } from "next/server";
 import path from "node:path";
 import { Worker } from "node:worker_threads";
 
@@ -52,13 +52,16 @@ export async function GET(
 
     const workerPath = path.join(process.cwd(), "workers", "product_record.js");
     const worker = new Worker(workerPath);
+    worker.on("error", (error) => {
+      console.error("[Product Visit] Failed to record product visit:", error);
+    });
+    worker.unref();
     worker.postMessage({
       productId: existingProduct[0].product.id,
       headers,
     });
   } catch (error) {
-    console.error("Error parsing request body:", error);
-    return new Response("Invalid request body", { status: 400 });
+    console.error("[Product Visit] Failed to start visit recorder:", error);
   }
 
   const firstRow = existingProduct[0];
