@@ -30,7 +30,9 @@ export default async function Restricted() {
     <section>
       <Card>
         <CardHeader>
-          <CardTitle className="text-destructive">Delete account</CardTitle>
+          <CardTitle className="text-destructive text-lg">
+            Delete account
+          </CardTitle>
           <CardDescription className="text-destructive">
             Once you delete your account, there is no going back. Please be
             certain.

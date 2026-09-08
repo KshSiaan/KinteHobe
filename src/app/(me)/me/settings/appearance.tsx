@@ -39,7 +39,7 @@ export default function Appearance() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Appearance</CardTitle>
+        <CardTitle className="text-lg">Appearance</CardTitle>
 
         <CardDescription>
           Select how the interface should look across the platform.

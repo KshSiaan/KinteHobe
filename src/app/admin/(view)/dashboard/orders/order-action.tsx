@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/select";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { MessagesSquareIcon } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 type OrderStatus =
@@ -37,7 +38,7 @@ export default function OrderAction({
 }: OrderActionProps) {
   const [value, setValue] = useState<OrderStatus>(status);
   const queryClient = useQueryClient();
-
+  const navig = useRouter();
   const { mutate, isPending, isError, error } = useMutation({
     mutationKey: ["changeOrderStatus", id],
     mutationFn: async () => {
@@ -52,6 +53,7 @@ export default function OrderAction({
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["orders"] });
+      navig.refresh();
     },
   });
 

@@ -1,9 +1,5 @@
-import UnderlineTabs from "@/components/shadcn-studio/tabs/tabs-29";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { followRelation } from "@/db/schema";
 import { auth } from "@/lib/auth";
-import { db } from "@/lib/db";
 import {
   CalendarDaysIcon,
   EditIcon,
@@ -13,8 +9,9 @@ import {
 import { headers } from "next/headers";
 import Image from "next/image";
 import Saved from "./_me/saved";
-import { and, count, eq } from "drizzle-orm";
 import Link from "next/link";
+import Recent from "./_me/recent";
+import { getOrders } from "@/lib/backend/order-queries";
 
 export default async function Page() {
   const data = await auth?.api?.getSession({
@@ -22,34 +19,6 @@ export default async function Page() {
   });
   const user = data?.user;
   const userId = user?.id ?? "";
-
-  const [[{ followers }], [{ following }]] = await Promise.all([
-    db
-      .select({ followers: count() })
-      .from(followRelation)
-      .where(
-        and(
-          eq(followRelation.followingId, userId),
-          eq(followRelation.status, "accepted"),
-        ),
-      ),
-    db
-      .select({ following: count() })
-      .from(followRelation)
-      .where(
-        and(
-          eq(followRelation.followerId, userId),
-          eq(followRelation.status, "accepted"),
-        ),
-      ),
-  ]);
-
-  const stats = [
-    { title: "Followers", value: String(followers) },
-    { title: "Following", value: String(following) },
-    { title: "My Orders", value: "46" },
-    { title: "Balance", value: "4.5k", isBalance: true },
-  ];
 
   return (
     <main className="min-h-screen bg-background pb-8">
@@ -127,60 +96,16 @@ export default async function Page() {
               </div>
             </div>
           </section>
-
-          {/* Additional content section */}
-          <section className="w-full mt-8 grid grid-cols-2 md:grid-cols-4 gap-8">
-            {stats.map((stat) => (
-              <Card
-                key={stat.title}
-                className="border-0! ring-0 shadow-none bg-muted"
-              >
-                <CardHeader>
-                  <CardTitle className="text-center text-xl uppercase font-semibold text-muted-foreground">
-                    {stat.title}
-                  </CardTitle>
-                  <CardContent
-                    className={`text-4xl text-center mt-4 font-bold ${
-                      stat.isBalance ? "text-primary" : ""
-                    }`}
-                  >
-                    {stat.value}
-                  </CardContent>
-                </CardHeader>
-              </Card>
-            ))}
-          </section>
           {userId && (
             <section className="mt-8 w-full space-y-6">
               <Saved />
             </section>
           )}
-          {/* <section className="mt-8 w-full">
-            <UnderlineTabs
-              tabs={[
-                {
-                  name: "Activity",
-                  value: "activity",
-                  content: <Activity />,
-                },
-                {
-                  name: "Purchases",
-                  value: "purchases",
-                  content: <Purchases />,
-                },
-                {
-                  name: "Saved",
-                  value: "saved",
-                  content: <Saved />,
-                },
-                {
-                  name: "Insights",
-                  value: "insights",
-                  content: <Insights />,
-                },
-              ]}
-            />
-          </section> */}
+          {userId && (
+            <section className="mt-8 w-full space-y-6">
+              <Recent />
+            </section>
+          )}
         </div>
       </div>
     </main>

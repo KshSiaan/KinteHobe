@@ -6,9 +6,10 @@ import {
   followRelation,
   order,
   orderItem,
+  product,
   transaction,
 } from "@/db/schema";
-import { eq } from "drizzle-orm";
+import { eq, inArray } from "drizzle-orm";
 import type { CartLineItem } from "@/hooks/use-cart-store";
 import type { ShippingForm } from "@/app/(view)/checkout/types";
 import { createNotification } from "@/lib/notifications";
@@ -77,6 +78,19 @@ export async function POST(request: Request) {
     items: CartLineItem[];
     type: "stripe" | "cash";
   };
+
+  const productIds = [...new Set(items.map((item) => item.productId))];
+  const existingProducts = await db
+    .select({ id: product.id })
+    .from(product)
+    .where(inArray(product.id, productIds));
+
+  if (existingProducts.length !== productIds.length) {
+    return Response.json(
+      { message: "One or more products are no longer available." },
+      { status: 400 },
+    );
+  }
 
   const subtotalCents = items.reduce((sum, i) => sum + toCents(i.lineTotal), 0);
   const taxCents = 0;

@@ -2,9 +2,7 @@ import { redirect } from "next/navigation";
 import { headers } from "next/headers";
 import Link from "next/link";
 import { auth } from "@/lib/auth";
-import { db } from "@/lib/db";
-import { followRelation, order, orderItem } from "@/db/schema";
-import { eq, desc } from "drizzle-orm";
+import { getOrders } from "@/lib/backend/order-queries";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -49,26 +47,6 @@ const STATUS_VARIANTS: Record<
   cancelled: "destructive",
   refunded: "destructive",
 };
-
-async function getOrders(userId: string) {
-  const orders = await db
-    .select()
-    .from(order)
-    .where(eq(order.userId, userId))
-    .orderBy(desc(order.createdAt));
-
-  const ordersWithItems = await Promise.all(
-    orders.map(async (o) => {
-      const items = await db
-        .select()
-        .from(orderItem)
-        .where(eq(orderItem.orderId, o.id));
-      return { ...o, items };
-    }),
-  );
-
-  return ordersWithItems;
-}
 
 type OrderWithItems = Awaited<ReturnType<typeof getOrders>>[number];
 

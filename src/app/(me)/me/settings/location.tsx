@@ -291,7 +291,7 @@ export default function Location() {
     <Card>
       <CardHeader>
         <div className="flex justify-between items-center">
-          <CardTitle>Saved Locations</CardTitle>
+          <CardTitle className="text-lg">Saved Locations</CardTitle>
           <Dialog open={addOpen} onOpenChange={setAddOpen}>
             <DialogTrigger asChild>
               <Button>

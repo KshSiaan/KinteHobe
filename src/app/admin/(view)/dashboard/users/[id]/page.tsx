@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 import { auth } from "@/lib/auth";
+import type { orderStatusEnum } from "@/db/schema";
 
 import {
   CalendarDaysIcon,
@@ -22,6 +23,9 @@ import Ban from "./ban";
 import { Badge } from "@/components/ui/badge";
 import Impersonate from "./impersonate";
 import ChangeRole from "./changeRole";
+import Saved from "./saved";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import RecentOrders from "./recent-orders";
 
 export default async function Page({
   params,
@@ -35,11 +39,117 @@ export default async function Page({
     query: { id },
   });
 
+  const info = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/admin/user/info?id=${id}`,
+    {
+      headers: await headers(),
+    },
+  );
+
+  const userInfo: {
+    message: string;
+    ok: boolean;
+    user: {
+      id: string;
+      name: string;
+      email: string;
+      emailVerified: boolean;
+      image: string;
+      role: string;
+      banned: boolean;
+      banReason: string | null;
+      banExpires: string | null;
+      createdAt: string;
+      updatedAt: string;
+    };
+    counts: {
+      followers: number;
+      following: number;
+      wishlist: number;
+      orders: number;
+    };
+    wishlist: {
+      wishlist: {
+        id: string;
+        productId: string;
+        userId: string;
+        createdAt: string;
+      };
+      product: {
+        id: string;
+        slug: string;
+        categoryId: string;
+        status: string;
+        variantIds: string[];
+        createdAt: string;
+        updatedAt: string;
+      };
+      product_variant: {
+        id: string;
+        groupId: string;
+        code: string | null;
+        sku: string;
+        price: string;
+        compareAtPrice: number | null;
+        stockQuantity: number;
+        weight: string;
+        details: string;
+        metadata: {
+          id: string;
+          name: string;
+          description: string;
+        }[];
+        position: number;
+        kind: string;
+        enabled: boolean;
+        title: string;
+        optionName: string | null;
+        images: string[];
+        createdAt: string;
+        bodySearch: string;
+        updatedAt: string;
+      };
+    }[];
+    recentOrders: {
+      id: string;
+      userId: string;
+      email: string;
+      status: (typeof orderStatusEnum.enumValues)[number];
+      shippingName: string;
+      shippingPhone: string;
+      shippingAddress: string;
+      shippingCity: string;
+      shippingState: string;
+      shippingZip: string;
+      shippingCountry: string;
+      subtotalCents: number;
+      taxCents: number;
+      shippingCents: number;
+      totalCents: number;
+      paymentMethod: string;
+      stripeSessionId: string | null;
+      createdAt: string;
+      updatedAt: string;
+      items: {
+        id: string;
+        orderId: string;
+        productId: string;
+        variantId: string;
+        productTitle: string;
+        variantTitle: string;
+        sku: string;
+        quantity: number;
+        unitPriceCents: number;
+        lineTotalCents: number;
+        imageUrl: string;
+      }[];
+    }[];
+  } = await info.json();
+
   const stats = [
-    { title: "Followers", value: "4.5k" },
-    { title: "Following", value: "4.5k" },
-    { title: "My Orders", value: "46" },
-    { title: "Balance", value: "4.5k", isBalance: true },
+    { title: "Followers", value: userInfo.counts.followers.toString() },
+    { title: "Following", value: userInfo.counts.following.toString() },
+    { title: "Total Orders", value: userInfo.counts.orders.toString() },
   ];
 
   return (
@@ -52,7 +162,10 @@ export default async function Page({
               <div className="flex justify-center md:justify-start shrink-0">
                 <div className="w-32 h-32 md:w-40 md:h-40 rounded-2xl overflow-hidden border-4 border-background shadow-md">
                   <Image
-                    src="https://api.dicebear.com/9.x/lorelei-neutral/svg?seed=Felix"
+                    src={
+                      user?.image ??
+                      "https://api.dicebear.com/9.x/lorelei-neutral/svg?seed=Felix"
+                    }
                     alt={user?.name || "User Avatar"}
                     className="w-full h-full object-cover"
                     height={160}
@@ -65,7 +178,7 @@ export default async function Page({
 
               <div className="flex-1 flex flex-col justify-between relative">
                 <Badge
-                  variant={"destructive"}
+                  variant={user?.banned ? "destructive" : "success"}
                   className="top-3 right-3 absolute"
                 >
                   {user?.banned ? "Banned" : "Active"}
@@ -169,7 +282,7 @@ export default async function Page({
               </div>
             )}
           </section>
-          <section className="w-full mt-8 grid grid-cols-4 gap-8">
+          <section className="w-full mt-8 grid md:grid-cols-3 gap-8">
             {stats.map((stat) => (
               <Card
                 key={stat.title}
@@ -180,9 +293,7 @@ export default async function Page({
                     {stat.title}
                   </CardTitle>
                   <CardContent
-                    className={`text-4xl text-center mt-4 font-bold ${
-                      stat.isBalance ? "text-primary" : ""
-                    }`}
+                    className={`text-4xl text-center mt-4 font-bold`}
                   >
                     {stat.value}
                   </CardContent>
@@ -190,6 +301,20 @@ export default async function Page({
               </Card>
             ))}
           </section>
+          <div className="h-12 w-full mt-8">
+            <Tabs defaultValue="wishlist" className="w-full">
+              <TabsList>
+                <TabsTrigger value="wishlist">Wish List</TabsTrigger>
+                <TabsTrigger value="recent">Recent Orders</TabsTrigger>
+              </TabsList>
+              <TabsContent value="wishlist">
+                <Saved data={userInfo.wishlist} />
+              </TabsContent>
+              <TabsContent value="recent">
+                <RecentOrders data={userInfo.recentOrders} />
+              </TabsContent>
+            </Tabs>
+          </div>
         </div>
       </div>
     </main>

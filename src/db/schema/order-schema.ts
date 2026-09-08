@@ -87,7 +87,10 @@ export const orderItem = pgTable(
     lineTotalCents: integer("line_total_cents").notNull(),
     imageUrl: text("image_url"),
   },
-  (table) => [index("order_item_order_idx").on(table.orderId)],
+  (table) => [
+    index("order_item_order_idx").on(table.orderId),
+    index("order_item_product_idx").on(table.productId),
+  ],
 );
 
 export const transaction = pgTable(

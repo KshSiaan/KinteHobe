@@ -4,8 +4,9 @@ import type { CartLineItem } from "@/hooks/use-cart-store";
 import type { ShippingForm } from "@/app/(view)/checkout/types";
 import { SSLInitResponse } from "./type";
 import { db } from "@/lib/db";
-import { order, orderItem, transaction } from "@/db/schema/order-schema";
+import { order, orderItem, product, transaction } from "@/db/schema";
 import { createNotification } from "@/lib/notifications";
+import { inArray } from "drizzle-orm";
 
 const shippingSchema = z.object({
   fullName: z.string().min(1),
@@ -101,6 +102,19 @@ export async function POST(request: Request) {
     type: "stripe" | "cash" | "online";
     provider: "bkash" | "nagad" | "dbblmobilebanking";
   };
+
+  const productIds = [...new Set(items.map((item) => item.productId))];
+  const existingProducts = await db
+    .select({ id: product.id })
+    .from(product)
+    .where(inArray(product.id, productIds));
+
+  if (existingProducts.length !== productIds.length) {
+    return Response.json(
+      { message: "One or more products are no longer available." },
+      { status: 400 },
+    );
+  }
 
   if (type !== "online") {
     return Response.json({ message: "Invalid payment type" }, { status: 400 });
