@@ -89,7 +89,13 @@ export const ChatMessageRow = memo(
                   {showTypingDots ? (
                     <TypingIndicator />
                   ) : (
-                    <MessageResponse>{part.text}</MessageResponse>
+                    <MessageResponse
+                      className={cn(
+                        "[&_img]:my-2 [&_img]:block [&_img]:h-32 [&_img]:w-32 [&_img]:max-w-full [&_img]:rounded-lg [&_img]:border [&_img]:border-border/60 [&_img]:bg-background [&_img]:object-contain [&_img]:p-1 sm:[&_img]:h-36 sm:[&_img]:w-36",
+                      )}
+                    >
+                      {part.text}
+                    </MessageResponse>
                   )}
                 </div>
               </div>

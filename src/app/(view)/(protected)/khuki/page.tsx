@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   Conversation,
   ConversationContent,
@@ -17,8 +17,44 @@ import { ChatEmptyState } from "./_components/empty-state";
 import { ChatMessageRow, BotTypingRow } from "./_components/chat-message";
 import { ChatInput } from "./_components/chat-input";
 import { useSearchParams } from "next/navigation";
+import { getStoredAgentConfig, type AgentConfig } from "@/lib/ai/agent-config";
+import { Button } from "@/components/ui/button";
+import { MaximizeIcon, MinimizeIcon } from "lucide-react";
 
 export default function Page() {
+  const chatPanelRef = useRef<HTMLDivElement>(null);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [agentConfig, setAgentConfig] = useState<AgentConfig>(() =>
+    getStoredAgentConfig(),
+  );
+
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(document.fullscreenElement === chatPanelRef.current);
+    };
+
+    document.addEventListener("fullscreenchange", handleFullscreenChange);
+    return () =>
+      document.removeEventListener("fullscreenchange", handleFullscreenChange);
+  }, []);
+
+  const toggleFullscreen = useCallback(async () => {
+    if (document.fullscreenElement === chatPanelRef.current) {
+      await document.exitFullscreen();
+      return;
+    }
+
+    await chatPanelRef.current?.requestFullscreen();
+  }, []);
+
+  useEffect(() => {
+    const refreshConfig = () => setAgentConfig(getStoredAgentConfig());
+    window.addEventListener("storage", refreshConfig);
+    refreshConfig();
+
+    return () => window.removeEventListener("storage", refreshConfig);
+  }, []);
+
   //! derive type directly from useChat so ref stays in sync with SDK changes
   const addToolOutputRef = useRef<
     ReturnType<typeof useChat>["addToolOutput"] | null
@@ -26,7 +62,10 @@ export default function Page() {
 
   //! onToolCall handles client-side tools — AI calls triggerTask, frontend executes it
   const { messages, sendMessage, status, regenerate, addToolOutput } = useChat({
-    transport: new DefaultChatTransport({ api: "/api/chat" }),
+    transport: new DefaultChatTransport({
+      api: "/api/chat",
+      body: () => ({ config: JSON.stringify(agentConfig) }),
+    }),
     //! required — triggers new request after all client-side tool outputs are provided
     sendAutomaticallyWhen: lastAssistantMessageIsCompleteWithToolCalls,
     onToolCall: ({ toolCall }) => {
@@ -55,8 +94,17 @@ export default function Page() {
 
   const q = useSearchParams().get("q");
 
+  const sendWithConfig = useCallback(
+    (message: { text: string }) => {
+      sendMessage(message, {
+        body: { config: JSON.stringify(getStoredAgentConfig()) },
+      });
+    },
+    [sendMessage],
+  );
+
   //record search query to database via worker thread if q is present
-  async function recordSearchQuery(query: string) {
+  const recordSearchQuery = useCallback(async (query: string) => {
     await fetch(`/api/client/record/ai`, {
       method: "POST",
       body: JSON.stringify({ q: query }),
@@ -64,20 +112,18 @@ export default function Page() {
         "Content-Type": "application/json",
       },
     });
-  }
+  }, []);
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   const recordedQueries = useRef(new Set<string>());
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   useEffect(() => {
     if (!q || recordedQueries.current.has(q)) return;
 
     recordedQueries.current.add(q);
 
-    sendMessage({ text: q });
+    sendWithConfig({ text: q });
     recordSearchQuery(q);
-  }, [q]);
+  }, [q, recordSearchQuery, sendWithConfig]);
 
   // biome-ignore lint/suspicious/noExplicitAny:sdsd
   addToolOutputRef.current = addToolOutput as any;
@@ -89,13 +135,31 @@ export default function Page() {
   return (
     <main className="px-4 h-[86dvh] py-4 flex items-start gap-4 container mx-auto">
       <section className="w-1/2 h-full border rounded-lg hidden" />
-      <div className="flex-1 h-full flex flex-col rounded-xl bg-background overflow-hidden">
-        <ChatHeader status={status} />
+      <div
+        ref={chatPanelRef}
+        className={`flex-1 h-full flex flex-col rounded-xl bg-background overflow-hidden ${
+          isFullscreen ? "p-3 md:p-6" : ""
+        }`}
+      >
+        <div className="w-full flex items-center justify-between">
+          <ChatHeader status={status} />
+
+          <Button
+            size="icon"
+            variant="ghost"
+            type="button"
+            onClick={toggleFullscreen}
+            aria-label={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
+            title={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
+          >
+            {isFullscreen ? <MinimizeIcon /> : <MaximizeIcon />}
+          </Button>
+        </div>
 
         <Conversation className="min-h-0">
           <ConversationContent className="gap-4 py-4 px-3">
             {messages.length === 0 && !isStreaming && (
-              <ChatEmptyState onSuggest={(text) => sendMessage({ text })} />
+              <ChatEmptyState onSuggest={(text) => sendWithConfig({ text })} />
             )}
             {messages.map((message, i) => (
               <ChatMessageRow
@@ -113,7 +177,7 @@ export default function Page() {
 
         <div className="p-3 border-t bg-background/95 shrink-0">
           <PromptInputProvider>
-            <ChatInput status={status} onSubmit={sendMessage} />
+            <ChatInput status={status} onSubmit={sendWithConfig} />
           </PromptInputProvider>
         </div>
       </div>
