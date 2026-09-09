@@ -2,6 +2,8 @@ import Image from "next/image";
 import React, { Suspense } from "react";
 import HeroWrapper from "../home/hero-wrapper";
 import { StarsIcon } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
+import Recent from "./recent";
 
 export default function Page() {
   return (
@@ -15,9 +17,22 @@ export default function Page() {
             </Suspense>
           </div>
           <div className="md:col-span-2  w-full h-full grid grid-rows-2 gap-4 *:border *:rounded-2xl">
-            <div className="w-full h-full relative p-4!">
+            <div className="w-full h-full relative p-4! flex flex-col gap-4">
               <div className="flex items-center justify-start gap-2 font-semibold">
                 <StarsIcon className="size-4" /> <h4>Khuki's Favorite</h4>
+              </div>
+              <div className="flex-1 w-full mb-[10%] grid grid-cols-3 gap-4">
+                <Suspense
+                  fallback={
+                    <>
+                      <Skeleton className="w-full h-full" />
+                      <Skeleton className="w-full h-full" />
+                      <Skeleton className="w-full h-full" />
+                    </>
+                  }
+                >
+                  <Recent />
+                </Suspense>
               </div>
               <Image
                 src="/illust/khuki-sit.webp"
