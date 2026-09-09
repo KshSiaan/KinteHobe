@@ -2,13 +2,17 @@
 
 import dynamic from "next/dynamic";
 
-const Hero = dynamic(() => import("./hero"), {
+type HeroProps = {
+  fill?: boolean;
+};
+
+const Hero = dynamic<HeroProps>(() => import("./hero"), {
   ssr: false,
   loading: () => (
     <div className="w-full h-[30dvh] lg:h-[60dvh] bg-muted/50 animate-pulse rounded-lg" />
   ),
 });
 
-export default function HeroWrapper() {
-  return <Hero />;
+export default function HeroWrapper({ fill = false }: HeroProps) {
+  return <Hero fill={fill} />;
 }

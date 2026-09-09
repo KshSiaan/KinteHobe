@@ -3,11 +3,15 @@
 import { useQuery } from "@tanstack/react-query";
 import Image from "next/image";
 
+type HeroProps = {
+  fill?: boolean;
+};
+
 type BannerResponse = {
   data: string;
 };
 
-export default function Hero() {
+export default function Hero({ fill = false }: HeroProps) {
   const { data } = useQuery<BannerResponse>({
     queryKey: ["fetchBanner"],
     queryFn: async () => {
@@ -20,15 +24,13 @@ export default function Hero() {
   const bannerUrl = data?.data;
 
   return (
-    <header className="bg-background h-[30dvh] lg:h-[60dvh] flex items-center justify-center">
-      <Image
-        className="w-full h-full object-contain"
-        src={bannerUrl || "/placeholder-banner.webp"}
-        width={1920}
-        height={1080}
-        alt="banner"
-        priority
-      />
-    </header>
+    <Image
+      className="object-contain"
+      src={bannerUrl || "/img/cover-test.svg"}
+      alt="banner"
+      priority
+      {...(fill ? { fill: true } : { width: 1920, height: 1080 })}
+      sizes="100vw"
+    />
   );
 }

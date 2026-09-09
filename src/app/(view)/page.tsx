@@ -20,7 +20,9 @@ export default async function Home() {
   return (
     <>
       <Suspense>
-        <HeroWrapper />
+        <header className="h-[60dvh] w-full flex flex-col relative">
+          <HeroWrapper fill />
+        </header>
       </Suspense>
       <main className="max-w-dvw overflow-x-hidden">
         <section className="container mx-auto grid grid-cols-3 lg:grid-cols-6 gap-8 lg:gap-12 my-24 lg:px-0 ">
