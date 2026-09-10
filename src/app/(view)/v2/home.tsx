@@ -157,11 +157,11 @@ export default function Home() {
           </div>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 mt-4">
             <Suspense fallback={skeletonCreator(4)}>
-              <DailyDiscover />
+              <DailyDiscover q="most_favorites" />
             </Suspense>
           </div>
         </section>
-        <section className="p-4 pt-2 mt-24 grid md:grid-cols-4 h-20 divide-x *:pl-4">
+        <section className="p-4 pt-3 mt-24 grid md:grid-cols-4 h-20 divide-x *:pl-4 border-t">
           <div className="flex items-center gap-4 pl-0!">
             <div className="p-4 bg-muted aspect-square rounded-4xl text-blue-700">
               <TruckIcon />

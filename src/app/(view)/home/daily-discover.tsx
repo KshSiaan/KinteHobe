@@ -14,9 +14,13 @@ import { useQuery } from "@tanstack/react-query";
 import Image from "next/image";
 import Link from "next/link";
 
-export default function DailyDiscover() {
+export default function DailyDiscover({
+  q,
+}: {
+  q?: "most_favorites" | "best_selling";
+}) {
   const { data, isPending } = useQuery({
-    queryKey: ["dailyDiscovers"],
+    queryKey: ["dailyDiscovers", q],
     queryFn: async (): Promise<
       CreateResponseType<{
         data: {
@@ -70,7 +74,7 @@ export default function DailyDiscover() {
         }[];
       }>
     > => {
-      const res = await fetch("/api/product");
+      const res = await fetch(`/api/product?preference=${q}`);
       const data = await res.json();
       return data;
     },
