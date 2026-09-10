@@ -91,6 +91,7 @@ export default function Recent() {
           <Image
             src={item.variants[0]?.publicImages[0] || "/placeholder.png"}
             alt={item.title}
+            placeholder="empty"
             fill
             className="object-cover"
           />
